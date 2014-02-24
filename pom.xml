@@ -7,6 +7,22 @@
   <groupId>com.elex.bigdata</groupId>
   <artifactId>zergling_etl</artifactId>
   <version>1.0</version>
+  <build>
+    <defaultGoal>package</defaultGoal>
+
+    <finalName>zergling_etl</finalName>
+    <resources>
+      <resource>
+        <directory>${project.basedir}/src/main/resources</directory>
+        <includes>
+          <include>*.*</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>${project.basedir}/src/main/resources/${env}/</directory>
+      </resource>
+    </resources>
+  </build>
 
   <dependencies>
     <dependency>
