@@ -31,5 +31,10 @@ else
   echo "Downloading from http://log.goo.mx/clicklogs is ok."
 fi
 echo ${line}
+echo "Unpacking and flattening path."
+tar zxvf ${raw_log_path}/22find.2014-02-24.tar.gz -C ${raw_log_path}
+mv  ${raw_log_path}/home/elex/serversoft/nginx/log/log.goo.mx.access.log ${raw_log_path}/22find.${processing_day}.log
+rm -rf ${raw_log_path}/home
+echo ${line}
 
 #mvn -f D:/git_home_new/zergling_etl/pom.xml exec:java -Dexec.mainClass="com.elex.bigdata.zergling.etl.NavigatorETL" -Dexec.args="2014-02-24 22find D:/22find/log.goo.mx.access.log D:/22find/22find.nav.log" -Dexec.classpathScope=runtime
