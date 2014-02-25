@@ -22,5 +22,6 @@ public class ETLConstants {
 
   static {
     STANDARD_OUTPUT_SDF.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
+//    STANDARD_OUTPUT_SDF.setTimeZone(TimeZone.getTimeZone("GMT-06:00"));
   }
 }
