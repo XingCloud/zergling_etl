@@ -2,7 +2,8 @@
 
 line="############################################"
 # Code base
-jar_home=/home/hadoop/git_project_home/zergling_etl/target/zergling_etl.jar
+code_home=/home/hadoop/git_project_home/zergling_etl
+jar_home=${code_home}/target/zergling_etl.jar
 hadoop_home=/usr/bin/
 
 echo ${line}
@@ -22,6 +23,7 @@ default_unpack_name=home/elex/serversoft/nginx/log/log.goo.mx.access.log
 hdfs_history_path=/user/hadoop/history/raw/${project_id}/nav
 current_op_file_name=${project_id}.${processing_day}
 history_op_file_name=${project_id}.${processing_history_day}
+output_path=/data/bigdata/${project_id}/nav
 
 echo ${line}
 echo "[PROCESSING-DAY]="${processing_day}
@@ -61,4 +63,4 @@ else
   rm -rf ${raw_log_path}/${history_op_file_name}.tar.gz
 fi
 
-#mvn -f D:/git_home_new/zergling_etl/pom.xml exec:java -Dexec.mainClass="com.elex.bigdata.zergling.etl.NavigatorETL" -Dexec.args="2014-02-24 22find D:/22find/log.goo.mx.access.log D:/22find/22find.nav.log" -Dexec.classpathScope=runtime
+mvn -f ${code_home}/pom.xml exec:java -Dexec.mainClass="com.elex.bigdata.zergling.etl.NavigatorETL" -Dexec.args="${processing_day} ${project_id} ${raw_log_path}/${current_op_file_name}.log ${output_path}/22find.nav.log" -Dexec.classpathScope=runtime
