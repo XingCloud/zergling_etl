@@ -23,7 +23,7 @@ echo "[HTTP-RAW-LOG]="${raw_log_web}
 echo "[DOWNLOAD-OUTPUT]="${raw_log_path}
 echo ${line}
 
-wget raw_log_web -O /data/raw/22find/nav/${project_id}.${processing_day}.tar.gz
+wget ${raw_log_web} -O /data/raw/22find/nav/${project_id}.${processing_day}.tar.gz
 if [ $? -ne 0 ];then
   echo "Downloading from http://log.goo.mx/clicklogs is failed."
   exit 1
