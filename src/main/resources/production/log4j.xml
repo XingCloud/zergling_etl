@@ -13,7 +13,7 @@
 
   <appender name="ERR_WRONG_UID"
             class="org.apache.log4j.DailyRollingFileAppender">
-    <param name="File" value="/data/bigdata/22find/nav.wronguid.log" />
+    <param name="File" value="/data/bigdata/22find/runlog/nav.wronguid.log" />
     <param name="Append" value="true" />
     <param name="Threshold" value="info" />
     <param name="DatePattern" value="'.'yyyy-MM-dd" />
@@ -23,7 +23,7 @@
   </appender>
   <appender name="ERR_WRONG_TITLE"
             class="org.apache.log4j.DailyRollingFileAppender">
-    <param name="File" value="/data/bigdata/22find/nav.wronguid.log" />
+    <param name="File" value="/data/bigdata/22find/runlog/nav.wronguid.log" />
     <param name="Append" value="true" />
     <param name="Threshold" value="info" />
     <param name="DatePattern" value="'.'yyyy-MM-dd" />
@@ -33,7 +33,7 @@
   </appender>
   <appender name="ERR_WRONG_URL"
             class="org.apache.log4j.DailyRollingFileAppender">
-    <param name="File" value="/data/bigdata/22find/nav.wronguid.log" />
+    <param name="File" value="/data/bigdata/22find/runlog/nav.wronguid.log" />
     <param name="Append" value="true" />
     <param name="Threshold" value="info" />
     <param name="DatePattern" value="'.'yyyy-MM-dd" />
@@ -44,7 +44,7 @@
 
   <appender name="RUN_LOG"
             class="org.apache.log4j.DailyRollingFileAppender">
-    <param name="File" value="/data/bigdata/22find/nav.run.log" />
+    <param name="File" value="/data/bigdata/22find/runlog/nav.run.log" />
     <param name="Append" value="true" />
     <param name="Threshold" value="info" />
     <param name="DatePattern" value="'.'yyyy-MM-dd" />
