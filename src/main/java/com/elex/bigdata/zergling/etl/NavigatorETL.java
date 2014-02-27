@@ -6,6 +6,10 @@ import static com.elex.bigdata.zergling.etl.ETLUtils.truncateURL;
 import com.elex.bigdata.logging.WrongTitleLogger;
 import com.elex.bigdata.logging.WrongUIDLogger;
 import com.elex.bigdata.logging.WrongURLLogger;
+import com.elex.bigdata.zergling.etl.hbase.HBasePutter;
+import com.elex.bigdata.zergling.etl.hbase.HBaseResourceManager;
+import com.elex.bigdata.zergling.etl.model.LogBatch;
+import com.elex.bigdata.zergling.etl.model.NavigatorLog;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -20,46 +24,55 @@ import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * User: Z J Wu Date: 14-2-20 Time: 下午4:15 Package: com.elex.bigdata.zergling.etl
  */
 public class NavigatorETL extends ETLBase {
+
   private static final Logger LOGGER = Logger.getLogger(NavigatorETL.class);
-  private String date;
+
+  private HBaseResourceManager hBaseResourceManager;
   private String projectId;
   private String rawFilePath;
   private String output;
   private SimpleDateFormat sdf;
 
-  public NavigatorETL(String date, String projectId, String rawFilePath, String output, SimpleDateFormat sdf) {
-    this.date = date;
+  public NavigatorETL(String projectId, String rawFilePath, String output, SimpleDateFormat sdf, int hbasePollSize) {
     this.projectId = projectId;
     this.rawFilePath = rawFilePath;
     this.output = output;
     this.sdf = sdf;
+    this.hBaseResourceManager = new HBaseResourceManager(hbasePollSize);
   }
 
-  public void run() throws IOException, ParseException {
+  public void run(InternalQueue<LogBatch<NavigatorLog>> queue, int workerCount) throws IOException, ParseException,
+    InterruptedException {
     File input = new File(rawFilePath);
     char c = '\t', blank = ' ', urlStop = '&';
-    String sep1 = " - - ", sep2 = "/img.gif?";
+    String sep1 = " - - ", sep2 = "/img.gif?", sep3 = "HTTP/1.1 ";
     int a, b;
     Date d;
-    String line, ip, dateString, urlParameters, uid, uidKey = "uid=", nationKey = "nation=", nation, titleKey = "title=", title, urlKey = "url=", url;
+    String line, ip, dateString, urlParameters, uid, uidKey = "uid=", nationKey = "nation=", nation, titleKey = "title=", title, urlKey = "url=", url, rawContent;
     int maxUID = 0;
+    long ipLong;
 
-    boolean writeURLAsTitle;
-    String decodedURL;
     LOGGER.info("Begin to read.");
     long t1 = System.currentTimeMillis();
+
+    int batchSize = 10, cnt = 0;
+    LogBatch<NavigatorLog> batch = new LogBatch<>(batchSize);
+
+    NavigatorLog nl;
     try (BufferedReader br = new BufferedReader(
       new InputStreamReader(new FileInputStream(input))); PrintWriter pw = new PrintWriter(
       new OutputStreamWriter(new FileOutputStream(new File(output))))) {
       while ((line = br.readLine()) != null) {
-        writeURLAsTitle = false;
         line = StringUtils.trimToNull(line);
         if (StringUtils.isBlank(line)) {
           continue;
@@ -72,6 +85,7 @@ public class NavigatorETL extends ETLBase {
         if (!ip.matches(ETLConstants.REGEX_IP_ADDRESS)) {
           continue;
         }
+        ipLong = ip2Long(ip);
 
         a = line.indexOf('[');
         b = line.indexOf(']');
@@ -80,12 +94,13 @@ public class NavigatorETL extends ETLBase {
         }
         dateString = line.substring(a + 1, b);
         d = sdf.parse(dateString);
+        dateString = ETLConstants.STANDARD_OUTPUT_SDF.format(d);
 
         a = line.indexOf(sep2);
         b = line.indexOf(blank, a + sep2.length());
         urlParameters = line.substring(a + sep2.length(), b);
 
-        uid = extractContent(urlParameters, uidKey, urlStop);
+        uid = StringUtils.trimToNull(extractContent(urlParameters, uidKey, urlStop));
         if (StringUtils.isBlank(uid) || ETLConstants.NULL_STRING.equalsIgnoreCase(uid)) {
           WrongUIDLogger.log(line);
           continue;
@@ -93,65 +108,104 @@ public class NavigatorETL extends ETLBase {
         if (uid.length() > maxUID) {
           maxUID = uid.length();
         }
-        nation = extractContent(urlParameters, nationKey, urlStop);
-        title = extractContent(urlParameters, titleKey, urlStop);
-        url = truncateURL(extractContent(urlParameters, urlKey));
-
-        pw.write(uid);
-        pw.write(c);
-        pw.write(ETLConstants.STANDARD_OUTPUT_SDF.format(d));
-        pw.write(c);
-        pw.write(String.valueOf(ip2Long(ip)));
-        pw.write(c);
+        nation = StringUtils.trimToNull(extractContent(urlParameters, nationKey, urlStop));
         if (StringUtils.isBlank(nation)) {
-          pw.write(ETLConstants.UNKNOWN_NATION);
-        } else {
-          pw.write(nation.trim());
+          nation = ETLConstants.UNKNOWN_NATION;
         }
 
-        pw.write(c);
-        if (StringUtils.isBlank(title)) {
-          writeURLAsTitle = true;
-        } else {
+        title = extractContent(urlParameters, titleKey, urlStop);
+        if (StringUtils.isNotBlank(title)) {
           try {
-            pw.write(URLDecoder.decode(title.toLowerCase(), "utf8"));
+            title = URLDecoder.decode(title.toLowerCase(), "utf8");
           } catch (Exception e) {
+            e.printStackTrace();
             WrongTitleLogger.log(line);
-            writeURLAsTitle = true;
           }
         }
+
+        url = truncateURL(extractContent(urlParameters, urlKey));
         if (StringUtils.isNotBlank(url)) {
           try {
-            decodedURL = URLDecoder.decode(url, "utf8");
+            url = URLDecoder.decode(url, "utf8");
           } catch (Exception e) {
+            e.printStackTrace();
             WrongURLLogger.log(line);
-            decodedURL = ExceptedContent.ERROR_WRONG_URL.getId();
           }
-
-          if (writeURLAsTitle) {
-            pw.write(decodedURL);
-          }
-          pw.write(c);
-          pw.write(decodedURL);
         }
+        if (StringUtils.isBlank(title) && StringUtils.isBlank(url)) {
+          continue;
+        }
+
+        a = line.indexOf(sep3);
+        if (a < 0) {
+          continue;
+        }
+        rawContent = line.substring(a);
+
+        nl = new NavigatorLog(dateString, uid, nation, title, ipLong);
+        nl.setUrl(url);
+        nl.setRawContent(rawContent);
+        pw.write(line);
         pw.write('\n');
+
+        if (cnt < batchSize) {
+          batch.add(nl);
+          ++cnt;
+        } else {
+          queue.put(batch);
+          batch = new LogBatch<>(batchSize);
+          cnt = 0;
+        }
+      }
+      if (!batch.isEmpty()) {
+        queue.put(batch);
+      }
+      for (int i = 0; i < workerCount; i++) {
+        queue.put(new LogBatch<NavigatorLog>(true));
+        LOGGER.info("Pill(" + i + ") putted.");
       }
     }
     long t2 = System.currentTimeMillis();
     LOGGER.info("All done in " + (t2 - t1) + " millis.");
   }
 
-  public static void main(String[] args) throws IOException, ParseException {
+  public static void main(String[] args) throws IOException, ParseException, InterruptedException {
     if (args == null || args.length < 4) {
       LOGGER.info("Wrong parameter number.");
       System.exit(1);
     }
-    String date = args[0];
-    String projectId = args[1];
-    String input = args[2];
-    String output = args[3];
-    NavigatorETL navigatorETL = new NavigatorETL(date, projectId, input, output,
-                                                 new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH));
-    navigatorETL.run();
+    String projectId = args[0];
+    String input = args[1];
+    String output = args[2];
+    String hTableName = args[3];
+    boolean onlyShow = true;
+
+    projectId = "22find";
+    input = "D:/22find/22find.2014-02-10.123.log";
+    output = "D:/22find/22find.2014-02-10.123.out.log";
+    hTableName = "nav_" + projectId;
+    onlyShow = true;
+
+    int workerCount = 3;
+    InternalQueue<LogBatch<NavigatorLog>> queue = new InternalQueue<>();
+    CountDownLatch signal = new CountDownLatch(workerCount);
+    List<HBasePutter> putters = new ArrayList<>(workerCount);
+    HBaseResourceManager manager = new HBaseResourceManager(20);
+
+    for (int i = 0; i < workerCount; i++) {
+      putters.add(new HBasePutter(queue, signal, manager.getHTable(hTableName), onlyShow));
+    }
+    LOGGER.info("Hbase putter created successfully(" + workerCount + ").");
+
+    for (int i = 0; i < putters.size(); i++) {
+      new Thread(putters.get(i), "HbasePutter" + i).start();
+    }
+
+    NavigatorETL navigatorETL = new NavigatorETL(projectId, input, output,
+                                                 new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH), 100);
+    navigatorETL.run(queue, workerCount);
+    signal.await();
+    LOGGER.info("All put done.(" + workerCount + ").");
+
   }
 }

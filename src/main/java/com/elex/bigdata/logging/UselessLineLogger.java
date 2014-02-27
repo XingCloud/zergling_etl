@@ -5,8 +5,8 @@ import org.apache.log4j.Logger;
 /**
  * User: Z J Wu Date: 14-2-24 Time: 下午3:59 Package: com.elex.bigdata.zergling.etl.logger
  */
-public class WrongUIDLogger extends BaseLogger {
-  private static final Logger LOGGER = Logger.getLogger(WrongUIDLogger.class);
+public class UselessLineLogger extends BaseLogger {
+  private static final Logger LOGGER = Logger.getLogger(UselessLineLogger.class);
 
   public static void log(String line) {
 //    LOGGER.info(line);

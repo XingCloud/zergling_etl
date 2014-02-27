@@ -7,7 +7,8 @@ import java.util.TimeZone;
  * User: Z J Wu Date: 14-2-24 Time: 上午10:19 Package: com.elex.bigdata.zergling.etl
  */
 public class ETLConstants {
-  public static final String UNKNOWN_NATION = "N/A";
+  public static final char LOG_LINE_SEPERATOR = '\001';
+  public static final String UNKNOWN_NATION = "NA";
   public static final String NULL_STRING = "null";
   public static final char IP_SEPERATOR = '.';
   public static final String REGEX_IP_ADDRESS = "((?:(?:25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))\\.){3}(?:25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d))))";
