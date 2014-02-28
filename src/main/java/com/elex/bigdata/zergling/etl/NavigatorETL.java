@@ -118,8 +118,6 @@ public class NavigatorETL extends ETLBase {
           try {
             title = URLDecoder.decode(title.toLowerCase(), "utf8");
           } catch (Exception e) {
-            e.printStackTrace();
-            WrongTitleLogger.log(line);
           }
         }
 
