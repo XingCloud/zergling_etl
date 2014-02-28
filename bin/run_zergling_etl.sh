@@ -48,10 +48,19 @@ mv  ${raw_log_path}/home/elex/serversoft/nginx/log/log.goo.mx.access.log ${raw_l
 rm -rf ${raw_log_path}/home
 echo ${line}
 echo "Copy local to hdfs backup."
+
 ${hadoop_home}/hadoop fs -test -d ${hdfs_history_path}
 if [ $? -ne 0 ];then
   echo "Backup path does not exist. Create it now(${hdfs_history_path})."
   ${hadoop_home}/hadoop fs -mkdir ${hdfs_history_path}
+fi
+
+${hadoop_home}/hadoop fs -test -e ${hdfs_history_path}/${current_op_file_name}.tar.gz
+if [ $? -ne 0 ];then
+  echo "Copy directly(${hdfs_history_path}/${current_op_file_name}.tar.gz)."
+else
+  echo "Remove exists history file.(${hdfs_history_path}/${current_op_file_name}.tar.gz)."
+  ${hadoop_home}/hadoop fs -rm -r  ${hdfs_history_path}/${current_op_file_name}.tar.gz
 fi
 ${hadoop_home}/hadoop fs -copyFromLocal ${raw_log_path}/${current_op_file_name}.tar.gz ${hdfs_history_path}
 echo ${line}
