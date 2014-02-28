@@ -129,9 +129,8 @@ public class NavigatorETL extends ETLBase {
           try {
             if (url.startsWith("http://goo.mx")) {
               url = ETLUtils.restoreShortenedURL(url);
-            } else {
-              url = URLDecoder.decode(url, "utf8");
             }
+            url = URLDecoder.decode(url, "utf8");
           } catch (Exception e) {
             e.printStackTrace();
             WrongURLLogger.log(line);
