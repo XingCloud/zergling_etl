@@ -167,6 +167,7 @@ public class NavigatorETL extends ETLBase {
       if (!batch.isEmpty()) {
         queue.put(batch);
       }
+    } finally {
       for (int i = 0; i < workerCount; i++) {
         queue.put(new LogBatch<NavigatorLog>(true));
         LOGGER.info("Pill(" + i + ") putted.");
