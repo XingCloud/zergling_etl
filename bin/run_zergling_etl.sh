@@ -15,7 +15,7 @@ else
   processing_day=$1
 fi
 project_id=22find
-only_show=true
+only_show=$2
 
 processing_history_day=`date -u -d"${processing_day} 7 days ago" +%Y-%m-%d`
 raw_log_web=http://log.goo.mx/clicklogs/log.goo.mx.access-${processing_day}.tar.gz

@@ -70,7 +70,6 @@ public class HBasePutter implements Runnable {
           puts.add(put);
         }
         if (onlyShow) {
-          LOGGER.info(puts.toString());
           continue;
         }
         try {
