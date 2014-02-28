@@ -15,6 +15,7 @@ else
   processing_day=$1
 fi
 project_id=22find
+only_show=true
 
 processing_history_day=`date -u -d"${processing_day} 7 days ago" +%Y-%m-%d`
 raw_log_web=http://log.goo.mx/clicklogs/log.goo.mx.access-${processing_day}.tar.gz
@@ -63,4 +64,4 @@ else
   rm -rf ${raw_log_path}/${history_op_file_name}.tar.gz
 fi
 
-mvn -f ${code_home}/pom.xml exec:java -Dexec.mainClass="com.elex.bigdata.zergling.etl.NavigatorETL" -Dexec.args="${processing_day} ${project_id} ${raw_log_path}/${current_op_file_name}.log ${output_path}/22find.nav.log" -Dexec.classpathScope=runtime
+mvn -f ${code_home}/pom.xml exec:java -Dexec.mainClass="com.elex.bigdata.zergling.etl.NavigatorETL" -Dexec.args="${project_id} ${raw_log_path}/${current_op_file_name}.log ${output_path}/${project_id}.nav.log nav_${project_id} ${only_show}" -Dexec.classpathScope=runtime

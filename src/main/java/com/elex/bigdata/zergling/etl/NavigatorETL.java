@@ -123,15 +123,22 @@ public class NavigatorETL extends ETLBase {
           }
         }
 
-        url = truncateURL(extractContent(urlParameters, urlKey));
+        url = StringUtils.trimToNull(extractContent(urlParameters, urlKey));
+
         if (StringUtils.isNotBlank(url)) {
           try {
-            url = URLDecoder.decode(url, "utf8");
+            if (url.startsWith("http://goo.mx")) {
+              url = ETLUtils.restoreShortenedURL(url);
+            } else {
+              url = URLDecoder.decode(url, "utf8");
+            }
           } catch (Exception e) {
             e.printStackTrace();
             WrongURLLogger.log(line);
           }
+          url = truncateURL(url);
         }
+
         if (StringUtils.isBlank(title) && StringUtils.isBlank(url)) {
           continue;
         }
@@ -145,7 +152,7 @@ public class NavigatorETL extends ETLBase {
         nl = new NavigatorLog(dateString, uid, nation, title, ipLong);
         nl.setUrl(url);
         nl.setRawContent(rawContent);
-        pw.write(line);
+        pw.write(nl.toLine());
         pw.write('\n');
 
         if (cnt < batchSize) {
@@ -170,7 +177,7 @@ public class NavigatorETL extends ETLBase {
   }
 
   public static void main(String[] args) throws IOException, ParseException, InterruptedException {
-    if (args == null || args.length < 4) {
+    if (args == null || args.length < 5) {
       LOGGER.info("Wrong parameter number.");
       System.exit(1);
     }
@@ -178,13 +185,7 @@ public class NavigatorETL extends ETLBase {
     String input = args[1];
     String output = args[2];
     String hTableName = args[3];
-    boolean onlyShow = true;
-
-    projectId = "22find";
-    input = "D:/22find/22find.2014-02-10.123.log";
-    output = "D:/22find/22find.2014-02-10.123.out.log";
-    hTableName = "nav_" + projectId;
-    onlyShow = true;
+    boolean onlyShow = Boolean.parseBoolean(args[4]);
 
     int workerCount = 3;
     InternalQueue<LogBatch<NavigatorLog>> queue = new InternalQueue<>();
