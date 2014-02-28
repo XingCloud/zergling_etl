@@ -13,7 +13,7 @@ env="production"
 if [ "" = "$1" ];then
   branch=master
 else
-  echo "User defined branch found($2)"
+  echo "User defined branch found($1)"
   branch=$2
 fi
 
