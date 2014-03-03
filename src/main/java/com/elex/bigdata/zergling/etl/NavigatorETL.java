@@ -51,8 +51,8 @@ public class NavigatorETL extends ETLBase {
     this.hBaseResourceManager = new HBaseResourceManager(hbasePollSize);
   }
 
-  public void run(InternalQueue<LogBatch<NavigatorLog>> queue, int workerCount) throws IOException, ParseException,
-    InterruptedException {
+  public void run(int batchSize, InternalQueue<LogBatch<NavigatorLog>> queue, int workerCount) throws IOException,
+    ParseException, InterruptedException {
     File input = new File(rawFilePath);
     char c = '\t', blank = ' ', urlStop = '&';
     String sep1 = " - - ", sep2 = "/img.gif?", sep3 = "HTTP/1.1 ";
@@ -65,7 +65,7 @@ public class NavigatorETL extends ETLBase {
     LOGGER.info("Begin to read.");
     long t1 = System.currentTimeMillis();
 
-    int batchSize = 10, cnt = 0;
+    int cnt = 0;
     LogBatch<NavigatorLog> batch = new LogBatch<>(batchSize);
 
     NavigatorLog nl;
@@ -175,7 +175,7 @@ public class NavigatorETL extends ETLBase {
   }
 
   public static void main(String[] args) throws IOException, ParseException, InterruptedException {
-    if (args == null || args.length < 5) {
+    if (args == null || args.length < 7) {
       LOGGER.info("Wrong parameter number.");
       System.exit(1);
     }
@@ -184,8 +184,9 @@ public class NavigatorETL extends ETLBase {
     String output = args[2];
     String hTableName = args[3];
     boolean onlyShow = Boolean.parseBoolean(args[4]);
+    int workerCount = Integer.parseInt(args[5]);
+    int batchSize = Integer.parseInt(args[6]);
 
-    int workerCount = 3;
     InternalQueue<LogBatch<NavigatorLog>> queue = new InternalQueue<>();
     CountDownLatch signal = new CountDownLatch(workerCount);
     List<HBasePutter> putters = new ArrayList<>(workerCount);
@@ -202,7 +203,7 @@ public class NavigatorETL extends ETLBase {
 
     NavigatorETL navigatorETL = new NavigatorETL(projectId, input, output,
                                                  new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH), 100);
-    navigatorETL.run(queue, workerCount);
+    navigatorETL.run(batchSize, queue, workerCount);
     signal.await();
     LOGGER.info("All put done.(" + workerCount + ").");
 
