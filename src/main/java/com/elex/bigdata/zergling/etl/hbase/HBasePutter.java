@@ -1,5 +1,6 @@
 package com.elex.bigdata.zergling.etl.hbase;
 
+import com.elex.bigdata.logging.WrongHbasePutLogger;
 import com.elex.bigdata.zergling.etl.InternalQueue;
 import com.elex.bigdata.zergling.etl.model.ColumnInfo;
 import com.elex.bigdata.zergling.etl.model.LogBatch;
@@ -75,7 +76,7 @@ public class HBasePutter implements Runnable {
         try {
           hTable.put(puts);
         } catch (IOException e) {
-          e.printStackTrace();
+          WrongHbasePutLogger.getInstance().logNavigatorLog(content);
         }
       }
     } catch (InterruptedException e) {

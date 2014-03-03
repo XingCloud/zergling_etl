@@ -11,6 +11,17 @@
     </layout>
   </appender>
 
+  <appender name="ERR_WRONG_HBASE_PUT"
+            class="org.apache.log4j.DailyRollingFileAppender">
+    <param name="File" value="/data/bigdata/22find/runlog/nav.wronghbase.log" />
+    <param name="Append" value="true" />
+    <param name="Threshold" value="info" />
+    <param name="DatePattern" value="'.'yyyy-MM-dd" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%m%n" />
+    </layout>
+  </appender>
+
   <appender name="ERR_WRONG_UID"
             class="org.apache.log4j.DailyRollingFileAppender">
     <param name="File" value="/data/bigdata/22find/runlog/nav.wronguid.log" />
@@ -21,6 +32,7 @@
       <param name="ConversionPattern" value="%m%n" />
     </layout>
   </appender>
+
   <appender name="ERR_WRONG_TITLE"
             class="org.apache.log4j.DailyRollingFileAppender">
     <param name="File" value="/data/bigdata/22find/runlog/nav.wronguid.log" />
@@ -56,6 +68,10 @@
   <logger name="com.elex.bigdata.logging.WrongUIDLogger">
     <level value="info" />
     <appender-ref ref="ERR_WRONG_UID" />
+  </logger>
+  <logger name="com.elex.bigdata.logging.WrongHbasePutLogger">
+    <level value="info" />
+    <appender-ref ref="ERR_WRONG_HBASE_PUT" />
   </logger>
   <logger name="com.elex.bigdata.logging.WrongTitleLogger">
     <level value="info" />
