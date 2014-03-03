@@ -42,7 +42,7 @@ public class TestLoadFromFile {
 
     NavigatorETL navigatorETL = new NavigatorETL(projectId, input, output,
                                                  new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH), 100);
-    navigatorETL.run(queue, workerCount);
+    navigatorETL.run(100, queue, workerCount);
     signal.await();
   }
 }
