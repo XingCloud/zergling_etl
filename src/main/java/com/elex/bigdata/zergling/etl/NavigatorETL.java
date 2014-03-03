@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -197,8 +198,9 @@ public class NavigatorETL extends ETLBase {
     }
     LOGGER.info("Hbase putter created successfully(" + workerCount + ").");
 
+    DecimalFormat df = new DecimalFormat("00");
     for (int i = 0; i < putters.size(); i++) {
-      new Thread(putters.get(i), "HbasePutter" + i).start();
+      new Thread(putters.get(i), "HbasePutter[" + df.format(i) + "]").start();
     }
 
     NavigatorETL navigatorETL = new NavigatorETL(projectId, input, output,
