@@ -83,8 +83,8 @@ public class HBasePutter implements Runnable {
           e.printStackTrace();
         } finally {
           long t2 = System.currentTimeMillis();
-          LOGGER.info("Status=" + (successful ? "ok" : "with-err"
-          ) + "CostInMilliseconds(" + Thread.currentThread().getName() + ")=" + (t2 - t1));
+          LOGGER.info("Status=[" + (successful ? "ok" : "with-err"
+          ) + "], CostInMilliseconds(" + Thread.currentThread().getName() + ")=" + (t2 - t1));
         }
       }
     } catch (InterruptedException e) {
