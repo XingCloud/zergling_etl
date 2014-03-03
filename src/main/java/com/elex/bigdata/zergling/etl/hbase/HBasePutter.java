@@ -73,11 +73,17 @@ public class HBasePutter implements Runnable {
         if (onlyShow) {
           continue;
         }
+        long t1 = System.currentTimeMillis();
+        boolean successful = true;
         try {
           hTable.put(puts);
         } catch (IOException e) {
+          successful = false;
           WrongHbasePutLogger.getInstance().logNavigatorLog(e.getClass().getName(), content);
           e.printStackTrace();
+        } finally {
+          long t2 = System.currentTimeMillis();
+          LOGGER.info("CostInMilliseconds=" + (t2 - t1) + ", Status=" + (successful ? "ok" : "with-err"));
         }
       }
     } catch (InterruptedException e) {
