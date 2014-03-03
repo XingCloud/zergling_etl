@@ -1,5 +1,7 @@
 package com.elex.bigdata.logging;
 
+import static com.elex.bigdata.zergling.etl.ETLConstants.LOG_LINE_SEPERATOR;
+
 import com.elex.bigdata.zergling.etl.model.NavigatorLog;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
@@ -30,7 +32,16 @@ public abstract class BaseLogger {
       return;
     }
     for (NavigatorLog log : logs) {
-      LOGGER.error(log.toLine() + "\t" + log.getRawContent());
+      LOGGER.error(log.toLine() + LOG_LINE_SEPERATOR + log.getRawContent());
+    }
+  }
+
+  public void logNavigatorLog(String className, Collection<NavigatorLog> logs) {
+    if (CollectionUtils.isEmpty(logs)) {
+      return;
+    }
+    for (NavigatorLog log : logs) {
+      LOGGER.error(className + LOG_LINE_SEPERATOR + log.toLine() + LOG_LINE_SEPERATOR + log.getRawContent());
     }
   }
 }

@@ -76,7 +76,8 @@ public class HBasePutter implements Runnable {
         try {
           hTable.put(puts);
         } catch (IOException e) {
-          WrongHbasePutLogger.getInstance().logNavigatorLog(content);
+          WrongHbasePutLogger.getInstance().logNavigatorLog(e.getClass().getName(), content);
+          LOGGER.error(e);
         }
       }
     } catch (InterruptedException e) {
