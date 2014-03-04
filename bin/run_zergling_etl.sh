@@ -16,6 +16,7 @@ else
 fi
 only_show=$2
 project_id=$3
+table_name_suffix=$4
 workers=20
 batch_size=100
 
@@ -75,4 +76,4 @@ else
   rm -rf ${raw_log_path}/${history_op_file_name}.tar.gz
 fi
 
-mvn -f ${code_home}/pom.xml exec:java -Dexec.mainClass="com.elex.bigdata.zergling.etl.NavigatorETL" -Dexec.args="${project_id} ${raw_log_path}/${current_op_file_name}.log ${output_path}/${project_id}.${processing_day}.nav.log nav_${project_id} ${only_show} ${workers} ${batch_size}" -Dexec.classpathScope=runtime
+mvn -f ${code_home}/pom.xml exec:java -Dexec.mainClass="com.elex.bigdata.zergling.etl.NavigatorETL" -Dexec.args="${project_id} ${raw_log_path}/${current_op_file_name}.log ${output_path}/${project_id}.${processing_day}.nav.log nav_${project_id}${table_name_suffix} ${only_show} ${workers} ${batch_size}" -Dexec.classpathScope=runtime
