@@ -55,7 +55,7 @@ public class NavigatorETL extends ETLBase {
   public void run(int batchSize, InternalQueue<LogBatch<NavigatorLog>> queue, int workerCount) throws IOException,
     ParseException, InterruptedException {
     File input = new File(rawFilePath);
-    char c = '\t', blank = ' ', urlStop = '&';
+    char blank = ' ', urlStop = '&';
     String sep1 = " - - ", sep2 = "/img.gif?", sep3 = "HTTP/1.1 ";
     int a, b;
     Date d;
