@@ -159,6 +159,7 @@ public class NavigatorETL extends ETLBase {
           ++cnt;
         } else {
           queue.put(batch);
+          LOGGER.info("Batch putted, size=" + batch.size());
           batch = new LogBatch<>(batchSize);
           cnt = 0;
         }
@@ -169,7 +170,7 @@ public class NavigatorETL extends ETLBase {
     } finally {
       for (int i = 0; i < workerCount; i++) {
         queue.put(new LogBatch<NavigatorLog>(true));
-        LOGGER.info("Pill(" + i + ") putted.");
+//        LOGGER.info("Pill(" + i + ") putted.");
       }
     }
     long t2 = System.currentTimeMillis();
