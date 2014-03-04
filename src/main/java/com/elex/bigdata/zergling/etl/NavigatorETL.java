@@ -155,13 +155,11 @@ public class NavigatorETL extends ETLBase {
 
         if (batch.isFull()) {
           queue.put(batch);
-          LOGGER.info("Batch putted, size=" + batch.size());
           batch = new LogBatch<>(batchSize);
         }
         batch.add(nl);
       }
       if (!batch.isEmpty()) {
-        LOGGER.info("Batch putted, size=" + batch.size());
         queue.put(batch);
       }
     } finally {
