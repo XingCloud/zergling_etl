@@ -2,6 +2,7 @@ package com.elex.bigdata.zergling.etl;
 
 import com.elex.bigdata.zergling.etl.hbase.HBasePutter;
 import com.elex.bigdata.zergling.etl.hbase.HBaseResourceManager;
+import com.elex.bigdata.zergling.etl.hbase.PutterCounter;
 import com.elex.bigdata.zergling.etl.model.LogBatch;
 import com.elex.bigdata.zergling.etl.model.NavigatorLog;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class TestLoadFromFile {
     HBaseResourceManager manager = new HBaseResourceManager(20);
 
     for (int i = 0; i < workerCount; i++) {
-      putters.add(new HBasePutter(queue, signal, manager.getHTable(hTableName), true));
+      putters.add(new HBasePutter(queue, signal, manager.getHTable(hTableName), true, new PutterCounter()));
     }
     for (int i = 0; i < putters.size(); i++) {
       new Thread(putters.get(i), "HbasePutter" + i).start();
