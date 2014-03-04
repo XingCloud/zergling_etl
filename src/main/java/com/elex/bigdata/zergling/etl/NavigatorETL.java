@@ -8,6 +8,7 @@ import com.elex.bigdata.logging.WrongUIDLogger;
 import com.elex.bigdata.logging.WrongURLLogger;
 import com.elex.bigdata.zergling.etl.hbase.HBasePutter;
 import com.elex.bigdata.zergling.etl.hbase.HBaseResourceManager;
+import com.elex.bigdata.zergling.etl.hbase.PutterCounter;
 import com.elex.bigdata.zergling.etl.model.LogBatch;
 import com.elex.bigdata.zergling.etl.model.NavigatorLog;
 import org.apache.commons.lang3.StringUtils;
@@ -192,9 +193,10 @@ public class NavigatorETL extends ETLBase {
     CountDownLatch signal = new CountDownLatch(workerCount);
     List<HBasePutter> putters = new ArrayList<>(workerCount);
     HBaseResourceManager manager = new HBaseResourceManager(20);
+    PutterCounter pc = new PutterCounter();
 
     for (int i = 0; i < workerCount; i++) {
-      putters.add(new HBasePutter(queue, signal, manager.getHTable(hTableName), onlyShow));
+      putters.add(new HBasePutter(queue, signal, manager.getHTable(hTableName), onlyShow, pc));
     }
     LOGGER.info("Hbase putter created successfully(" + workerCount + ").");
 
@@ -207,7 +209,7 @@ public class NavigatorETL extends ETLBase {
                                                  new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH), 100);
     navigatorETL.run(batchSize, queue, workerCount);
     signal.await();
-    LOGGER.info("All put done.(" + workerCount + ").");
+    LOGGER.info(pc.getVal() + " lines putted to hbase successfully(" + workerCount + ").");
 
   }
 }

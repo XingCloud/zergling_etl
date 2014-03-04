@@ -29,12 +29,15 @@ public class HBasePutter implements Runnable {
 
   private boolean onlyShow;
 
+  private PutterCounter counter;
+
   public HBasePutter(InternalQueue<LogBatch<NavigatorLog>> queue, CountDownLatch signal, HTableInterface hTable,
-                     boolean onlyShow) {
+                     boolean onlyShow, PutterCounter counter) {
     this.queue = queue;
     this.signal = signal;
     this.hTable = hTable;
     this.onlyShow = onlyShow;
+    this.counter = counter;
   }
 
   @Override
@@ -77,6 +80,7 @@ public class HBasePutter implements Runnable {
         boolean successful = true;
         try {
           hTable.put(puts);
+          counter.incVal(batch.size());
         } catch (IOException e) {
           successful = false;
           WrongHbasePutLogger.getInstance().logNavigatorLog(e.getClass().getName(), content);
