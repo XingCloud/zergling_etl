@@ -12,18 +12,24 @@ public class LogBatch<T> {
 
   public static final LogBatch PILL = new LogBatch<>(true);
 
+  private int capacity;
+
   private final boolean pill;
 
   private List<T> content;
 
+  private int count = 0;
+
   public LogBatch() {
     this.content = new ArrayList<>(30);
+    this.capacity = 30;
     this.pill = false;
   }
 
   public LogBatch(int initCapacity) {
     this.content = new ArrayList<>(initCapacity);
     this.pill = false;
+    this.capacity = initCapacity;
   }
 
   public LogBatch(boolean pill) {
@@ -40,6 +46,11 @@ public class LogBatch<T> {
 
   public void add(T t) {
     this.content.add(t);
+    ++count;
+  }
+
+  public boolean isFull() {
+    return isPill() ? true : (count == capacity);
   }
 
   public int size() {
