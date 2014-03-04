@@ -83,8 +83,13 @@ public class HBasePutter implements Runnable {
           e.printStackTrace();
         } finally {
           long t2 = System.currentTimeMillis();
-          LOGGER.info("Status=[" + (successful ? "ok" : "with-err"
-          ) + "], CostInMilliseconds(" + Thread.currentThread().getName() + ")=" + (t2 - t1));
+          long thisRoundTime = t2 - t1;
+          if (thisRoundTime > 50 && successful) {
+            LOGGER.info("Put hbase ok but too slow, " + Thread.currentThread()
+                                                              .getName() + " used " + (t2 - t1) + " milliseconds.");
+          } else if (!successful) {
+            LOGGER.info("Put hbase error(" + Thread.currentThread().getName() + " in " + (t2 - t1) + " milliseconds.");
+          }
         }
       }
     } catch (InterruptedException e) {
