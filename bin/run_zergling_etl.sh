@@ -73,6 +73,7 @@ if [ $? -ne 0 ];then
   echo "Old raw file does not exist on hdfs(${hdfs_history_path}/${history_op_file_name}.tar.gz), skip to remove local old file."
 else
   echo "Remove old file from local(${hdfs_history_path}/${history_op_file_name}.tar.gz)."
+  rm -rf ${raw_log_path}/${history_op_file_name}.log
   rm -rf ${raw_log_path}/${history_op_file_name}.tar.gz
 fi
 

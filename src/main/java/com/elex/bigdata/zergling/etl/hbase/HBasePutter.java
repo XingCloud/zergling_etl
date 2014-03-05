@@ -10,7 +10,6 @@ import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -87,10 +86,10 @@ public class HBasePutter implements Runnable {
         try {
           hTable.put(puts);
           counter.incVal(batch.size());
-        } catch (IOException e) {
+        } catch (Exception e) {
           successful = false;
           WrongHbasePutLogger.getInstance().logNavigatorLog(e.getClass().getName(), content);
-          e.printStackTrace();
+          LOGGER.error(e);
         } finally {
           long t2 = System.currentTimeMillis();
           long thisRoundTime = t2 - t1;
