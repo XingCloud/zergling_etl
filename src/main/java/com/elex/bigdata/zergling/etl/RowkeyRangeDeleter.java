@@ -69,7 +69,9 @@ public class RowkeyRangeDeleter {
         deletes.add(delete);
         ++count;
       }
-
+      if (!deletes.isEmpty()) {
+        hTableInterface.delete(deletes);
+      }
     } finally {
       HBaseResourceManager.closeResultScanner(rs);
       HBaseResourceManager.closeHTable(hTableInterface);
