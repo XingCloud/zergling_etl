@@ -26,7 +26,6 @@ import java.util.List;
 public class RowkeyRangeDeleter {
   private static final Logger LOGGER = Logger.getLogger(RowkeyRangeDeleter.class);
 
-
   public static void main(String[] args) throws IOException {
     if (args == null || args.length < 4) {
       LOGGER.error("Parameter is not enough");
@@ -45,9 +44,7 @@ public class RowkeyRangeDeleter {
 
     int batch = 100, count = 0;
     List<Delete> deletes = new ArrayList<>(batch);
-    try (PrintWriter pw = new PrintWriter(
-      new OutputStreamWriter(new FileOutputStream(f))); BufferedReader br = new BufferedReader(
-      new InputStreamReader(new FileInputStream(f)));) {
+    try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(f)));) {
       hTableInterface = manager.getHTable(table);
       Scan scan = new Scan(Bytes.toBytes(rowkeyStart), Bytes.toBytes(rowkeyStop));
 
@@ -57,7 +54,9 @@ public class RowkeyRangeDeleter {
         pw.write(Bytes.toStringBinary(r.getRow()));
         pw.write("\n");
       }
+    }
 
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));) {
       String line;
       Delete delete;
       while ((line = br.readLine()) != null) {
@@ -67,16 +66,15 @@ public class RowkeyRangeDeleter {
           count = 0;
         }
         delete = new Delete(Bytes.toBytes(line));
-        System.out.println(delete);
         deletes.add(delete);
         ++count;
       }
       if (!deletes.isEmpty()) {
         hTableInterface.delete(deletes);
       }
-    } finally {
-      HBaseResourceManager.closeResultScanner(rs);
-      HBaseResourceManager.closeHTable(hTableInterface);
     }
+
+    HBaseResourceManager.closeResultScanner(rs);
+    HBaseResourceManager.closeHTable(hTableInterface);
   }
 }
