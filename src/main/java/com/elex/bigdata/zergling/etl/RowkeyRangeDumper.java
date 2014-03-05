@@ -31,17 +31,21 @@ public class RowkeyRangeDumper {
     String output = args[3];
 
     HBaseResourceManager manager = new HBaseResourceManager(20);
-    HTableInterface hTableInterface = manager.getHTable(table);
-    Scan scan = new Scan(Bytes.toBytes(rowkeyStart), Bytes.toBytes(rowkeyStop));
-
-    ResultScanner rs = hTableInterface.getScanner(scan);
 
     File f = new File(output);
+    HTableInterface hTableInterface = null;
     try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(f)))) {
+      hTableInterface = manager.getHTable(table);
+      Scan scan = new Scan(Bytes.toBytes(rowkeyStart), Bytes.toBytes(rowkeyStop));
+
+      ResultScanner rs = hTableInterface.getScanner(scan);
+
       for (Result r : rs) {
         pw.write(Bytes.toStringBinary(r.getRow()));
         pw.write("\n");
       }
+    } finally {
+      HBaseResourceManager.closeHTable(hTableInterface);
     }
   }
 }
