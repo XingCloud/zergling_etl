@@ -67,9 +67,10 @@ public class NavigatorETL extends ETLBase {
     LOGGER.info("Begin to read.");
     long t1 = System.currentTimeMillis();
 
-    LogBatch<NavigatorLog> batch = new LogBatch<>(batchSize);
+    LogBatch<NavigatorLog> batch = new LogBatch<>(batchSize, 0);
 
     NavigatorLog nl;
+    int version = 1;
     try (BufferedReader br = new BufferedReader(
       new InputStreamReader(new FileInputStream(input))); PrintWriter pw = new PrintWriter(
       new OutputStreamWriter(new FileOutputStream(new File(output))))) {
@@ -155,7 +156,8 @@ public class NavigatorETL extends ETLBase {
 
         if (batch.isFull()) {
           queue.put(batch);
-          batch = new LogBatch<>(batchSize);
+          batch = new LogBatch<>(batchSize, version);
+          ++version;
         }
         batch.add(nl);
       }

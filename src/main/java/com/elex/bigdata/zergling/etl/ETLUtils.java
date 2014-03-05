@@ -8,6 +8,7 @@ import static com.elex.bigdata.zergling.etl.ETLConstants.IP_SEPERATOR;
 import static com.elex.bigdata.zergling.etl.ETLConstants.URL_END;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -20,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.Arrays;
 
 /**
  * User: Z J Wu Date: 14-2-24 Time: 上午10:52 Package: com.elex.bigdata.zergling.etl
@@ -118,8 +120,23 @@ public class ETLUtils {
     }
   }
 
+  public static long makeVersion(int outerVersion, int innerVersion) {
+    byte[] longBytes = new byte[8];
+    byte[] outerBytes = Bytes.toBytes(outerVersion);
+    byte[] innerBytes = Bytes.toBytes(innerVersion);
+    System.arraycopy(outerBytes, 0, longBytes, 0, outerBytes.length);
+    System.arraycopy(innerBytes, 0, longBytes, 4, innerBytes.length);
+    return Bytes.toLong(longBytes);
+  }
+
   public static void main(String[] args) throws Exception {
-    System.out.println(restoreShortenedURL("http://goo.mx/Iryeqi"));
+    for (int i = 0; i < 1000; i++) {
+      for (int j = 0; j < 100; j++) {
+        long l = makeVersion(i, j);
+        System.out.println(l + " - " + Arrays.toString(Bytes.toBytes(l)));
+      }
+    }
+
   }
 
 }

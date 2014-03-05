@@ -20,16 +20,19 @@ public class LogBatch<T> {
 
   private int count = 0;
 
+  private int version;
+
   public LogBatch() {
     this.content = new ArrayList<>(30);
     this.capacity = 30;
     this.pill = false;
   }
 
-  public LogBatch(int initCapacity) {
+  public LogBatch(int initCapacity, int version) {
     this.content = new ArrayList<>(initCapacity);
     this.pill = false;
     this.capacity = initCapacity;
+    this.version = version;
   }
 
   public LogBatch(boolean pill) {
@@ -61,4 +64,7 @@ public class LogBatch<T> {
     return !isPill() && CollectionUtils.isEmpty(content);
   }
 
+  public int getVersion() {
+    return version;
+  }
 }

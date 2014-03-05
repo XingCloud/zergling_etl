@@ -1,6 +1,7 @@
 package com.elex.bigdata.zergling.etl.hbase;
 
 import com.elex.bigdata.logging.WrongHbasePutLogger;
+import com.elex.bigdata.zergling.etl.ETLUtils;
 import com.elex.bigdata.zergling.etl.InternalQueue;
 import com.elex.bigdata.zergling.etl.model.ColumnInfo;
 import com.elex.bigdata.zergling.etl.model.LogBatch;
@@ -59,7 +60,10 @@ public class HBasePutter implements Runnable {
           break;
         }
         content = batch.getContent();
+        int outerVersion = batch.getVersion();
         puts = new ArrayList<>(content.size());
+        int innerVersion = 0;
+        long v;
         for (NavigatorLog log : content) {
           rowkeyBytes = log.getRowkey();
           try {
@@ -67,11 +71,13 @@ public class HBasePutter implements Runnable {
           } catch (IllegalAccessException e) {
             continue;
           }
+          v = ETLUtils.makeVersion(outerVersion, innerVersion);
           put = new Put(rowkeyBytes);
           for (ColumnInfo ci : columnInfos) {
-            put.add(ci.getColumnFamilyBytes(), ci.getQualifierBytes(), ci.getValueBytes());
+            put.add(ci.getColumnFamilyBytes(), ci.getQualifierBytes(), v, ci.getValueBytes());
           }
           puts.add(put);
+          ++innerVersion;
         }
         if (onlyShow) {
           continue;
