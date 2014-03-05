@@ -4,6 +4,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.HTablePool;
+import org.apache.hadoop.hbase.client.ResultScanner;
 
 import java.io.IOException;
 
@@ -37,6 +38,14 @@ public class HBaseResourceManager {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  // This is a return operation.
+  public static void closeResultScanner(ResultScanner resultScanner) {
+    if (resultScanner == null) {
+      return;
+    }
+    resultScanner.close();
   }
 
   // This is a shutdown operation.
