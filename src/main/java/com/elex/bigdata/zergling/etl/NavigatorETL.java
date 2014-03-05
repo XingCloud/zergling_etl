@@ -190,7 +190,7 @@ public class NavigatorETL extends ETLBase {
     InternalQueue<LogBatch<NavigatorLog>> queue = new InternalQueue<>();
     CountDownLatch signal = new CountDownLatch(workerCount);
     List<HBasePutter> putters = new ArrayList<>(workerCount);
-    HBaseResourceManager manager = new HBaseResourceManager(20);
+    HBaseResourceManager manager = new HBaseResourceManager((int) (workerCount * 1.5));
     PutterCounter pc = new PutterCounter();
 
     for (int i = 0; i < workerCount; i++) {

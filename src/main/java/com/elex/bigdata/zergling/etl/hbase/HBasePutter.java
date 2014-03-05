@@ -6,6 +6,7 @@ import com.elex.bigdata.zergling.etl.InternalQueue;
 import com.elex.bigdata.zergling.etl.model.ColumnInfo;
 import com.elex.bigdata.zergling.etl.model.LogBatch;
 import com.elex.bigdata.zergling.etl.model.NavigatorLog;
+import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.log4j.Logger;
