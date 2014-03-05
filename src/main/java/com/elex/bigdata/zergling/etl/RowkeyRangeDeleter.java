@@ -26,6 +26,7 @@ import java.util.List;
 public class RowkeyRangeDeleter {
   private static final Logger LOGGER = Logger.getLogger(RowkeyRangeDeleter.class);
 
+
   public static void main(String[] args) throws IOException {
     if (args == null || args.length < 4) {
       LOGGER.error("Parameter is not enough");
@@ -66,6 +67,7 @@ public class RowkeyRangeDeleter {
           count = 0;
         }
         delete = new Delete(Bytes.toBytes(line));
+        System.out.println(delete);
         deletes.add(delete);
         ++count;
       }
