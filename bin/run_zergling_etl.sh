@@ -3,8 +3,9 @@
 line="############################################"
 # Code base
 code_home=/home/hadoop/git_project_home/zergling_etl
-jar_home=${code_home}/target/zergling_etl.jar
+jar_home=${code_home}/target/zergling_etl-jar-with-dependencies.jar
 hadoop_home=/usr/bin/
+java_bin=/usr/java/jdk1.7.0_45/bin
 
 echo ${line}
 if [ "" = "$1" ];then
@@ -77,4 +78,7 @@ else
   rm -rf ${raw_log_path}/${history_op_file_name}.tar.gz
 fi
 
-mvn -f ${code_home}/pom.xml exec:java -Dexec.mainClass="com.elex.bigdata.zergling.etl.NavigatorETL" -Dexec.args="${project_id} ${raw_log_path}/${current_op_file_name}.log ${output_path}/${project_id}${table_name_suffix}.${processing_day}.nav.log nav_${project_id}${table_name_suffix} ${only_show} ${workers} ${batch_size}" -Dexec.classpathScope=runtime
+#mvn -f ${code_home}/pom.xml exec:java -Dexec.mainClass="com.elex.bigdata.zergling.etl.NavigatorETL" -Dexec.args="${project_id} ${raw_log_path}/${current_op_file_name}.log ${output_path}/${project_id}${table_name_suffix}.${processing_day}.nav.log nav_${project_id}${table_name_suffix} ${only_show} ${workers} ${batch_size}" -Dexec.classpathScope=runtime
+java_bin/java -jar ${jar_home} ${project_id} ${raw_log_path}/${current_op_file_name}.log ${output_path}/${project_id}${table_name_suffix}.${processing_day}.nav.log nav_${project_id}${table_name_suffix} ${only_show} ${workers} ${batch_size}
+
+echo "All done"
