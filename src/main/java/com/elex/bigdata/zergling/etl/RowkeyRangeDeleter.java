@@ -55,7 +55,6 @@ public class RowkeyRangeDeleter {
         pw.write("\n");
       }
     }
-
     try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));) {
       String line;
       Delete delete;
@@ -73,7 +72,6 @@ public class RowkeyRangeDeleter {
         hTableInterface.delete(deletes);
       }
     }
-
     HBaseResourceManager.closeResultScanner(rs);
     HBaseResourceManager.closeHTable(hTableInterface);
   }
