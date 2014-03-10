@@ -2,7 +2,7 @@
 <configuration>
   <property>
     <name>hbase.zookeeper.quorum</name>
-    <value>datanode0</value>
+    <value>65.255.35.156,65.255.35.157,65.255.35.133</value>
   </property>
   <property>
     <name>hbase.cluster.distributed</name>
@@ -16,7 +16,7 @@
 
   <property skipInDoc="true">
     <name>hbase.defaults.for.version</name>
-    <value>0.94.6-cdh4.3.0</value>
+    <value>0.94.6-cdh4.5.0</value>
   </property>
   <property>
     <name>hbase.client.ipc.pool.type</name>

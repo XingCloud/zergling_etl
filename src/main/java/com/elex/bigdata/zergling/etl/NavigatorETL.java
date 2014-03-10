@@ -1,5 +1,6 @@
 package com.elex.bigdata.zergling.etl;
 
+import static com.elex.bigdata.zergling.etl.ETLConstants.STANDARD_OUTPUT_FORMAT;
 import static com.elex.bigdata.zergling.etl.ETLUtils.ip2Long;
 import static com.elex.bigdata.zergling.etl.ETLUtils.truncateURL;
 
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -39,18 +41,20 @@ public class NavigatorETL extends ETLBase {
 
   private static final Logger LOGGER = Logger.getLogger(NavigatorETL.class);
 
-  private HBaseResourceManager hBaseResourceManager;
   private String projectId;
   private String rawFilePath;
   private String output;
   private SimpleDateFormat sdf;
+  private SimpleDateFormat outputSDF;
 
-  public NavigatorETL(String projectId, String rawFilePath, String output, SimpleDateFormat sdf, int hbasePollSize) {
+  public NavigatorETL(String projectId, String rawFilePath, String output, SimpleDateFormat sdf,
+                      String userDefinedOutputTimezone) {
     this.projectId = projectId;
     this.rawFilePath = rawFilePath;
     this.output = output;
     this.sdf = sdf;
-    this.hBaseResourceManager = new HBaseResourceManager(hbasePollSize);
+    this.outputSDF = new SimpleDateFormat(STANDARD_OUTPUT_FORMAT);
+    this.outputSDF.setTimeZone(TimeZone.getTimeZone(userDefinedOutputTimezone));
   }
 
   public void run(int batchSize, InternalQueue<LogBatch<NavigatorLog>> queue, int workerCount) throws IOException,
@@ -96,7 +100,7 @@ public class NavigatorETL extends ETLBase {
         }
         dateString = line.substring(a + 1, b);
         d = sdf.parse(dateString);
-        dateString = ETLConstants.STANDARD_OUTPUT_SDF.format(d);
+        dateString = outputSDF.format(d);
 
         a = line.indexOf(sep2);
         b = line.indexOf(blank, a + sep2.length());
@@ -164,6 +168,8 @@ public class NavigatorETL extends ETLBase {
       if (!batch.isEmpty()) {
         queue.put(batch);
       }
+    } catch (Exception e) {
+      e.printStackTrace();
     } finally {
       for (int i = 0; i < workerCount; i++) {
         queue.put(new LogBatch<NavigatorLog>(true));
@@ -175,7 +181,7 @@ public class NavigatorETL extends ETLBase {
   }
 
   public static void main(String[] args) throws IOException, ParseException, InterruptedException {
-    if (args == null || args.length < 7) {
+    if (args == null || args.length < 8) {
       LOGGER.info("Wrong parameter number.");
       System.exit(1);
     }
@@ -186,6 +192,7 @@ public class NavigatorETL extends ETLBase {
     boolean onlyShow = Boolean.parseBoolean(args[4]);
     int workerCount = Integer.parseInt(args[5]);
     int batchSize = Integer.parseInt(args[6]);
+    String userDefinedOutputTimezone = args[7];
 
     InternalQueue<LogBatch<NavigatorLog>> queue = new InternalQueue<>();
     CountDownLatch signal = new CountDownLatch(workerCount);
@@ -204,7 +211,8 @@ public class NavigatorETL extends ETLBase {
     }
 
     NavigatorETL navigatorETL = new NavigatorETL(projectId, input, output,
-                                                 new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH), 100);
+                                                 new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH),
+                                                 userDefinedOutputTimezone);
     navigatorETL.run(batchSize, queue, workerCount);
     signal.await();
     LOGGER.info(pc.getVal() + " lines putted to hbase successfully(" + workerCount + ").");

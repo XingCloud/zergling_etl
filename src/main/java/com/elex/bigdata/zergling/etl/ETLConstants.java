@@ -20,6 +20,7 @@ public class ETLConstants {
   public static final String URL_END = "/";
 
   public static final SimpleDateFormat STANDARD_OUTPUT_SDF = new SimpleDateFormat("yyyyMMddHHmmss");
+  public static final String STANDARD_OUTPUT_FORMAT = "yyyyMMddHHmmss";
 
   static {
     STANDARD_OUTPUT_SDF.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
