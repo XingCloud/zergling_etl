@@ -182,6 +182,7 @@ public class NavigatorETL extends ETLBase {
       LOGGER.info("Wrong parameter number.");
       System.exit(1);
     }
+    long t1 = System.currentTimeMillis();
     String projectId = args[0];
     String input = args[1];
     String output = args[2];
@@ -212,7 +213,8 @@ public class NavigatorETL extends ETLBase {
                                                  userDefinedOutputTimezone);
     navigatorETL.run(batchSize, queue, workerCount);
     signal.await();
-    LOGGER.info(pc.getVal() + " lines putted to hbase successfully(" + workerCount + ").");
-
+    long t2 = System.currentTimeMillis();
+    LOGGER.info(
+      pc.getVal() + " lines putted to hbase successfully(" + workerCount + ") in " + (t2 - t1) + " milliseconds.");
   }
 }
