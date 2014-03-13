@@ -9,16 +9,17 @@ fi
 
 if [ -d /data/bigdata/${project_id}/runlog ];then
   sudo mkdir -p /data/bigdata/${project_id}/runlog
+  sudo chmod -R a+w /data/bigdata/${project_id}/runlog
   echo "Runlog path for ${project_id} has been created."
 else
   echo "Runlog path for ${project_id} exists."
 fi
 
 sudo mkdir -p /data/raw/${project_id}/nav
-sudo chmod -r a+w /data/raw/${project_id}/nav
+sudo chmod -R a+w /data/raw/${project_id}/nav
 echo "Raw log path /data/raw/${project_id}/nav has been created."
 
 sudo mkdir -p /data/bigdata/${project_id}/nav
-sudo chmod -r a+w /data/bigdata/${project_id}/nav
+sudo chmod -R a+w /data/bigdata/${project_id}/nav
 echo "Output file path /data/bigdata/${project_id}/nav has been created."
 
