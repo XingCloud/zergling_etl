@@ -108,7 +108,7 @@ public class NavigatorETL extends ETLBase {
 
         uid = StringUtils.trimToNull(extractContent(urlParameters, uidKey, urlStop));
         if (StringUtils.isBlank(uid) || ETLConstants.NULL_STRING.equalsIgnoreCase(uid)) {
-          WrongUIDLogger.getInstance().log(line);
+//          WrongUIDLogger.getInstance().log(line);
           continue;
         }
         if (uid.length() > maxUID) {
@@ -124,7 +124,7 @@ public class NavigatorETL extends ETLBase {
           try {
             title = URLDecoder.decode(title.toLowerCase(), "utf8");
           } catch (Exception e) {
-            WrongTitleLogger.getInstance().log(line);
+//            WrongTitleLogger.getInstance().log(line);
           }
         }
 
@@ -137,7 +137,7 @@ public class NavigatorETL extends ETLBase {
             }
             url = URLDecoder.decode(url, "utf8");
           } catch (Exception e) {
-            WrongURLLogger.getInstance().log(line);
+//            WrongURLLogger.getInstance().log(line);
           }
           url = truncateURL(url);
         }
