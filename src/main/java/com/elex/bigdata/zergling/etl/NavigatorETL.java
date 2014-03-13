@@ -4,9 +4,6 @@ import static com.elex.bigdata.zergling.etl.ETLConstants.STANDARD_OUTPUT_FORMAT;
 import static com.elex.bigdata.zergling.etl.ETLUtils.ip2Long;
 import static com.elex.bigdata.zergling.etl.ETLUtils.truncateURL;
 
-import com.elex.bigdata.logging.WrongTitleLogger;
-import com.elex.bigdata.logging.WrongUIDLogger;
-import com.elex.bigdata.logging.WrongURLLogger;
 import com.elex.bigdata.zergling.etl.hbase.HBasePutter;
 import com.elex.bigdata.zergling.etl.hbase.HBaseResourceManager;
 import com.elex.bigdata.zergling.etl.hbase.PutterCounter;

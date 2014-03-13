@@ -6,7 +6,6 @@ import com.elex.bigdata.zergling.etl.InternalQueue;
 import com.elex.bigdata.zergling.etl.model.ColumnInfo;
 import com.elex.bigdata.zergling.etl.model.LogBatch;
 import com.elex.bigdata.zergling.etl.model.NavigatorLog;
-import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.log4j.Logger;
@@ -89,7 +88,7 @@ public class HBasePutter implements Runnable {
           counter.incVal(batch.size());
         } catch (Exception e) {
           successful = false;
-          WrongHbasePutLogger.getInstance().logNavigatorLog(e.getClass().getName(), content);
+          WrongHbasePutLogger.logNavigatorLog(e.getClass().getName(), content);
           LOGGER.error(e);
         } finally {
           long t2 = System.currentTimeMillis();
