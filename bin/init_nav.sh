@@ -8,11 +8,11 @@ else
 fi
 
 if [ -d /data/bigdata/${project_id}/runlog ];then
+  echo "Runlog path for ${project_id} exists."
+else
   sudo mkdir -p /data/bigdata/${project_id}/runlog
   sudo chmod -R a+w /data/bigdata/${project_id}/runlog
   echo "Runlog path for ${project_id} has been created."
-else
-  echo "Runlog path for ${project_id} exists."
 fi
 
 sudo mkdir -p /data/raw/${project_id}/nav
