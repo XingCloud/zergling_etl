@@ -87,6 +87,7 @@ public class HBasePutter implements Runnable {
           hTable.put(puts);
           counter.incVal(batch.size());
         } catch (Exception e) {
+          System.out.println("hhhhhhhhhhhhhhhhhhhhhhh");
           successful = false;
           WrongHbasePutLogger.logNavigatorLog(e.getClass().getName(), content);
           LOGGER.error(e);
