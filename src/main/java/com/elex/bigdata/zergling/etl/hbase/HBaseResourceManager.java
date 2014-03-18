@@ -13,14 +13,14 @@ import java.io.IOException;
  */
 public class HBaseResourceManager {
 
-  private HTablePool pool;
+  private static HTablePool pool;
 
   public HBaseResourceManager(int poolSize) {
     Configuration conf = HBaseConfiguration.create();
     this.pool = new HTablePool(conf, poolSize);
   }
 
-  public HTableInterface getHTable(String tableName) throws IOException {
+  public static HTableInterface getHTable(String tableName) throws IOException {
     try {
       return pool.getTable(tableName);
     } catch (Exception e) {
