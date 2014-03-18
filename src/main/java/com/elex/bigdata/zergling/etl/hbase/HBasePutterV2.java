@@ -1,11 +1,10 @@
 package com.elex.bigdata.zergling.etl.hbase;
 
 import com.elex.bigdata.zergling.etl.model.LogType;
-import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -47,9 +46,9 @@ public class HBasePutterV2 implements Callable<String> {
             }
         }
         if(puts.size()>0){
-            HTable hTable = null;
+            HTableInterface hTable = null;
             try {
-                hTable = (HTable) HBaseResourceManager.getHTable(tableName);
+                hTable = HBaseResourceManager.getHTable(tableName);
                 hTable.put(puts);
                 this.counter.addAndGet(puts.size());
             } catch (Exception e) {
