@@ -6,7 +6,11 @@ import static com.elex.bigdata.zergling.etl.ETLConstants.HTTP_START;
 import static com.elex.bigdata.zergling.etl.ETLConstants.HTTP_START_LENGTH;
 import static com.elex.bigdata.zergling.etl.ETLConstants.IP_SEPERATOR;
 import static com.elex.bigdata.zergling.etl.ETLConstants.URL_END;
+import static com.elex.bigdata.zergling.etl.model.HbaseDataType.NUM;
 
+import com.elex.bigdata.zergling.etl.model.BigDataColumn;
+import com.elex.bigdata.zergling.etl.model.ColumnInfo;
+import com.elex.bigdata.zergling.etl.model.HbaseDataType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.http.HttpEntity;
@@ -20,8 +24,11 @@ import org.apache.http.impl.client.HttpClients;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * User: Z J Wu Date: 14-2-24 Time: 上午10:52 Package: com.elex.bigdata.zergling.etl
@@ -128,6 +135,43 @@ public class ETLUtils {
     System.arraycopy(innerBytes, 0, longBytes, 4, innerBytes.length);
     return Bytes.toLong(longBytes);
   }
+
+    public static List<ColumnInfo> getColumnInfos(Object log) throws IllegalAccessException {
+        Field[] fields = log.getClass().getDeclaredFields();
+        BigDataColumn bigDataColumnAnno;
+        List<ColumnInfo> columnInfos = new ArrayList<>();
+        String cf, q, stringVal;
+        byte[] byteVal;
+        Object fieldVal;
+        HbaseDataType type;
+        for (Field field : fields) {
+            field.setAccessible(true);
+            bigDataColumnAnno = field.getAnnotation(BigDataColumn.class);
+            if (bigDataColumnAnno == null) {
+                continue;
+            }
+            fieldVal = field.get(log);
+            if (fieldVal == null) {
+                continue;
+            }
+            stringVal = fieldVal.toString();
+            if (StringUtils.isBlank(stringVal)) {
+                continue;
+            }
+
+            cf = bigDataColumnAnno.cf();
+            q = bigDataColumnAnno.q();
+            type = bigDataColumnAnno.type();
+
+            if (NUM.equals(type)) {
+                byteVal = Bytes.toBytes(Long.parseLong(stringVal));
+            } else {
+                byteVal = Bytes.toBytes(stringVal);
+            }
+            columnInfos.add(new ColumnInfo(cf, q, byteVal));
+        }
+        return columnInfos;
+    }
 
   public static void main(String[] args) throws Exception {
     for (int i = 0; i < 1000; i++) {
