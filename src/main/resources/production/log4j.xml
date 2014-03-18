@@ -94,7 +94,6 @@
         <level value="debug" />
         <appender-ref ref="SEARCH_RUN_LOG" />
     </logger>
-
     <logger name="search_ignore">
         <level value="info" />
         <appender-ref ref="SEARCH_IGNORE_LOG" />
