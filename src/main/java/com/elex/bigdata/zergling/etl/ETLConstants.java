@@ -2,6 +2,7 @@ package com.elex.bigdata.zergling.etl;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 /**
  * User: Z J Wu Date: 14-2-24 Time: 上午10:19 Package: com.elex.bigdata.zergling.etl
@@ -21,9 +22,16 @@ public class ETLConstants {
 
   public static final SimpleDateFormat STANDARD_OUTPUT_SDF = new SimpleDateFormat("yyyyMMddHHmmss");
   public static final String STANDARD_OUTPUT_FORMAT = "yyyyMMddHHmmss";
+  public static final String UNKOWN_UID = "0000000000";
+  public static final Pattern UID_PARTTERN = Pattern.compile("uid=([a-zA-Z0-9_\\\\-]+);", Pattern.CASE_INSENSITIVE);
 
-  static {
+    static {
     STANDARD_OUTPUT_SDF.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
 //    STANDARD_OUTPUT_SDF.setTimeZone(TimeZone.getTimeZone("GMT-06:00"));
+  }
+
+  public static final class LOG_TPYE{
+      public static final String SEARCH = "search";
+      public static final String AD = "ad";
   }
 }
