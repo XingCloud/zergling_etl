@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class LogImport {
 
     public static void main(String args[]) throws Exception {
-        if(args.length != 4){
+        if(args.length != 5){
             throw new Exception("Please specify the type,tableName,filePath and batch size");
         }
         long startTime = System.currentTimeMillis();
@@ -28,9 +28,11 @@ public class LogImport {
         String type = args[0];
         String tableName = args[1];
         String filePath = args[2];
-        String batchStr = args[3];
+        String workersStr = args[3];
+        String batchStr = args[4];
 
         int batch = Integer.parseInt(batchStr);
+        int workers = Integer.parseInt(workersStr);
 
         //日志类型
 //        String type = "search";
@@ -44,7 +46,7 @@ public class LogImport {
         }
         Logger LOGGER = Logger.getLogger(type);
 
-        ExecutorService service = new ThreadPoolExecutor(5,10,60, TimeUnit.MILLISECONDS,new LinkedBlockingDeque<Runnable>());
+        ExecutorService service = new ThreadPoolExecutor(5,workers,60, TimeUnit.MILLISECONDS,new LinkedBlockingDeque<Runnable>());
         FileInputStream fis = null;
         BufferedReader reader = null;
         List<Future<String>> jobs = new ArrayList<Future<String>>();
@@ -55,7 +57,7 @@ public class LogImport {
         try {
             fis = new FileInputStream(filePath);
             reader = new BufferedReader(new InputStreamReader(fis));
-            String line = "";
+            String line;
             List<String> lines = new ArrayList<String>();
 
             while((line =  reader.readLine()) != null){
