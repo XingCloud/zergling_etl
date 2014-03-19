@@ -65,8 +65,14 @@ public class SearchLogHBaseBuilder implements HBaseBuilder {
             uid = match.group(1);
         }
 
+        long ip = 0;
+        try{
+            ip = ETLUtils.ip2Long(kv.get("fip"));
+        }catch (Exception e){
+        }
+
         SearchLog searchLog = new SearchLog(kv.get("ts"), kv.get("country"), uid,
-                kv.get("query"), ETLUtils.ip2Long(kv.get("fip")), kv.get("service"), kv.get("visit_time"),
+                kv.get("query"), ip, kv.get("service"), kv.get("visit_time"),
                 kv.get("visit_counter"), kv.get("uri"), kv.get("ua"), kv.get("http_referer"));
 
         return searchLog;

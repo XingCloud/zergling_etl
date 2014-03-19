@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class LogImport {
 
     public static void main(String args[]) throws Exception {
-        if(args.length != 5){
+        if(args.length != 6){
             throw new Exception("Please specify the type,tableName,filePath and batch size");
         }
         long startTime = System.currentTimeMillis();
@@ -30,6 +30,7 @@ public class LogImport {
         String filePath = args[2];
         String workersStr = args[3];
         String batchStr = args[4];
+        String projectName = args[5]; //保留字段，多个项目的时候可以用上
 
         int batch = Integer.parseInt(batchStr);
         int workers = Integer.parseInt(workersStr);
@@ -38,6 +39,7 @@ public class LogImport {
 //        String type = "search";
 //        String filePath = "d:/search.log";
 //        int batch = 2;
+//        int workers = 10;
 //        String tableName = "search_22find_test";
 
         LogType logType = LogType.getLogType(type);
@@ -86,8 +88,7 @@ public class LogImport {
         }
         for(Future<String> job : jobs){
             try {
-                String result = job.get(1,TimeUnit.MINUTES);
-                System.out.println(result);
+                job.get(3,TimeUnit.MINUTES);
             } catch (InterruptedException e) {
                 LOGGER.error(e.getMessage());
                 e.printStackTrace();
@@ -103,6 +104,7 @@ public class LogImport {
         }
 
         service.shutdownNow();
+        System.out.println("Insert " + counter.get() + "/" + totalCount + " lines spend " + (System.currentTimeMillis() - startTime) + "ms ");
         LOGGER.info("Insert " + counter.get() + "/" + totalCount + " lines spend " + (System.currentTimeMillis() - startTime) + "ms ");
     }
 }
