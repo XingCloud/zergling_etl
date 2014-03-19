@@ -5,7 +5,6 @@ import com.elex.bigdata.zergling.etl.ETLUtils;
 import com.elex.bigdata.zergling.etl.model.ColumnInfo;
 import com.elex.bigdata.zergling.etl.model.SearchLog;
 import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.util.Bytes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,11 +26,11 @@ public class SearchLogHBaseBuilder implements HBaseBuilder {
         //cf:  basis : fip query service
         //cf:  extend : visit_time visit_counter uri ua http_referer
         SearchLog searchLog = parse22Find(line + "[");
-        System.out.println(searchLog);
         Put put = new Put(searchLog.getRowkey());
+        long ts = Long.parseLong(searchLog.getDateStr()); //使用点击的时间作为timestamp，避免重复插入过多版本
         List<ColumnInfo> columns = ETLUtils.getColumnInfos(searchLog);
         for(ColumnInfo colInfo : columns){
-            put.add(colInfo.getColumnFamilyBytes(),colInfo.getQualifierBytes(),colInfo.getValueBytes());
+            put.add(colInfo.getColumnFamilyBytes(),colInfo.getQualifierBytes(),ts,colInfo.getValueBytes());
         }
         return put;
     }

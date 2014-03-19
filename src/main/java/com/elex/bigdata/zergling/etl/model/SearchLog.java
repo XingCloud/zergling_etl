@@ -13,7 +13,7 @@ public class SearchLog {
     private static final String CF1 ="basis"; //family
     private static final String CF2 = "extend"; //family
 
-    private String ts;
+    private String dateStr;
     private String nation;
     private String uid;
 
@@ -35,8 +35,8 @@ public class SearchLog {
     @BigDataColumn(cf = CF2, q = "hr")
     private String httpReferer;
 
-    public SearchLog(String ts,String nation,String uid, String query, long ip, String service, String visitTime,String visitCounter,String uri,String ua, String httpReferer){
-        this.ts = ts;
+    public SearchLog(String dateStr,String nation,String uid, String query, long ip, String service, String visitTime,String visitCounter,String uri,String ua, String httpReferer){
+        this.dateStr = dateStr;
         this.nation = nation;
         this.uid = uid;
         this.query = query;
@@ -50,15 +50,11 @@ public class SearchLog {
     }
 
     public byte[] getRowkey() {
-        return Bytes.toBytes(ts.concat(nation).concat(uid));
+        return Bytes.toBytes(dateStr.concat(nation).concat(uid));
     }
 
-    public static String getCf1() {
-        return CF1;
-    }
-
-    public static String getCf2() {
-        return CF2;
+    public String getDateStr() {
+        return dateStr;
     }
 
     public String getQuery() {
@@ -96,7 +92,7 @@ public class SearchLog {
     @Override
     public String toString() {
         return "SearchLog{" +
-                "ts='" + ts + '\'' +
+                "date='" + dateStr + '\'' +
                 ", nation='" + nation + '\'' +
                 ", uid='" + uid + '\'' +
                 ", query='" + query + '\'' +
