@@ -54,7 +54,7 @@
   </appender>
 
     <appender name="SEARCH_RUN_LOG" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="/data/bigdata/22find/runlog/search.run.log" />
+        <param name="File" value="/data/bigdata/22find/search/search.run.log" />
         <param name="Append" value="true" />
         <param name="Threshold" value="info" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
@@ -64,7 +64,7 @@
     </appender>
 
     <appender name="SEARCH_IGNORE_LOG" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="/data/bigdata/22find/runlog/search.ignore.log" />
+        <param name="File" value="/data/bigdata/22find/search/search.ignore.log" />
         <param name="Append" value="true" />
         <param name="Threshold" value="info" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
