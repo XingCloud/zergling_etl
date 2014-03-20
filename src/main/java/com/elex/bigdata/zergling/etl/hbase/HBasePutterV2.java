@@ -53,13 +53,13 @@ public class HBasePutterV2 implements Callable<String> {
                 this.counter.addAndGet(puts.size());
             } catch (Exception e) {
                 //此时的失败一般是因为HBase出问题了，暂不分离日志
-                LOGGER.error("Fail to insert data after spend "+(begin - System.currentTimeMillis()) +"ms as ：" + e.getMessage() );
+                LOGGER.error("Fail to insert data after spend "+(System.currentTimeMillis() - begin ) +"ms as ：" + e.getMessage() );
                 throw e;
             } finally {
                 HBaseResourceManager.closeHTable(hTable);
             }
         }
-        LOGGER.info("Insert " + puts.size() + " logs spend " + (begin - System.currentTimeMillis()) + "ms");
+        LOGGER.info("Insert " + puts.size() + " logs spend " + (System.currentTimeMillis() - begin ) + "ms");
         return "success";
     }
 }
