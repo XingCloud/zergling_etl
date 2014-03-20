@@ -3,23 +3,26 @@
 line="############################################"
 # Code base
 code_home=/home/hadoop/git_project_home/zergling_etl
-jar_home=${code_home}/target/zergling_etl-jar-with-dependencies.jar
+jar_home=${code_home}/target/LogImport-jar-with-dependencies.jar
 hadoop_home=/usr/bin/
 java_bin=/usr/java/jdk1.7.0_45/bin
 
 echo ${line}
-if [ "" = "$1" ];then
+project_id=$1
+table_name=$2
+#type=search or ad
+type=$3
+
+if [ "" = "$4" ];then
   echo "Using default processing day."
   processing_day=`date -u +%Y%m%d`
 else
   echo "User defined processing day found."
-  processing_day=$1
+  processing_day=$4
 fi
-project_id=$2
-table_name=$3
+
 workers=10
-batch_size=100
-time_zone=GMT-06:00
+batch_size=500
 
 processing_history_day=`date -u -d"${processing_day} 7 days ago" +%Y%m%d`
 raw_log_web=http://22find-log.22find.com/22find.log.${processing_day}
@@ -74,5 +77,5 @@ else
 fi
 
 #mvn -f ${code_home}/pom.xml exec:java -Dexec.mainClass="com.elex.bigdata.zergling.etl.NavigatorETL" -Dexec.args="${project_id} ${raw_log_path}/${current_op_file_name}.log ${output_path}/${project_id}${table_name_suffix}.${processing_day}.nav.log nav_${project_id}${table_name_suffix} ${only_show} ${workers} ${batch_size}" -Dexec.classpathScope=runtime
-${java_bin}/java -jar ${jar_home} search ${table_name} ${raw_log_path}/${current_op_file_name} ${workers} ${batch_size}
+${java_bin}/java -jar ${jar_home} ${type} ${table_name} ${raw_log_path}/${current_op_file_name} ${workers} ${batch_size} ${project_id}
 echo "All done"

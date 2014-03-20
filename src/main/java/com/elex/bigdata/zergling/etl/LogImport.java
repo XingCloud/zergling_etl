@@ -19,28 +19,28 @@ import java.util.concurrent.atomic.AtomicLong;
 public class LogImport {
 
     public static void main(String args[]) throws Exception {
-        if(args.length != 6){
-            throw new Exception("Please specify the type,tableName,filePath and batch size");
-        }
+//        if(args.length != 6){
+//            throw new Exception("Please specify the type,tableName,filePath , batch size and project id");
+//        }
         long startTime = System.currentTimeMillis();
+//
+//
+//        String type = args[0];
+//        String tableName = args[1];
+//        String filePath = args[2];
+//        String workersStr = args[3];
+//        String batchStr = args[4];
+//        String projectName = args[5]; //保留字段，多个项目的时候可以用上
 
-
-        String type = args[0];
-        String tableName = args[1];
-        String filePath = args[2];
-        String workersStr = args[3];
-        String batchStr = args[4];
-        String projectName = args[5]; //保留字段，多个项目的时候可以用上
-
-        int batch = Integer.parseInt(batchStr);
-        int workers = Integer.parseInt(workersStr);
+//        int batch = Integer.parseInt(batchStr);
+//        int workers = Integer.parseInt(workersStr);
 
         //日志类型
-//        String type = "search";
-//        String filePath = "d:/search.log";
-//        int batch = 2;
-//        int workers = 10;
-//        String tableName = "search_22find_test";
+        String type = "search";
+        String filePath = "d:/search.log";
+        int batch = 2;
+        int workers = 10;
+        String tableName = "search_22find_test";
 
         LogType logType = LogType.getLogType(type);
         if( logType == null){
@@ -56,6 +56,7 @@ public class LogImport {
         AtomicLong counter = new AtomicLong();
         Long totalCount = 0l;
         new HBaseResourceManager(10);
+        System.out.println("Begin processing log " + filePath);
         try {
             fis = new FileInputStream(filePath);
             reader = new BufferedReader(new InputStreamReader(fis));
@@ -66,6 +67,7 @@ public class LogImport {
                 lines.add(line);
                 ++totalCount;
                 if(lines.size() == batch){
+                    System.out.print(".");
                     jobs.add(service.submit(new HBasePutterV2(logType,tableName,lines,counter)));
                     lines = new ArrayList<String>();
                 }
@@ -89,6 +91,7 @@ public class LogImport {
         for(Future<String> job : jobs){
             try {
                 job.get(3,TimeUnit.MINUTES);
+                System.out.print(".");
             } catch (InterruptedException e) {
                 LOGGER.error(e.getMessage());
                 e.printStackTrace();
@@ -104,6 +107,8 @@ public class LogImport {
         }
 
         service.shutdownNow();
+        System.out.println(".");
+        System.out.println("Finished import log");
         System.out.println("Insert " + counter.get() + "/" + totalCount + " lines spend " + (System.currentTimeMillis() - startTime) + "ms ");
         LOGGER.info("Insert " + counter.get() + "/" + totalCount + " lines spend " + (System.currentTimeMillis() - startTime) + "ms ");
     }
