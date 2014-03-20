@@ -38,5 +38,6 @@ fi
 
 echo "[CHECK-POINT] - Packaging."
 #mvn -f ${code_home}/pom.xml clean package -DskipTests=true -Daid=${aid} -Denv=${env}
-mvn -f ${code_home}/pom.xml clean compile assembly:single -DskipTests=true -Daid=${aid} -Denv=${env}
+#mvn -f ${code_home}/pom.xml clean compile assembly:single -DskipTests=true -Daid=${aid} -Denv=${env}
+mvn clean package -DskipTests
 echo "[CHECK-POINT] - Packaging is done."
