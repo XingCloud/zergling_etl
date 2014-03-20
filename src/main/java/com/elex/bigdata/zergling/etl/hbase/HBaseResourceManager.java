@@ -15,6 +15,7 @@ public class HBaseResourceManager {
 
   private static HTablePool pool;
 
+  //TODO: 单例
   public HBaseResourceManager(int poolSize) {
     Configuration conf = HBaseConfiguration.create();
     this.pool = new HTablePool(conf, poolSize);
