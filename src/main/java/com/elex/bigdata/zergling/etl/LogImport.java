@@ -24,7 +24,7 @@ public class LogImport {
         }
         long startTime = System.currentTimeMillis();
 
-
+        boolean error = false;
         String type = args[0];
         String tableName = args[1];
         String filePath = args[2];
@@ -70,6 +70,7 @@ public class LogImport {
             }
 
         } catch (Exception e) {
+            error = true;
             LOGGER.error(e.getMessage());
             e.printStackTrace();
         } finally {
@@ -86,13 +87,16 @@ public class LogImport {
                 job.get(3,TimeUnit.MINUTES);
                 System.out.print(".");
             } catch (InterruptedException e) {
+                error = true;
                 LOGGER.error(e.getMessage());
                 e.printStackTrace();
             } catch (ExecutionException e) {
+                error = true;
                 LOGGER.error(e.getMessage());
                 //TODO; 线程内部异常处理
                 e.printStackTrace();
             } catch (TimeoutException e) {
+                error = true;
                 LOGGER.error(e.getMessage());
                 //TODO: 超时异常
                 e.printStackTrace();
@@ -101,7 +105,7 @@ public class LogImport {
 
         service.shutdownNow();
         System.out.println(".");
-        System.out.println("Finished import log");
+        System.out.println("Finished import log " + (error? "with":"without") + " error");
         System.out.println("Insert " + counter.get() + "/" + totalCount + " lines spend " + (System.currentTimeMillis() - startTime) + "ms ");
         LOGGER.info("Insert " + counter.get() + "/" + totalCount + " lines spend " + (System.currentTimeMillis() - startTime) + "ms ");
     }
