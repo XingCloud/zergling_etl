@@ -6,6 +6,7 @@ import com.elex.bigdata.zergling.etl.InternalQueue;
 import com.elex.bigdata.zergling.etl.model.ColumnInfo;
 import com.elex.bigdata.zergling.etl.model.LogBatch;
 import com.elex.bigdata.zergling.etl.model.NavigatorLog;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.log4j.Logger;
@@ -38,6 +39,15 @@ public class HBasePutter implements Runnable {
     this.hTable = hTable;
     this.onlyShow = onlyShow;
     this.counter = counter;
+  }
+
+  private String purePut(List<Put> puts) {
+    try {
+      hTable.put(puts);
+      return null;
+    } catch (Exception e) {
+      return e.getClass().getName();
+    }
   }
 
   @Override
@@ -81,25 +91,21 @@ public class HBasePutter implements Runnable {
         if (onlyShow) {
           continue;
         }
+
         long t1 = System.currentTimeMillis();
-        boolean successful = true;
-        try {
-          hTable.put(puts);
+        String returnResult = purePut(puts);
+        boolean ok = StringUtils.isBlank(returnResult);
+        long t2 = System.currentTimeMillis();
+        long thisRoundTime = t2 - t1;
+        if (ok) {
           counter.incVal(batch.size());
-        } catch (Exception e) {
-          System.out.println("hhhhhhhhhhhhhhhhhhhhhhh");
-          successful = false;
-          WrongHbasePutLogger.logNavigatorLog(e.getClass().getName(), content);
-          LOGGER.error(e);
-        } finally {
-          long t2 = System.currentTimeMillis();
-          long thisRoundTime = t2 - t1;
-          if (thisRoundTime > 50 && successful) {
-            LOGGER.info("Put hbase ok but too slow, " + Thread.currentThread()
-                                                              .getName() + " used " + (t2 - t1) + " milliseconds.");
-          } else if (!successful) {
-            LOGGER.info("Put hbase error(" + Thread.currentThread().getName() + " in " + (t2 - t1) + " milliseconds.");
+          if (thisRoundTime > 50) {
+            LOGGER.info(
+              "Put hbase ok but too slow, " + Thread.currentThread().getName() + " used " + thisRoundTime + " millis.");
           }
+        } else {
+          WrongHbasePutLogger.logNavigatorLog(returnResult, content);
+          LOGGER.info("Put hbase error(" + Thread.currentThread().getName() + " in " + thisRoundTime + " millis.");
         }
       }
     } catch (InterruptedException e) {
