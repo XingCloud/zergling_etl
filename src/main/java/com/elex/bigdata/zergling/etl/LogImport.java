@@ -19,28 +19,21 @@ import java.util.concurrent.atomic.AtomicLong;
 public class LogImport {
 
     public static void main(String args[]) throws Exception {
-//        if(args.length != 6){
-//            throw new Exception("Please specify the type,tableName,filePath , batch size and project id");
-//        }
+        if(args.length != 6){
+            throw new Exception("Please specify the type,tableName,filePath , batch size and project id");
+        }
         long startTime = System.currentTimeMillis();
-//
-//
-//        String type = args[0];
-//        String tableName = args[1];
-//        String filePath = args[2];
-//        String workersStr = args[3];
-//        String batchStr = args[4];
-//        String projectName = args[5]; //保留字段，多个项目的时候可以用上
 
-//        int batch = Integer.parseInt(batchStr);
-//        int workers = Integer.parseInt(workersStr);
 
-        //日志类型
-        String type = "search";
-        String filePath = "d:/search.log";
-        int batch = 2;
-        int workers = 10;
-        String tableName = "search_22find_test";
+        String type = args[0];
+        String tableName = args[1];
+        String filePath = args[2];
+        String workersStr = args[3];
+        String batchStr = args[4];
+        String projectName = args[5]; //保留字段，多个项目的时候可以用上
+
+        int batch = Integer.parseInt(batchStr);
+        int workers = Integer.parseInt(workersStr);
 
         LogType logType = LogType.getLogType(type);
         if( logType == null){
