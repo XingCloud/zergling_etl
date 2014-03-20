@@ -48,7 +48,7 @@ public class LogImport {
 
         AtomicLong counter = new AtomicLong();
         Long totalCount = 0l;
-        new HBaseResourceManager(10);
+        new HBaseResourceManager(workers);
         System.out.println("Begin processing log " + filePath);
         try {
             fis = new FileInputStream(filePath);
