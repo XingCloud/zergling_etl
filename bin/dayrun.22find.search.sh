@@ -8,7 +8,7 @@ fi
 
 daily_log_path="/data/bigdata/22find/search/search_${day}.log"
 sh log_import.sh 22find search_22find search ${day} >> ${daily_log_path}
-if grep -Fxq "without error" ${daily_log_path}
+if grep -Fxq "Finished import log without error" ${daily_log_path}
 then
     echo "No Exception"
 else
