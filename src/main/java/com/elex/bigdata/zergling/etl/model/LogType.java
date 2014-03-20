@@ -2,7 +2,6 @@ package com.elex.bigdata.zergling.etl.model;
 
 import com.elex.bigdata.zergling.etl.hbase.HBaseBuilder;
 import com.elex.bigdata.zergling.etl.hbase.SearchLogHBaseBuilder;
-import org.apache.log4j.Logger;
 
 /**
  * Author: liqiang
