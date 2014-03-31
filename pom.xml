@@ -15,7 +15,9 @@
       <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
     </repository>
   </repositories>
-
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   <build>
     <defaultGoal>package</defaultGoal>
 
@@ -32,60 +34,75 @@
       </resource>
     </resources>
 
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.0</version>
-          <configuration>
-            <source>1.7</source>
-            <target>1.7</target>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.4</version>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.0</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <finalName>zergling_etl</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+        <executions>
+          <execution>
+            <id>LogImport</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
             <configuration>
-                <finalName>zergling_etl</finalName>
-                <appendAssemblyId>false</appendAssemblyId>
-                <descriptorRefs>
-                    <descriptorRef>jar-with-dependencies</descriptorRef>
-                </descriptorRefs>
+              <finalName>LogImport-jar-with-dependencies</finalName>
+              <archive>
+                <manifest>
+                  <mainClass>com.elex.bigdata.zergling.etl.LogImport</mainClass>
+                </manifest>
+              </archive>
             </configuration>
-            <executions>
-            <execution>
-                <id>LogImport</id>
-                <phase>package</phase>
-                <goals>
-                    <goal>single</goal>
-                </goals>
-                <configuration>
-                    <finalName>LogImport-jar-with-dependencies</finalName>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.elex.bigdata.zergling.etl.LogImport</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </execution>
-            <execution>
-                <id>Navigator</id>
-                <phase>package</phase>
-                <goals>
-                    <goal>single</goal>
-                </goals>
-                <configuration>
-                    <finalName>zergling_etl-jar-with-dependencies</finalName>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.elex.bigdata.zergling.etl.NavigatorETL</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </execution>
-            </executions>
-        </plugin>
-      </plugins>
+          </execution>
+          <execution>
+            <id>Navigator</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <finalName>zergling_etl-jar-with-dependencies</finalName>
+              <archive>
+                <manifest>
+                  <mainClass>com.elex.bigdata.zergling.etl.NavigatorETL</mainClass>
+                </manifest>
+              </archive>
+            </configuration>
+          </execution>
+          <execution>
+            <id>Nav_All</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <finalName>zergling_etl.AllInOneNavigatorETL.jar-with-dependencies</finalName>
+              <archive>
+                <manifest>
+                  <mainClass>com.elex.bigdata.zergling.etl.AllInOneNavigatorETL</mainClass>
+                </manifest>
+              </archive>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
 
   </build>
 

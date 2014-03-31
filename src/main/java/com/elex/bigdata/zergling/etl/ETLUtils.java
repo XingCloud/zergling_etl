@@ -26,14 +26,32 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * User: Z J Wu Date: 14-2-24 Time: 上午10:52 Package: com.elex.bigdata.zergling.etl
  */
 public class ETLUtils {
+  public static final Map<String, SimpleDateFormat> SDF_MAP = new HashMap<>();
+
+  static {
+    SimpleDateFormat brSDF = new SimpleDateFormat("yyyyMMddHHmmss");
+    brSDF.setTimeZone(TimeZone.getTimeZone("-06:00"));
+    SimpleDateFormat frSDF = new SimpleDateFormat("yyyyMMddHHmmss");
+    frSDF.setTimeZone(TimeZone.getTimeZone("+01:00"));
+    SimpleDateFormat bjSDF = new SimpleDateFormat("yyyyMMddHHmmss");
+    frSDF.setTimeZone(TimeZone.getTimeZone("+08:00"));
+    SDF_MAP.put("br", brSDF);
+    SDF_MAP.put("fr", frSDF);
+    SDF_MAP.put("bj", bjSDF);
+  }
+
   private static final String HTTP_SCHEMA = "http";
   private static final String HOST = "restore.url";
   private static final int PORT = 8080;
@@ -136,42 +154,42 @@ public class ETLUtils {
     return Bytes.toLong(longBytes);
   }
 
-    public static List<ColumnInfo> getColumnInfos(Object log) throws IllegalAccessException {
-        Field[] fields = log.getClass().getDeclaredFields();
-        BigDataColumn bigDataColumnAnno;
-        List<ColumnInfo> columnInfos = new ArrayList<>();
-        String cf, q, stringVal;
-        byte[] byteVal;
-        Object fieldVal;
-        HbaseDataType type;
-        for (Field field : fields) {
-            field.setAccessible(true);
-            bigDataColumnAnno = field.getAnnotation(BigDataColumn.class);
-            if (bigDataColumnAnno == null) {
-                continue;
-            }
-            fieldVal = field.get(log);
-            if (fieldVal == null) {
-                continue;
-            }
-            stringVal = fieldVal.toString();
-            if (StringUtils.isBlank(stringVal)) {
-                continue;
-            }
+  public static List<ColumnInfo> getColumnInfos(Object log) throws IllegalAccessException {
+    Field[] fields = log.getClass().getDeclaredFields();
+    BigDataColumn bigDataColumnAnno;
+    List<ColumnInfo> columnInfos = new ArrayList<>();
+    String cf, q, stringVal;
+    byte[] byteVal;
+    Object fieldVal;
+    HbaseDataType type;
+    for (Field field : fields) {
+      field.setAccessible(true);
+      bigDataColumnAnno = field.getAnnotation(BigDataColumn.class);
+      if (bigDataColumnAnno == null) {
+        continue;
+      }
+      fieldVal = field.get(log);
+      if (fieldVal == null) {
+        continue;
+      }
+      stringVal = fieldVal.toString();
+      if (StringUtils.isBlank(stringVal)) {
+        continue;
+      }
 
-            cf = bigDataColumnAnno.cf();
-            q = bigDataColumnAnno.q();
-            type = bigDataColumnAnno.type();
+      cf = bigDataColumnAnno.cf();
+      q = bigDataColumnAnno.q();
+      type = bigDataColumnAnno.type();
 
-            if (NUM.equals(type)) {
-                byteVal = Bytes.toBytes(Long.parseLong(stringVal));
-            } else {
-                byteVal = Bytes.toBytes(stringVal);
-            }
-            columnInfos.add(new ColumnInfo(cf, q, byteVal));
-        }
-        return columnInfos;
+      if (NUM.equals(type)) {
+        byteVal = Bytes.toBytes(Long.parseLong(stringVal));
+      } else {
+        byteVal = Bytes.toBytes(stringVal);
+      }
+      columnInfos.add(new ColumnInfo(cf, q, byteVal));
     }
+    return columnInfos;
+  }
 
   public static void main(String[] args) throws Exception {
     for (int i = 0; i < 1000; i++) {

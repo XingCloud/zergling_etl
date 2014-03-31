@@ -25,4 +25,8 @@ public class InternalQueue<T> {
     queue.put(t);
   }
 
+  public int size() {
+    return queue.size();
+  }
+
 }
