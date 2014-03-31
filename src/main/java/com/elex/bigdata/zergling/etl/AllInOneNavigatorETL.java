@@ -64,15 +64,20 @@ public class AllInOneNavigatorETL extends ETLBase {
           continue;
         }
 
+        if (requestURISep.indexOf(requestURISep) < 0) {
+          continue;
+        }
+
         from = line.indexOf(ipSep);
         if (from < 0) {
           continue;
         }
         ipString = line.substring(0, from);
         if (!ipString.matches(ETLConstants.REGEX_IP_ADDRESS)) {
-          continue;
+          ipLong = 0;
+        } else {
+          ipLong = ip2Long(ipString);
         }
-        ipLong = ip2Long(ipString);
 
         from = line.indexOf('[');
         to = line.indexOf(']');
@@ -107,8 +112,8 @@ public class AllInOneNavigatorETL extends ETLBase {
   }
 
   private void extractAndRun(String fileInput, String hTableName, int batchSize, int urlRestoreWorkerCount,
-                             int logStoreWorkerCount, boolean enableURLRestore, boolean enableHbasePut) throws IOException,
-    InterruptedException {
+                             int logStoreWorkerCount, boolean enableURLRestore, boolean enableHbasePut) throws
+    IOException, InterruptedException {
     File input = new File(fileInput);
     if (!input.exists()) {
       throw new IOException("File not found - " + fileInput);
