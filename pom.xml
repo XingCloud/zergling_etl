@@ -110,7 +110,7 @@
               <finalName>zergling_etl.CurrentMin5.jar-with-dependencies</finalName>
               <archive>
                 <manifest>
-                  <mainClass>com.elex.bigdata.zergling.etl.CurrentMin5</mainClass>
+                  <mainClass>com.elex.bigdata.zergling.etl.LastMin5</mainClass>
                 </manifest>
               </archive>
             </configuration>
