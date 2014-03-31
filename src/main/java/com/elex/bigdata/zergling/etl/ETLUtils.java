@@ -193,12 +193,18 @@ public class ETLUtils {
     return columnInfos;
   }
 
-  public static String current5Min() throws ParseException {
+  public static String last5Min() throws ParseException {
     DecimalFormat df = new DecimalFormat("000");
     Date d = new Date();
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     Date d2 = sdf.parse(sdf.format(d));
-    return df.format((d.getTime() - d2.getTime()) / 300000);
+    long i = (d.getTime() - d2.getTime()) / 300000 - 1;
+
+    if (i < 0) {
+      i = 287;
+      d2 = new Date(d2.getTime() - 86400 * 1000);
+    }
+    return sdf.format(d2) + "." + df.format(i);
   }
 
 }
