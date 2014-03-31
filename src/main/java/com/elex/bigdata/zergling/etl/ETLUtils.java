@@ -26,9 +26,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -191,14 +193,12 @@ public class ETLUtils {
     return columnInfos;
   }
 
-  public static void main(String[] args) throws Exception {
-    for (int i = 0; i < 1000; i++) {
-      for (int j = 0; j < 100; j++) {
-        long l = makeVersion(i, j);
-        System.out.println(l + " - " + Arrays.toString(Bytes.toBytes(l)));
-      }
-    }
-
+  public static String current5Min() throws ParseException {
+    DecimalFormat df = new DecimalFormat("000");
+    Date d = new Date();
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    Date d2 = sdf.parse(sdf.format(d));
+    return df.format((d.getTime() - d2.getTime()) / 300000);
   }
 
 }

@@ -100,6 +100,21 @@
               </archive>
             </configuration>
           </execution>
+          <execution>
+            <id>CurrentMin5</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <finalName>zergling_etl.CurrentMin5.jar-with-dependencies</finalName>
+              <archive>
+                <manifest>
+                  <mainClass>com.elex.bigdata.zergling.etl.CurrentMin5</mainClass>
+                </manifest>
+              </archive>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
     </plugins>
