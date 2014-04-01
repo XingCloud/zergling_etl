@@ -24,10 +24,10 @@ public class HBasePutterV2 implements Callable<String> {
     private String tableName;
     private AtomicLong counter;
 
-    public HBasePutterV2(LogType logType,String tableName,List<String> lines,AtomicLong counter) throws Exception {
-        LOGGER = Logger.getLogger(logType.getType());
-        IGNORE_LOGGER = Logger.getLogger(logType.getType() + "_ignore");
-        this.builder = logType.getBuilder();
+    public HBasePutterV2(String logType, HBaseBuilder builder, String tableName,List<String> lines,AtomicLong counter) throws Exception {
+        LOGGER = Logger.getLogger(logType);
+        IGNORE_LOGGER = Logger.getLogger(logType + "_ignore");
+        this.builder = builder;
         this.tableName = tableName;
         this.lines = lines;
         this.counter = counter;

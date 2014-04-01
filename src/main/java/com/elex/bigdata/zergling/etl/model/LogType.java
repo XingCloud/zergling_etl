@@ -1,5 +1,6 @@
 package com.elex.bigdata.zergling.etl.model;
 
+import com.elex.bigdata.zergling.etl.hbase.ADLogHBaseBuilder;
 import com.elex.bigdata.zergling.etl.hbase.HBaseBuilder;
 import com.elex.bigdata.zergling.etl.hbase.SearchLogHBaseBuilder;
 
@@ -18,7 +19,7 @@ public enum LogType {
     },AD("ad"){
         @Override
         public HBaseBuilder getBuilder() {
-            return null;
+            return new ADLogHBaseBuilder();
         }
     };
 
