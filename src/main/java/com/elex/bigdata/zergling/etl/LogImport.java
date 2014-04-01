@@ -1,5 +1,6 @@
 package com.elex.bigdata.zergling.etl;
 
+import com.elex.bigdata.zergling.etl.hbase.HBaseBuilder;
 import com.elex.bigdata.zergling.etl.hbase.HBasePutterV2;
 import com.elex.bigdata.zergling.etl.hbase.HBaseResourceManager;
 import com.elex.bigdata.zergling.etl.model.LogType;
@@ -50,6 +51,7 @@ public class LogImport {
         Long totalCount = 0l;
         new HBaseResourceManager(workers);
         System.out.println("Begin processing log " + filePath);
+        HBaseBuilder builder = logType.getBuilder();
         try {
             fis = new FileInputStream(filePath);
             reader = new BufferedReader(new InputStreamReader(fis));
@@ -61,12 +63,12 @@ public class LogImport {
                 ++totalCount;
                 if(lines.size() == batch){
                     System.out.print(".");
-                    jobs.add(service.submit(new HBasePutterV2(logType,tableName,lines,counter)));
+                    jobs.add(service.submit(new HBasePutterV2(logType.getType(),builder,tableName,lines,counter)));
                     lines = new ArrayList<String>();
                 }
             }
             if(lines.size() > 0){
-                jobs.add(service.submit(new HBasePutterV2(logType,tableName,lines,counter)));
+                jobs.add(service.submit(new HBasePutterV2(logType.getType(),builder,tableName,lines,counter)));
             }
 
         } catch (Exception e) {
@@ -107,6 +109,6 @@ public class LogImport {
         System.out.println(".");
         System.out.println("Finished import log " + (error? "with":"without") + " error");
         System.out.println("Insert " + counter.get() + "/" + totalCount + " lines spend " + (System.currentTimeMillis() - startTime) + "ms ");
-        LOGGER.info("Insert " + counter.get() + "/" + totalCount + " lines spend " + (System.currentTimeMillis() - startTime) + "ms ");
+        LOGGER.info("Insert " + counter.get() + "/" + totalCount + "("+ filePath +") lines spend " + (System.currentTimeMillis() - startTime) + "ms ");
     }
 }
