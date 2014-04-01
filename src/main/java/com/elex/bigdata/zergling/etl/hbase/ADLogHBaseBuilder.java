@@ -1,5 +1,6 @@
 package com.elex.bigdata.zergling.etl.hbase;
 
+import com.elex.bigdata.util.MetricMapping;
 import com.elex.bigdata.zergling.etl.ETLUtils;
 import com.elex.bigdata.zergling.etl.driver.MongoDriver;
 import org.apache.commons.lang.StringUtils;
@@ -24,13 +25,14 @@ import java.util.Map;
 public class ADLogHBaseBuilder implements HBaseBuilder {
 
     public static final Log LOG = LogFactory.getLog(ADLogHBaseBuilder.class);
+    public static MetricMapping metricMapping = MetricMapping.getInstance();
     private byte[] cf = Bytes.toBytes("basis");
     private byte[] scoreCf = Bytes.toBytes("h"); //hit 命中情况
     private byte[] aidCol = Bytes.toBytes("aid");
     private byte[] ipCol = Bytes.toBytes("ip");
     private byte[] urlCol = Bytes.toBytes("url");
-    private byte[] priceCol = Bytes.toBytes("p");
-    private byte[] categoryCol = Bytes.toBytes("c");
+    private byte[] cpcCol = Bytes.toBytes("cpc");
+    private byte[] categoryCol = Bytes.toBytes("c"); //0，未指定 1，游戏 2，电商 99，其他
     private byte[] widthCol = Bytes.toBytes("w");
     private byte[] heightCol = Bytes.toBytes("h");
     private String urlPrefix = "/ad.png?";
@@ -47,7 +49,7 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         adDetailKeys.put("w",widthCol);
         adDetailKeys.put("h",heightCol);
         adDetailKeys.put("category",categoryCol);
-        adDetailKeys.put("cpc",priceCol);
+        adDetailKeys.put("cpc",cpcCol);
         adDetailKeys.put("url",urlCol);
     }
 
@@ -55,7 +57,7 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
     public Put buildPut(String line) throws Exception {
         //        0  10.1.20.152
         //        1  2014-03-31T14:24:23+08:00
-        //        2  /ad.png?p=22find&nation=br&uid=wuzijing&aid=123&t=z.20,a.50,b.30
+        //        2  /ad.png?p=www.awesomehp.com&ip=37.239.46.2&nation=IQ&uid=WDCXWD5000BPVT-22HXZT3_WD-WXL1A911029910299&aid=1883&t=
 
         List<String> attrs = split(line,LOG_ATTR_SEPRATOR);
         List<String> uriParams = split(attrs.get(2).substring(urlPrefix.length()),LOG_URI_SEPRATOR);
@@ -69,7 +71,8 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         }
 
         if(StringUtils.isBlank(params.get("p")) || StringUtils.isBlank(params.get("nation"))
-                || StringUtils.isBlank(params.get("uid")) || StringUtils.isBlank(params.get("aid")) ){
+                || StringUtils.isBlank(params.get("uid")) || StringUtils.isBlank(params.get("aid"))
+                || StringUtils.isBlank(params.get("ip")) ){
             throw new Exception(" One ad params is null");
         }
 
@@ -79,12 +82,16 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
             throw new Exception("Could not find the AD detail for aid " + params.get("aid"));
         }
 
-        long ip = ETLUtils.ip2Long(attrs.get(0));
+        long ip = ETLUtils.ip2Long(params.get("ip"));
         long time = sdf.parse(attrs.get(1)).getTime();
 
-        //TIME + NATION + PID + UID
-        byte[] rowKeySuffix = Bytes.add(Bytes.toBytes(params.get("nation")), Bytes.toBytes(params.get("p")), Bytes.toBytes(StringUtils.isBlank(params.get("uid"))));
-        byte[] rowKey = Bytes.add(Bytes.toBytes(time),rowKeySuffix);
+        //PID + NATION + TIME + UID
+        Byte pid = metricMapping.getProjectURLByte(params.get("p"));
+        if(pid == null){
+            throw new Exception("Could not find the mapped pid for URL:" + params.get("p"));
+        }
+        byte[] rowKeyPreffix = Bytes.add(new byte[]{pid.byteValue()},Bytes.toBytes(params.get("nation")),Bytes.toBytes(time));
+        byte[] rowKey = Bytes.add(rowKeyPreffix, Bytes.toBytes(params.get("uid")));
 
         Put put = new Put(rowKey);
         put.add(cf,aidCol,time,Bytes.toBytes(params.get("aid")));
@@ -110,7 +117,6 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         }
 
         return put;
-
     }
 
 
