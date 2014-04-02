@@ -106,6 +106,7 @@ public class LogImport {
         }
 
         service.shutdownNow();
+        builder.cleanup();
         System.out.println(".");
         System.out.println("Finished import log " + (error? "with":"without") + " error");
         System.out.println("Insert " + counter.get() + "/" + totalCount + " lines spend " + (System.currentTimeMillis() - startTime) + "ms ");

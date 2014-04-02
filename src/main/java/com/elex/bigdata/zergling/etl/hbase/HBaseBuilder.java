@@ -10,4 +10,5 @@ import org.apache.hadoop.hbase.client.Put;
  */
 public interface HBaseBuilder {
     public Put buildPut(String line) throws Exception;
+    public void cleanup() throws Exception;
 }
