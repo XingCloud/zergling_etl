@@ -42,13 +42,14 @@ public class UrlShorterWorker<T extends BasicNavigatorLog> implements Runnable {
 
     for (BasicNavigatorLog log : content) {
       shortenedURL = log.getUrl();
-      originalURL = null;
       if (shortenedURL.startsWith("http://goo.mx")) {
         try {
           originalURL = UrlShortener.getInstance().toOriginalURL(shortenedURL);
         } catch (Exception e) {
           originalURL = "Error";
         }
+      } else {
+        originalURL = shortenedURL;
       }
 
       if (StringUtils.isBlank(originalURL)) {
