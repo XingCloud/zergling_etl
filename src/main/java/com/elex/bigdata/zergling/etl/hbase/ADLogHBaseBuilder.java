@@ -32,13 +32,13 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
     private byte[] ipCol = Bytes.toBytes("ip");
     private byte[] urlCol = Bytes.toBytes("url");
     private byte[] cpcCol = Bytes.toBytes("cpc");
-    private byte[] categoryCol = Bytes.toBytes("c"); //0，未指定 1，游戏 2，电商 99，其他
+    private byte[] categoryCol = Bytes.toBytes("c");
     private byte[] widthCol = Bytes.toBytes("w");
     private byte[] heightCol = Bytes.toBytes("h");
-    private String urlPrefix = "/ad.png?";
+    private String urlPreffix = "/ad.png?";
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private Map<String,byte[]> adDetailKeys = new HashMap<String, byte[]>();
-    private static String LOG_ATTR_SEPRATOR = " ";
+    private static String LOG_ATTR_SEPRATOR = "\t";
     private static String LOG_URI_SEPRATOR = "&";
     private static String LOG_URI_PARAM_SEPRATOR = "=";
     private static String LOG_HIT_SEPRATOR = ",";
@@ -60,7 +60,7 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         //        2  /ad.png?p=www.awesomehp.com&ip=37.239.46.2&nation=IQ&uid=WDCXWD5000BPVT-22HXZT3_WD-WXL1A911029910299&aid=1883&t=
 
         List<String> attrs = split(line,LOG_ATTR_SEPRATOR);
-        List<String> uriParams = split(attrs.get(2).substring(urlPrefix.length()),LOG_URI_SEPRATOR);
+        List<String> uriParams = split(attrs.get(2).substring(urlPreffix.length()),LOG_URI_SEPRATOR);
 
         Map<String,String> params = new HashMap<String,String>();
         for(String param : uriParams){
@@ -108,12 +108,17 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         //命中情况
         if(StringUtils.isNotBlank(params.get("t"))){
             List<String> scores = split(params.get("t"),LOG_HIT_SEPRATOR);
+            //b.19,a.21,z.60 a.游戏 b.电商 z.未知
             for(String score : scores){
                 int pos = score.indexOf(LOG_HIT_KV_SEPRATOR);
                 String key = score.substring(0, pos);
                 Integer value = Integer.parseInt(score.substring(pos + 1));
                 put.add(scoreCf,Bytes.toBytes(key),time,Bytes.toBytes(value));
             }
+            //0，未指定 1，游戏 2，电商 99，其他 ,冗余存一份，用于后期指定CF分析命中情况使用
+            //具体是否命中不在这里计算，后期可能类型会有更新，这里不易枚举映射情况
+            Object cat = adDetail.get("category");
+            put.add(scoreCf,categoryCol,time,Bytes.toBytes(Integer.parseInt(cat.toString())));
         }
 
         return put;
