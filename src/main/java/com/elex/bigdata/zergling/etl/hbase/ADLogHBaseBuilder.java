@@ -125,9 +125,13 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         }
 
         //更新nation,nation放到mongo中，方便训练的时候使用
-        String comNation = pid.toString() + COMBINE_NATION_SEPRATOR + params.get("nation");
-        if(!historyNations.contains(comNation) && newNations.get(comNation) == null){
-            newNations.put(comNation,null);
+        try{
+            String comNation = pid.toString() + COMBINE_NATION_SEPRATOR + params.get("nation");
+            if(!historyNations.contains(comNation) && newNations.get(comNation) == null){
+                newNations.put(comNation,null);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
         return put;
