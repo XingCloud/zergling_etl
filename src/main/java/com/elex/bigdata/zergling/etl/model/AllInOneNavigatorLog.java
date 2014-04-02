@@ -2,6 +2,7 @@ package com.elex.bigdata.zergling.etl.model;
 
 import static com.elex.bigdata.zergling.etl.ETLConstants.LOG_LINE_SEPERATOR;
 
+import com.elex.bigdata.zergling.etl.ETLConstants;
 import com.elex.bigdata.zergling.etl.ETLUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.client.Put;
@@ -34,25 +35,31 @@ public class AllInOneNavigatorLog extends BasicNavigatorLog {
 
   @Override
   public Put toPut(int outerVersion, int innerVersion) throws Exception {
-    long version = ETLUtils.makeVersion(outerVersion, innerVersion);
-    byte[] rowkeyBytes = Bytes.toBytes(dateString.concat(uid));
-    Put put = new Put(rowkeyBytes);
+    if (StringUtils.isBlank(this.projectId) || StringUtils.isBlank(this.nation) || StringUtils
+      .isBlank(this.url) || StringUtils.isBlank(this.uid)) {
+      return null;
+    }
+    Byte projectByte = ETLConstants.METRIC_MAPPING.getProjectURLByte(this.projectId);
+    if (projectByte == null) {
+      throw new Exception("Unknown project(" + this.projectId + ")");
+    }
     if (StringUtils.isBlank(this.url)) {
       throw new Exception("URL is necessary.");
     }
+
+    // Make version
+    long version = ETLUtils.makeVersion(outerVersion, innerVersion);
+    byte[] b = Bytes.toBytes(nation.toLowerCase().concat(dateString.concat(uid)));
+    byte[] rowkeyBytes = new byte[b.length + 1];
+    rowkeyBytes[0] = projectByte.byteValue();
+    System.arraycopy(b, 0, rowkeyBytes, 1, b.length);
+    Put put = new Put(rowkeyBytes);
+
+    put.add(CF, Q_IP, version, Bytes.toBytes(ip));
     put.add(CF, Q_URL, version, Bytes.toBytes(url));
 
-    if (StringUtils.isNotBlank(this.projectId)) {
-      put.add(CF, Q_PROJECT_ID, version, Bytes.toBytes(projectId));
-    }
-    if (StringUtils.isNotBlank(this.nation)) {
-      put.add(CF, Q_NATION, version, Bytes.toBytes(nation));
-    }
     if (StringUtils.isNotBlank(this.userDateString)) {
       put.add(CF, Q_USERDATE_STRING, version, Bytes.toBytes(userDateString));
-    }
-    if (this.ip > 0) {
-      put.add(CF, Q_IP, version, Bytes.toBytes(ip));
     }
     return put;
   }

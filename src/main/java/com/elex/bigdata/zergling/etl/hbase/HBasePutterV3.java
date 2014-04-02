@@ -39,9 +39,6 @@ public class HBasePutterV3<T extends GenericLog> implements Runnable {
   }
 
   private String purePut(List<Put> puts) {
-    if (!enableHbasePut) {
-      return null;
-    }
     try {
       hTable.put(puts);
       return null;
@@ -82,7 +79,15 @@ public class HBasePutterV3<T extends GenericLog> implements Runnable {
         }
 
         long t1 = System.currentTimeMillis();
-        String returnResult = purePut(puts);
+        String returnResult;
+        if (enableHbasePut) {
+          returnResult = purePut(puts);
+        } else {
+          for (GenericLog log : content) {
+            LOGGER.info("[LINE] - " + log.toLine());
+          }
+          returnResult = null;
+        }
         boolean ok = StringUtils.isBlank(returnResult);
         long t2 = System.currentTimeMillis();
         long thisRoundTime = t2 - t1;

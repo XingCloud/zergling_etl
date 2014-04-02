@@ -1,5 +1,7 @@
 package com.elex.bigdata.zergling.etl;
 
+import com.elex.bigdata.util.MetricMapping;
+
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
@@ -25,13 +27,15 @@ public class ETLConstants {
   public static final String UNKOWN_UID = "0000000000";
   public static final Pattern UID_PARTTERN = Pattern.compile("uid=([a-zA-Z0-9_\\\\-]+);", Pattern.CASE_INSENSITIVE);
 
-    static {
+  static {
     STANDARD_OUTPUT_SDF.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
 //    STANDARD_OUTPUT_SDF.setTimeZone(TimeZone.getTimeZone("GMT-06:00"));
   }
 
-  public static final class LOG_TPYE{
-      public static final String SEARCH = "search";
-      public static final String AD = "ad";
+  public static final class LOG_TPYE {
+    public static final String SEARCH = "search";
+    public static final String AD = "ad";
   }
+
+  public static final MetricMapping METRIC_MAPPING = MetricMapping.getInstance();
 }

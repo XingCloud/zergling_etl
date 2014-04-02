@@ -49,7 +49,7 @@ public class AllInOneNavigatorETL extends ETLBase {
     IOException, InterruptedException {
     String line;
     int from, to, version = 1;
-    char ipSep = ' ', stop = '&';
+    char blank = ' ', stop = '&';
     long ipLong;
     String requestURISep = "/nav.png?", projectSep = "p=", nationSep = "nation=", uidSep = "uid=", urlSep = "url=";
     String ipString, dateString, userLocalTime, requestURI, projectId, nation, uid, url;
@@ -64,27 +64,30 @@ public class AllInOneNavigatorETL extends ETLBase {
           continue;
         }
 
+        // Filter other invalid request.
         if (requestURISep.indexOf(requestURISep) < 0) {
           continue;
         }
 
-        from = line.indexOf(ipSep);
-        if (from < 0) {
+        // Parse ip
+        to = line.indexOf(blank);
+        if (to < 0) {
           continue;
         }
-        ipString = line.substring(0, from);
+        from = 0;
+        ipString = line.substring(from, to);
         if (!ipString.matches(ETLConstants.REGEX_IP_ADDRESS)) {
           ipLong = 0;
         } else {
           ipLong = ip2Long(ipString);
         }
 
-        from = line.indexOf('[');
-        to = line.indexOf(']');
+        from = to + 1;
+        to = line.indexOf(blank, from);
         if (from < 0 || to < 0) {
           continue;
         }
-        dateString = line.substring(from + 1, to);
+        dateString = line.substring(from, to);
         fillDate(dateChars, dateString);
         dateString = new String(dateChars);
 
@@ -118,6 +121,7 @@ public class AllInOneNavigatorETL extends ETLBase {
     if (!input.exists()) {
       throw new IOException("File not found - " + fileInput);
     }
+    System.out.println("haha");
     LOGGER.info(
       "Generic navigator log putter(File=" + fileInput + ", HTable=" + hTableName + ", BatchSize=" + batchSize + ", URLRestoreWorker=" + urlRestoreWorkerCount + ", LogStoreWorker=" + logStoreWorkerCount + ") begin working.");
     final InternalQueue<LogBatch<AllInOneNavigatorLog>> urlRestoreQueue = new InternalQueue<>(), logStoreQueue = new InternalQueue<>();
