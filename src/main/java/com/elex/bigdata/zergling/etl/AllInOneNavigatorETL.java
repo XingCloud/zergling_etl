@@ -53,7 +53,7 @@ public class AllInOneNavigatorETL extends ETLBase {
     IOException, InterruptedException {
     String line;
     int from, to, version = 1;
-    char blank = ' ', stop = '&';
+    char blank = '\t', stop = '&';
     long ipLong;
     String requestURISep = "/nav.png?", projectSep = "p=", nationSep = "nation=", uidSep = "uid=", urlSep = "url=";
     String ipString, dateString, userLocalTime, requestURI, projectId, nation, uid, url;
@@ -79,7 +79,7 @@ public class AllInOneNavigatorETL extends ETLBase {
           continue;
         }
         from = 0;
-        ipString = line.substring(from, to);
+        ipString = chooseLastIPString(line.substring(from, to));
         if (!ipString.matches(ETLConstants.REGEX_IP_ADDRESS)) {
           ipLong = 0;
         } else {

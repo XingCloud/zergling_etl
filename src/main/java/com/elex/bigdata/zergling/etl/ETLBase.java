@@ -8,6 +8,8 @@ import java.util.Date;
  * User: Z J Wu Date: 14-2-24 Time: 上午10:23 Package: com.elex.bigdata.zergling.etl
  */
 public abstract class ETLBase {
+  private final String MULTI_IP_SEP = ", ";
+  private final int MULTI_IP_SEP_LEN = MULTI_IP_SEP.length();
   protected final SimpleDateFormat bjSDF = ETLUtils.SDF_MAP.get("bj");
 
   protected String extractContent(String line, String key, char stop) {
@@ -22,6 +24,14 @@ public abstract class ETLBase {
     } else {
       return line.substring(a + keyLength);
     }
+  }
+
+  protected String chooseLastIPString(String s) {
+    int index = s.lastIndexOf(MULTI_IP_SEP);
+    if (index < 0) {
+      return s;
+    }
+    return s.substring(index + MULTI_IP_SEP_LEN);
   }
 
   protected String extractContent(String line, String key) {
@@ -42,6 +52,5 @@ public abstract class ETLBase {
     }
     return targetSDF.format(d);
   }
-
 
 }
