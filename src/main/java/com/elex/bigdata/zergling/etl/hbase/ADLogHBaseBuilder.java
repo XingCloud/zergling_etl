@@ -128,7 +128,7 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         try{
             String comNation = pid.toString() + COMBINE_NATION_SEPRATOR + params.get("nation");
             if(!historyNations.contains(comNation) && newNations.get(comNation) == null){
-                newNations.put(comNation,null);
+                newNations.put(comNation,"");
             }
         }catch (Exception e){
             e.printStackTrace();
