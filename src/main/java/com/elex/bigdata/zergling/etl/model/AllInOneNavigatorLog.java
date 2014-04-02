@@ -44,6 +44,7 @@ public class AllInOneNavigatorLog extends BasicNavigatorLog {
     if (StringUtils.isBlank(this.url)) {
       return false;
     }
+    this.nation = nation.toLowerCase();
     return true;
   }
 
