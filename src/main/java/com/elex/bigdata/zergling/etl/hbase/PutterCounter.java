@@ -11,12 +11,12 @@ public class PutterCounter {
     this.val = 0;
   }
 
-  public PutterCounter(long val) {
-    this.val = val;
-  }
-
   public synchronized void incVal(long v) {
     this.val += v;
+  }
+
+  public synchronized void incOne() {
+    this.val += 1;
   }
 
   public long getVal() {

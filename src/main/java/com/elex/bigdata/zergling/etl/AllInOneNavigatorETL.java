@@ -28,21 +28,25 @@ import java.util.concurrent.CountDownLatch;
 public class AllInOneNavigatorETL extends ETLBase {
   private static final Logger LOGGER = Logger.getLogger(AllInOneNavigatorETL.class);
 
-  private void fillDate(char[] dateChars, String dateString) {
-    dateChars[0] = dateString.charAt(0);
-    dateChars[1] = dateString.charAt(1);
-    dateChars[2] = dateString.charAt(2);
-    dateChars[3] = dateString.charAt(3);
-    dateChars[4] = dateString.charAt(5);
-    dateChars[5] = dateString.charAt(6);
-    dateChars[6] = dateString.charAt(8);
-    dateChars[7] = dateString.charAt(9);
-    dateChars[8] = dateString.charAt(11);
-    dateChars[9] = dateString.charAt(12);
-    dateChars[10] = dateString.charAt(14);
-    dateChars[11] = dateString.charAt(15);
-    dateChars[12] = dateString.charAt(17);
-    dateChars[13] = dateString.charAt(18);
+  private void fillDate(char[] dateChars, String dateString) throws Exception {
+    try {
+      dateChars[0] = dateString.charAt(0);
+      dateChars[1] = dateString.charAt(1);
+      dateChars[2] = dateString.charAt(2);
+      dateChars[3] = dateString.charAt(3);
+      dateChars[4] = dateString.charAt(5);
+      dateChars[5] = dateString.charAt(6);
+      dateChars[6] = dateString.charAt(8);
+      dateChars[7] = dateString.charAt(9);
+      dateChars[8] = dateString.charAt(11);
+      dateChars[9] = dateString.charAt(12);
+      dateChars[10] = dateString.charAt(14);
+      dateChars[11] = dateString.charAt(15);
+      dateChars[12] = dateString.charAt(17);
+      dateChars[13] = dateString.charAt(18);
+    } catch (Exception e) {
+      throw new Exception("Cannot fill date(" + dateString + ")");
+    }
   }
 
   private void putQueue(int batchSize, File input, InternalQueue<LogBatch<AllInOneNavigatorLog>> urlRestoreQueue) throws
@@ -88,7 +92,12 @@ public class AllInOneNavigatorETL extends ETLBase {
           continue;
         }
         dateString = line.substring(from, to);
-        fillDate(dateChars, dateString);
+        try {
+          fillDate(dateChars, dateString);
+        } catch (Exception e) {
+          LOGGER.warn(e.getMessage(), e);
+          continue;
+        }
         dateString = new String(dateChars);
 
         from = line.indexOf(requestURISep);

@@ -17,8 +17,6 @@ public class AllInOneNavigatorLog extends BasicNavigatorLog {
 
   private static final byte[] Q_IP = Bytes.toBytes("ip");
   private static final byte[] Q_URL = Bytes.toBytes("url");
-  private static final byte[] Q_PROJECT_ID = Bytes.toBytes("project_id");
-  private static final byte[] Q_NATION = Bytes.toBytes("nation");
   private static final byte[] Q_USERDATE_STRING = Bytes.toBytes("user_date");
 
   private String projectId;
