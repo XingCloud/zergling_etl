@@ -28,28 +28,32 @@ import java.util.concurrent.CountDownLatch;
 public class AllInOneNavigatorETL extends ETLBase {
   private static final Logger LOGGER = Logger.getLogger(AllInOneNavigatorETL.class);
 
-  private void fillDate(char[] dateChars, String dateString) {
-    dateChars[0] = dateString.charAt(0);
-    dateChars[1] = dateString.charAt(1);
-    dateChars[2] = dateString.charAt(2);
-    dateChars[3] = dateString.charAt(3);
-    dateChars[4] = dateString.charAt(5);
-    dateChars[5] = dateString.charAt(6);
-    dateChars[6] = dateString.charAt(8);
-    dateChars[7] = dateString.charAt(9);
-    dateChars[8] = dateString.charAt(11);
-    dateChars[9] = dateString.charAt(12);
-    dateChars[10] = dateString.charAt(14);
-    dateChars[11] = dateString.charAt(15);
-    dateChars[12] = dateString.charAt(17);
-    dateChars[13] = dateString.charAt(18);
+  private void fillDate(char[] dateChars, String dateString) throws Exception {
+    try {
+      dateChars[0] = dateString.charAt(0);
+      dateChars[1] = dateString.charAt(1);
+      dateChars[2] = dateString.charAt(2);
+      dateChars[3] = dateString.charAt(3);
+      dateChars[4] = dateString.charAt(5);
+      dateChars[5] = dateString.charAt(6);
+      dateChars[6] = dateString.charAt(8);
+      dateChars[7] = dateString.charAt(9);
+      dateChars[8] = dateString.charAt(11);
+      dateChars[9] = dateString.charAt(12);
+      dateChars[10] = dateString.charAt(14);
+      dateChars[11] = dateString.charAt(15);
+      dateChars[12] = dateString.charAt(17);
+      dateChars[13] = dateString.charAt(18);
+    } catch (Exception e) {
+      throw new Exception("Cannot fill date(" + dateString + ")");
+    }
   }
 
   private void putQueue(int batchSize, File input, InternalQueue<LogBatch<AllInOneNavigatorLog>> urlRestoreQueue) throws
     IOException, InterruptedException {
     String line;
     int from, to, version = 1;
-    char ipSep = ' ', stop = '&';
+    char blank = ' ', stop = '&';
     long ipLong;
     String requestURISep = "/nav.png?", projectSep = "p=", nationSep = "nation=", uidSep = "uid=", urlSep = "url=";
     String ipString, dateString, userLocalTime, requestURI, projectId, nation, uid, url;
@@ -64,28 +68,36 @@ public class AllInOneNavigatorETL extends ETLBase {
           continue;
         }
 
+        // Filter other invalid request.
         if (requestURISep.indexOf(requestURISep) < 0) {
           continue;
         }
 
-        from = line.indexOf(ipSep);
-        if (from < 0) {
+        // Parse ip
+        to = line.indexOf(blank);
+        if (to < 0) {
           continue;
         }
-        ipString = line.substring(0, from);
+        from = 0;
+        ipString = line.substring(from, to);
         if (!ipString.matches(ETLConstants.REGEX_IP_ADDRESS)) {
           ipLong = 0;
         } else {
           ipLong = ip2Long(ipString);
         }
 
-        from = line.indexOf('[');
-        to = line.indexOf(']');
+        from = to + 1;
+        to = line.indexOf(blank, from);
         if (from < 0 || to < 0) {
           continue;
         }
-        dateString = line.substring(from + 1, to);
-        fillDate(dateChars, dateString);
+        dateString = line.substring(from, to);
+        try {
+          fillDate(dateChars, dateString);
+        } catch (Exception e) {
+          LOGGER.warn(e.getMessage(), e);
+          continue;
+        }
         dateString = new String(dateChars);
 
         from = line.indexOf(requestURISep);
@@ -118,6 +130,7 @@ public class AllInOneNavigatorETL extends ETLBase {
     if (!input.exists()) {
       throw new IOException("File not found - " + fileInput);
     }
+    System.out.println("haha");
     LOGGER.info(
       "Generic navigator log putter(File=" + fileInput + ", HTable=" + hTableName + ", BatchSize=" + batchSize + ", URLRestoreWorker=" + urlRestoreWorkerCount + ", LogStoreWorker=" + logStoreWorkerCount + ") begin working.");
     final InternalQueue<LogBatch<AllInOneNavigatorLog>> urlRestoreQueue = new InternalQueue<>(), logStoreQueue = new InternalQueue<>();

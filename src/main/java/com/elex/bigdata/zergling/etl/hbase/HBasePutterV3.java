@@ -27,21 +27,18 @@ public class HBasePutterV3<T extends GenericLog> implements Runnable {
 
   private boolean enableHbasePut;
 
-  private PutterCounter counter;
+  private PutterCounter success;
 
   public HBasePutterV3(InternalQueue<LogBatch<T>> queue, CountDownLatch signal, HTableInterface hTable,
-                       boolean enableHbasePut, PutterCounter counter) {
+                       boolean enableHbasePut, PutterCounter success) {
     this.queue = queue;
     this.signal = signal;
     this.hTable = hTable;
     this.enableHbasePut = enableHbasePut;
-    this.counter = counter;
+    this.success = success;
   }
 
   private String purePut(List<Put> puts) {
-    if (!enableHbasePut) {
-      return null;
-    }
     try {
       hTable.put(puts);
       return null;
@@ -82,12 +79,20 @@ public class HBasePutterV3<T extends GenericLog> implements Runnable {
         }
 
         long t1 = System.currentTimeMillis();
-        String returnResult = purePut(puts);
+        String returnResult;
+        if (enableHbasePut) {
+          returnResult = purePut(puts);
+        } else {
+          for (GenericLog log : content) {
+            LOGGER.info("[LINE] - " + log.toLine());
+          }
+          returnResult = null;
+        }
         boolean ok = StringUtils.isBlank(returnResult);
         long t2 = System.currentTimeMillis();
         long thisRoundTime = t2 - t1;
         if (ok) {
-          counter.incVal(batch.size());
+          success.incVal(innerVersion);
           if (thisRoundTime > 50) {
             LOGGER.info(
               "Put hbase ok but too slow, " + Thread.currentThread().getName() + " used " + thisRoundTime + " millis.");
