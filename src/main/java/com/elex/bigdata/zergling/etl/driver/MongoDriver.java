@@ -10,6 +10,7 @@ import org.apache.hadoop.hbase.client.ConnectionUtils;
 import org.bson.types.BasicBSONList;
 
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Author: liqiang
@@ -20,6 +21,7 @@ public class MongoDriver {
 
     public static final Log LOG = LogFactory.getLog(MongoDriver.class);
     public static final String OBJ_ID = "_id";
+    public static final String createdAt = "createdAt";
     private Mongo mongo;
     private DB db;
     public DBCollection adColl;
@@ -34,7 +36,8 @@ public class MongoDriver {
             db = mongo.getDB(mongodbDBName);
             adColl = db.getCollection(mongodbDBCollectionName);
 
-            adColl.ensureIndex("id");
+            //adColl.ensureIndex("id");
+            adColl.ensureIndex(new BasicDBObject("createdAt", 1), new BasicDBObject("expireAfterSeconds", 12*3600));
 
             LOG.info("connect to " + mongodbHost + " " + mongodbPort + " " + mongodbDBName
                     + " " + mongodbDBCollectionName);
@@ -78,7 +81,7 @@ public class MongoDriver {
         return instance.mongo;
     }
 
-    static public DBObject getADDetail(String id){
+    static public DBObject getADDetail(String id) throws Exception{
         //get from local
         DBObject queryObject = new BasicDBObject();
         queryObject.put(OBJ_ID,String.valueOf(id));
@@ -98,15 +101,14 @@ public class MongoDriver {
 
             DBObject bson = (DBObject) bsonList.get(0);
             bson.put(OBJ_ID,bson.get("id"));
+            bson.put(createdAt,new Date());
             MongoDriver.getADCollection().insert(bson);
             return bson;
 
         } catch (Exception e) {
-            LOG.info("Fail to get the AD for aid("+id+") as get exception : " + e.getMessage());
-            e.printStackTrace();
+            throw new Exception("Fail to get the AD detail for aid("+id+")",e);
         }
 
-        return null;
     }
 
     static private String getRemoteAD(String id) throws IOException, InterruptedException {
