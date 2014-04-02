@@ -35,6 +35,11 @@ public class SearchLogHBaseBuilder implements HBaseBuilder {
         return put;
     }
 
+    @Override
+    public void cleanup() throws Exception {
+
+    }
+
     private SearchLog parse22Find(String line){
         //暂不抽象成对象，目前没有其他地方使用
         List<String> fields = new ArrayList<String>();

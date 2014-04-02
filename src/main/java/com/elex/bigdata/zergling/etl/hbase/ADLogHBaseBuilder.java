@@ -11,10 +11,8 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.bson.BSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -38,11 +36,14 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
     private String urlPreffix = "/ad.png?";
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private Map<String,byte[]> adDetailKeys = new HashMap<String, byte[]>();
-    private static String LOG_ATTR_SEPRATOR = "\t";
-    private static String LOG_URI_SEPRATOR = "&";
-    private static String LOG_URI_PARAM_SEPRATOR = "=";
-    private static String LOG_HIT_SEPRATOR = ",";
-    private static String LOG_HIT_KV_SEPRATOR = ".";
+    private static final String LOG_ATTR_SEPRATOR = "\t";
+    private static final String LOG_URI_SEPRATOR = "&";
+    private static final String LOG_URI_PARAM_SEPRATOR = "=";
+    private static final String LOG_HIT_SEPRATOR = ",";
+    private static final String LOG_HIT_KV_SEPRATOR = ".";
+    private static final String COMBINE_NATION_SEPRATOR = "_";
+    private static Set<String> historyNations;
+    private static ConcurrentHashMap<String,String> newNations = new ConcurrentHashMap<String,String>();
 
     public ADLogHBaseBuilder(){
         MongoDriver.getInstance();
@@ -51,6 +52,8 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         adDetailKeys.put("category",categoryCol);
         adDetailKeys.put("cpc",cpcCol);
         adDetailKeys.put("url",urlCol);
+
+        historyNations = MetricMapping.getAllNationsAsSet();
     }
 
     @Override
@@ -121,7 +124,22 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
             put.add(scoreCf,categoryCol,time,Bytes.toBytes(Integer.parseInt(cat.toString())));
         }
 
+        //更新nation,nation放到mongo中，方便训练的时候使用
+        try{
+            String comNation = pid.toString() + COMBINE_NATION_SEPRATOR + params.get("nation");
+            if(!historyNations.contains(comNation) && newNations.get(comNation) == null){
+                newNations.put(comNation,"");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         return put;
+    }
+
+    @Override
+    public void cleanup() throws Exception {
+        MetricMapping.insertNations(newNations.keySet());
     }
 
 
