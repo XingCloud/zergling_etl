@@ -49,9 +49,12 @@ public class ETLUtils {
     frSDF.setTimeZone(TimeZone.getTimeZone("+01:00"));
     SimpleDateFormat bjSDF = new SimpleDateFormat("yyyyMMddHHmmss");
     frSDF.setTimeZone(TimeZone.getTimeZone("+08:00"));
+    SimpleDateFormat trSDF = new SimpleDateFormat("yyyyMMddHHmmss");
+    trSDF.setTimeZone(TimeZone.getTimeZone("+02:00"));
     SDF_MAP.put("br", brSDF);
     SDF_MAP.put("fr", frSDF);
     SDF_MAP.put("bj", bjSDF);
+    SDF_MAP.put("tr", bjSDF);
   }
 
   private static final String HTTP_SCHEMA = "http";

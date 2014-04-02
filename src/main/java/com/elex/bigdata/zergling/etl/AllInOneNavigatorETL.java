@@ -7,6 +7,7 @@ import com.elex.bigdata.zergling.etl.hbase.HBaseResourceManager;
 import com.elex.bigdata.zergling.etl.hbase.PutterCounter;
 import com.elex.bigdata.zergling.etl.model.AllInOneNavigatorLog;
 import com.elex.bigdata.zergling.etl.model.LogBatch;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.client.HTableInterface;
@@ -20,6 +21,7 @@ import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -49,77 +51,116 @@ public class AllInOneNavigatorETL extends ETLBase {
     }
   }
 
-  private void putQueue(int batchSize, File input, InternalQueue<LogBatch<AllInOneNavigatorLog>> urlRestoreQueue) throws
-    IOException, InterruptedException {
-    String line;
-    int from, to, version = 1;
-    char blank = ' ', stop = '&';
+  private AllInOneNavigatorLog line2Log(String line) throws Exception {
+    int from, to;
+    char blank = '\t', stop = '&';
     long ipLong;
     String requestURISep = "/nav.png?", projectSep = "p=", nationSep = "nation=", uidSep = "uid=", urlSep = "url=";
     String ipString, dateString, userLocalTime, requestURI, projectId, nation, uid, url;
     char[] dateChars = new char[14];
+    line = StringUtils.trimToNull(line);
+    if (StringUtils.isBlank(line)) {
+      return null;
+    }
+
+    // Filter other invalid request.
+    if (requestURISep.indexOf(requestURISep) < 0) {
+      return null;
+    }
+
+    // Parse ip
+    to = line.indexOf(blank);
+    if (to < 0) {
+      return null;
+    }
+    from = 0;
+    ipString = chooseLastIPString(line.substring(from, to));
+    if (!ipString.matches(ETLConstants.REGEX_IP_ADDRESS)) {
+      ipLong = 0;
+    } else {
+      ipLong = ip2Long(ipString);
+    }
+
+    from = to + 1;
+    to = line.indexOf(blank, from);
+    if (from < 0 || to < 0) {
+      return null;
+    }
+    dateString = line.substring(from, to);
+    try {
+      fillDate(dateChars, dateString);
+    } catch (Exception e) {
+      throw e;
+    }
+    dateString = new String(dateChars);
+    from = line.indexOf(requestURISep);
+    requestURI = line.substring(from);
+    projectId = extractContent(requestURI, projectSep, stop);
+    nation = extractContent(requestURI, nationSep, stop);
+    uid = extractContent(requestURI, uidSep, stop);
+    url = extractContent(requestURI, urlSep);
+    userLocalTime = toLocalTime(dateString, nation);
+    return new AllInOneNavigatorLog(dateString, uid, ipLong, url, projectId, nation, userLocalTime);
+  }
+
+  private void putQueue(int batchSize, File input, InternalQueue<LogBatch<AllInOneNavigatorLog>> urlRestoreQueue,
+                        List<String> errorLines) throws IOException, InterruptedException {
+    String line;
+    int version = 1;
     AllInOneNavigatorLog singleLog;
     LogBatch<AllInOneNavigatorLog> batch = new LogBatch<>(batchSize, 0);
     int cnt = 0;
     try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(input)));) {
       while ((line = br.readLine()) != null) {
-        line = StringUtils.trimToNull(line);
-        if (StringUtils.isBlank(line)) {
-          continue;
-        }
-
-        // Filter other invalid request.
-        if (requestURISep.indexOf(requestURISep) < 0) {
-          continue;
-        }
-
-        // Parse ip
-        to = line.indexOf(blank);
-        if (to < 0) {
-          continue;
-        }
-        from = 0;
-        ipString = line.substring(from, to);
-        if (!ipString.matches(ETLConstants.REGEX_IP_ADDRESS)) {
-          ipLong = 0;
-        } else {
-          ipLong = ip2Long(ipString);
-        }
-
-        from = to + 1;
-        to = line.indexOf(blank, from);
-        if (from < 0 || to < 0) {
-          continue;
-        }
-        dateString = line.substring(from, to);
-        try {
-          fillDate(dateChars, dateString);
-        } catch (Exception e) {
-          LOGGER.warn(e.getMessage(), e);
-          continue;
-        }
-        dateString = new String(dateChars);
-
-        from = line.indexOf(requestURISep);
-        requestURI = line.substring(from);
-        projectId = extractContent(requestURI, projectSep, stop);
-        nation = extractContent(requestURI, nationSep, stop);
-        uid = extractContent(requestURI, uidSep, stop);
-        url = extractContent(requestURI, urlSep);
-        userLocalTime = toLocalTime(dateString, nation);
-        singleLog = new AllInOneNavigatorLog(dateString, uid, ipLong, url, projectId, nation, userLocalTime);
-        ++cnt;
         if (batch.isFull()) {
           urlRestoreQueue.put(batch);
           batch = new LogBatch<>(batchSize, version);
           ++version;
         }
-        batch.add(singleLog);
+        ++cnt;
+
+        try {
+          singleLog = line2Log(line);
+        } catch (Exception e) {
+          errorLines.add(line);
+          continue;
+        }
+
+        if (!singleLog.isValid()) {
+          errorLines.add(line);
+          continue;
+        }
+
+        if (singleLog != null) {
+          batch.add(singleLog);
+        }
       }
+
       if (!batch.isEmpty()) {
         urlRestoreQueue.put(batch);
       }
+
       LOGGER.info("All file content read(" + cnt + " lines).");
+    }
+  }
+
+  private void logErrorLines(Vector<LogBatch<AllInOneNavigatorLog>> errors, List<String> errorLines) {
+    if (CollectionUtils.isNotEmpty(errorLines)) {
+      for (String s : errorLines) {
+        LOGGER.error("[ERR-WHEN-READ]=" + s);
+      }
+    }
+    if (CollectionUtils.isNotEmpty(errors)) {
+      List<AllInOneNavigatorLog> content;
+      for (LogBatch<AllInOneNavigatorLog> batch : errors) {
+        content = batch.getContent();
+        if (CollectionUtils.isEmpty(content)) {
+          continue;
+        }
+        for (AllInOneNavigatorLog log : content) {
+          LOGGER.error("[ERR-WHEN-PUT]=" + log.toLine());
+        }
+      }
     }
   }
 
@@ -130,7 +171,6 @@ public class AllInOneNavigatorETL extends ETLBase {
     if (!input.exists()) {
       throw new IOException("File not found - " + fileInput);
     }
-    System.out.println("haha");
     LOGGER.info(
       "Generic navigator log putter(File=" + fileInput + ", HTable=" + hTableName + ", BatchSize=" + batchSize + ", URLRestoreWorker=" + urlRestoreWorkerCount + ", LogStoreWorker=" + logStoreWorkerCount + ") begin working.");
     final InternalQueue<LogBatch<AllInOneNavigatorLog>> urlRestoreQueue = new InternalQueue<>(), logStoreQueue = new InternalQueue<>();
@@ -151,13 +191,15 @@ public class AllInOneNavigatorETL extends ETLBase {
 
     List<HBasePutterV3<AllInOneNavigatorLog>> logStoreWorkers = new ArrayList<>(urlRestoreWorkerCount);
     HTableInterface htable;
+    Vector<LogBatch<AllInOneNavigatorLog>> failedBatches = new Vector<>(100);
     for (int i = 0; i < logStoreWorkerCount; i++) {
       if (!enableHbasePut) {
         htable = null;
       } else {
         htable = manager.getHTable(hTableName);
       }
-      logStoreWorkers.add(new HBasePutterV3<>(logStoreQueue, logStoreSignal, htable, enableHbasePut, pc));
+      logStoreWorkers
+        .add(new HBasePutterV3<>(logStoreQueue, logStoreSignal, htable, enableHbasePut, pc, failedBatches));
     }
     LOGGER.info("Log store workers inited.");
     LOGGER.info("Begin to put queue.");
@@ -177,8 +219,9 @@ public class AllInOneNavigatorETL extends ETLBase {
     new Thread(queueMonitor, "MonitorThread").start();
 
     long t1 = System.currentTimeMillis();
+    List<String> errorLines = new ArrayList<>(100);
     try {
-      putQueue(batchSize, input, urlRestoreQueue);
+      putQueue(batchSize, input, urlRestoreQueue, errorLines);
       LOGGER.info("All lines have sent to restore queue. Begin to send url-restore pills.");
     } finally {
       for (int i = 0; i < urlRestoreWorkerCount; i++) {
@@ -200,6 +243,8 @@ public class AllInOneNavigatorETL extends ETLBase {
     if (enableHbasePut) {
       manager.close();
     }
+    LOGGER.info("Record error log if necessary.");
+    logErrorLines(failedBatches, errorLines);
     LOGGER
       .info("File processed successfully. " + pc.getVal() + " rows is processed in " + (t2 - t1) + " milliseconds.");
   }
