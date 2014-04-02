@@ -20,6 +20,7 @@ public class AllInOneNavigatorLog extends BasicNavigatorLog {
   private static final byte[] Q_USERDATE_STRING = Bytes.toBytes("user_date");
 
   private String projectId;
+  private Byte projectByte;
   private String nation;
   private String userDateString;
 
@@ -27,24 +28,27 @@ public class AllInOneNavigatorLog extends BasicNavigatorLog {
                               String userDateString) {
     super(dateString, uid, ip, url);
     this.projectId = projectId;
+    this.projectByte = ETLConstants.METRIC_MAPPING.getProjectURLByte(this.projectId);
     this.nation = nation;
     this.userDateString = userDateString;
   }
 
-  @Override
-  public Put toPut(int outerVersion, int innerVersion) throws Exception {
+  public boolean isValid() {
     if (StringUtils.isBlank(this.projectId) || StringUtils.isBlank(this.nation) || StringUtils
       .isBlank(this.url) || StringUtils.isBlank(this.uid)) {
-      return null;
+      return false;
     }
-    Byte projectByte = ETLConstants.METRIC_MAPPING.getProjectURLByte(this.projectId);
     if (projectByte == null) {
-      throw new Exception("Unknown project(" + this.projectId + ")");
+      return false;
     }
     if (StringUtils.isBlank(this.url)) {
-      throw new Exception("URL is necessary.");
+      return false;
     }
+    return true;
+  }
 
+  @Override
+  public Put toPut(int outerVersion, int innerVersion) {
     // Make version
     long version = ETLUtils.makeVersion(outerVersion, innerVersion);
     byte[] b = Bytes.toBytes(nation.toLowerCase().concat(dateString.concat(uid)));

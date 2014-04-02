@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -29,13 +30,16 @@ public class HBasePutterV3<T extends GenericLog> implements Runnable {
 
   private PutterCounter success;
 
+  private Vector<LogBatch<T>> failedBatches;
+
   public HBasePutterV3(InternalQueue<LogBatch<T>> queue, CountDownLatch signal, HTableInterface hTable,
-                       boolean enableHbasePut, PutterCounter success) {
+                       boolean enableHbasePut, PutterCounter success, Vector<LogBatch<T>> failedBatches) {
     this.queue = queue;
     this.signal = signal;
     this.hTable = hTable;
     this.enableHbasePut = enableHbasePut;
     this.success = success;
+    this.failedBatches = failedBatches;
   }
 
   private String purePut(List<Put> puts) {
@@ -99,9 +103,7 @@ public class HBasePutterV3<T extends GenericLog> implements Runnable {
           }
         } else {
           LOGGER.info("Put hbase error(" + Thread.currentThread().getName() + " in " + thisRoundTime + " millis.");
-          for (GenericLog log : content) {
-            LOGGER.error(log.toLine());
-          }
+          failedBatches.add(batch);
         }
       }
     } catch (InterruptedException e) {
