@@ -72,7 +72,10 @@ public class UrlShorterWorker<T extends BasicNavigatorLog> implements Runnable {
         if (batch.isPill()) {
           break;
         }
+        long t1 = System.currentTimeMillis();
         restoreURL(batch);
+        long t2 = System.currentTimeMillis();
+        LOGGER.info(Thread.currentThread().getName() + " restore batch url used " + (t2 - t1) + " milliseconds");
         sink.put(batch);
       }
     } catch (InterruptedException e) {
