@@ -13,6 +13,21 @@ else
   input=${1}
 fi
 
+if [ "" = "$2" ];then
+  echo "Processing date is necessary."
+  exit 1
+else
+  current_date=${2}
+fi
+
+if [ "" = "$3" ];then
+  echo "Processing min 5 is necessary."
+  exit 1
+else
+  current_min5=${3}
+fi
+
+
 table_name=nav_all
 batch_size=50
 url_restore_worker_count=10
@@ -20,8 +35,6 @@ log_store_worker_count=5
 using_url_restore=true
 store_to_hbase=true
 
-current_date=`date +%Y%m%d`
-current_min5=`date +%H%M`
 log_file_path=/data/log/runlog/nav/${current_date}
 if [ ! -d ${log_file_path} ];then
   sudo mkdir -p ${log_file_path}
