@@ -7,7 +7,6 @@ import com.elex.bigdata.zergling.etl.model.LogBatch;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import java.net.URLDecoder;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -31,32 +30,29 @@ public class UrlShorterWorker<T extends BasicNavigatorLog> implements Runnable {
 
   private void restoreURL(LogBatch<T> batch) {
     List<T> content;
-    String originalURL;
     content = batch.getContent();
     if (!enabled) {
       for (BasicNavigatorLog log : content) {
-        originalURL = truncateURL(log.getUrl());
-        log.setUrl(originalURL);
+        log.setUrl(truncateURL(log.getUrl()));
       }
       return;
     }
 
+    String shortenedURL, originalURL;
+
     for (BasicNavigatorLog log : content) {
-      try {
-        originalURL = UrlShortener.getInstance().toOriginalURL(log.getUrl());
-      } catch (Exception e) {
-        originalURL = "Unknown";
-      }
-      if (StringUtils.isBlank(originalURL)) {
-        originalURL = "Unknown";
+      shortenedURL = log.getUrl();
+      if (shortenedURL.startsWith("http://goo.mx")) {
+        try {
+          originalURL = UrlShortener.getInstance().toOriginalURL(shortenedURL);
+        } catch (Exception e) {
+          originalURL = "Error";
+        }
+      } else {
+        originalURL = shortenedURL;
       }
 
-      try {
-        if (originalURL.startsWith("http://goo.mx")) {
-          originalURL = ETLUtils.restoreShortenedURL(originalURL);
-        }
-        originalURL = URLDecoder.decode(originalURL, "utf8");
-      } catch (Exception e) {
+      if (StringUtils.isBlank(originalURL)) {
         originalURL = "Unknown";
       }
 
@@ -77,7 +73,10 @@ public class UrlShorterWorker<T extends BasicNavigatorLog> implements Runnable {
         if (batch.isPill()) {
           break;
         }
+        long t1 = System.currentTimeMillis();
         restoreURL(batch);
+        long t2 = System.currentTimeMillis();
+        LOGGER.info(Thread.currentThread().getName() + " restore batch url used " + (t2 - t1) + " milliseconds");
         sink.put(batch);
       }
     } catch (InterruptedException e) {
