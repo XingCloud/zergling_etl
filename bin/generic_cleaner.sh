@@ -39,8 +39,8 @@ else
 fi
 ${hadoop_home}/hadoop fs -copyFromLocal ${compressed_local_history_file} ${history_file}
 
-processing_date=`date -d"-8 days" +%Y%m%d`
-too_old_history_path=${source_file_home}/${type}/${processing_date}
+history_processing_date=`date -d"${processing_date} -7 days" +%Y%m%d`
+too_old_history_path=${source_file_home}/${type}/${history_processing_date}
 echo "Cleaning(${too_old_history_path})"
 sudo rm -rf ${too_old_history_path}
 echo "All done"

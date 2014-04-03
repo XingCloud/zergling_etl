@@ -103,6 +103,7 @@ public class UrlShortener {
     String line;
     Set<String> sortedSet = new TreeSet<>();
     UrlShortener shortener = UrlShortener.getInstance();
+    String ori;
     for (File f : files) {
       if (f.isDirectory()) {
         continue;
@@ -115,7 +116,9 @@ public class UrlShortener {
         while ((line = br.readLine()) != null) {
           line = StringUtils.trim(line);
           if (line.startsWith("http://goo.mx") || line.startsWith("https://goo.mx")) {
-            sortedSet.add(shortener.toOriginalURL(line));
+            ori = shortener.toOriginalURL(line);
+            System.out.println("\t" + line + "\t" + ori);
+            sortedSet.add(ori);
           } else {
             sortedSet.add(line);
           }
