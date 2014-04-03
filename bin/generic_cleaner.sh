@@ -40,7 +40,13 @@ fi
 ${hadoop_home}/hadoop fs -copyFromLocal ${compressed_local_history_file} ${history_file}
 
 history_processing_date=`date -d"${processing_date} -7 days" +%Y%m%d`
-too_old_history_path=${source_file_home}/${type}/${history_processing_date}
-echo "Cleaning(${too_old_history_path})"
-sudo rm -rf ${too_old_history_path}
+too_old_history_path1=${source_file_home}/${type}/${history_processing_date}
+too_old_history_path2=${hdfs_history_home}/${type}/${type}.${history_processing_date}.log
+too_old_history_path3=${hdfs_history_home}/${type}/${type}.${history_processing_date}.log.tar.gz
+echo "Cleaning(${too_old_history_path1})"
+sudo rm -rf ${too_old_history_path1}
+echo "Cleaning(${too_old_history_path2})"
+sudo rm -rf ${too_old_history_path2}
+echo "Cleaning(${too_old_history_path3})"
+sudo rm -rf ${too_old_history_path3}
 echo "All done"
