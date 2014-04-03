@@ -13,7 +13,7 @@ else
   input=${1}
 fi
 
-table_name=b
+table_name=nav_all
 batch_size=50
 url_restore_worker_count=10
 log_store_worker_count=5
