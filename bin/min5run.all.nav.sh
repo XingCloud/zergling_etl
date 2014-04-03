@@ -28,7 +28,7 @@ if [ ! -d ${log_file_path} ];then
   sudo chmod a+w ${log_file_path}
 fi
 
-log_file=${log_file_path}/run.%{current_min5}.log
+log_file=${log_file_path}/run.${current_min5}.log
 
 ${java_bin}/java -jar ${jar_file} ${input} ${table_name} ${batch_size} ${url_restore_worker_count} ${log_store_worker_count} ${using_url_restore} ${store_to_hbase} > ${log_file} 2>&1
 
