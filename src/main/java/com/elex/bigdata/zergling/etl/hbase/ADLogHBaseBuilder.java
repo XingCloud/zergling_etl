@@ -34,7 +34,13 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
     private byte[] widthCol = Bytes.toBytes("w");
     private byte[] heightCol = Bytes.toBytes("h");
     private String urlPreffix = "/ad.png?";
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>(){
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        }
+    };
+//    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private Map<String,byte[]> adDetailKeys = new HashMap<String, byte[]>();
     private static final String LOG_ATTR_SEPRATOR = "\t";
     private static final String LOG_URI_SEPRATOR = "&";
@@ -86,7 +92,7 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         }
 
         long ip = ETLUtils.ip2Long(params.get("ip"));
-        long time = sdf.parse(attrs.get(1)).getTime();
+        long time = sdf.get().parse(attrs.get(1)).getTime();
 
         //PID + NATION + TIME + UID
         Byte pid = metricMapping.getProjectURLByte(params.get("p"));
