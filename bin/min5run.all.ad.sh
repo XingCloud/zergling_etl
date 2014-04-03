@@ -12,6 +12,23 @@ workers=10
 batch_size=500
 project_id=all
 
+tmp_log_path=/data/bigdata/all/ad/tmp.log
+
+if [ $# = 1 ] ; then
+    fullPath=$1
+else
+    fullPath=/data/log/ad/$(date +"%Y%m%d")/ad_$(date +"%Y%m%d%H%M").log
+    sleep 30s #sleep 30s to wait the log been splited
+fi
+
+if [ ! -s ${fullPath} ]; then
+    echo "The ${fullPath} is empty, exit!!"
+    exit 1
+fi
+
+#clear tmp log
+echo "begin import" > ${tmp_log_path}
+
 #每天凌晨0000,删除历史文件(暂不放到HDFS)
 minute=$(date +"%H%M")
 if [ "0000" = "${minute}" ]; then
@@ -22,17 +39,7 @@ if [ "0000" = "${minute}" ]; then
     fi
 fi
 
-
-if [ $# = 1 ] ; then
-    fullPath=$1
-else
-    fullPath=/data/log/ad/$(date +"%Y%m%d")/ad_$(date +"%Y%m%d%H%M").log
-    sleep 30s #sleep 30s to wait the log been splited
-fi
-
 daily_log_path="/data/bigdata/all/ad/ad_${day}.log"
-tmp_log_path=/data/bigdata/all/ad/tmp.log
-#echo "minute:${minute}"
 echo "begin import ${fullPath} at "$(date +"%Y-%m-%d %H:%M:%S")
 
 ${java_bin}/java -jar ${jar_home} ${type} ${table_name} ${fullPath} ${workers} ${batch_size} ${project_id} > ${tmp_log_path}
