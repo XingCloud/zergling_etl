@@ -7,9 +7,9 @@ local_history_home=/data/local_history
 hdfs_history_home=/user/hadoop/history
 
 if [ "" = "$1" ];then
-  processing_date=$1
-else
   processing_date=`date -d"-1 days" +%Y%m%d`
+else
+  processing_date=$1
 fi
 
 type=nav
