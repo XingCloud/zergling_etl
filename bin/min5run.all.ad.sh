@@ -14,6 +14,18 @@ project_id=all
 
 tmp_log_path=/data/bigdata/all/ad/tmp.log
 
+if [ $# = 1 ] ; then
+    fullPath=$1
+else
+    fullPath=/data/log/ad/$(date +"%Y%m%d")/ad_$(date +"%Y%m%d%H%M").log
+    sleep 30s #sleep 30s to wait the log been splited
+fi
+
+if [ ! -s ${fullPath} ]; then
+    echo "The ${fullPath} is empty, exit!!"
+    exit 1
+fi
+
 #clear tmp log
 echo "begin import" > ${tmp_log_path}
 
@@ -25,19 +37,6 @@ if [ "0000" = "${minute}" ]; then
             echo "Remove the directory ${history_path}"
             rm -rf ${history_path}
     fi
-fi
-
-
-if [ $# = 1 ] ; then
-    fullPath=$1
-else
-    fullPath=/data/log/ad/$(date +"%Y%m%d")/ad_$(date +"%Y%m%d%H%M").log
-    sleep 30s #sleep 30s to wait the log been splited
-fi
-
-if [ ! -s ${fullPath} ]; then
-    echo "The ${fullPath} is empty, exit!!"
-    exit 1
 fi
 
 daily_log_path="/data/bigdata/all/ad/ad_${day}.log"
