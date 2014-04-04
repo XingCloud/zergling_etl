@@ -99,7 +99,8 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         if(pid == null){
             throw new Exception("Could not find the mapped pid for URL:" + params.get("p"));
         }
-        byte[] rowKeyPreffix = Bytes.add(new byte[]{pid.byteValue()},Bytes.toBytes(params.get("nation")),Bytes.toBytes(time));
+        String nation = params.get("nation").toLowerCase();
+        byte[] rowKeyPreffix = Bytes.add(new byte[]{pid.byteValue()},Bytes.toBytes(nation),Bytes.toBytes(time));
         byte[] rowKey = Bytes.add(rowKeyPreffix, Bytes.toBytes(params.get("uid")));
 
         Put put = new Put(rowKey);
@@ -132,7 +133,7 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
 
         //更新nation,nation放到mongo中，方便训练的时候使用
         try{
-            String comNation = pid.toString() + COMBINE_NATION_SEPRATOR + params.get("nation");
+            String comNation = pid.toString() + COMBINE_NATION_SEPRATOR + nation;
             if(!historyNations.contains(comNation) && newNations.get(comNation) == null){
                 newNations.put(comNation,"");
             }
