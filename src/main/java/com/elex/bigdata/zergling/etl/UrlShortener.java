@@ -10,11 +10,18 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * User: Z J Wu Date: 14-3-27 Time: 下午5:17 Package: com.elex.bigdata.zergling.etl
@@ -88,5 +95,40 @@ public class UrlShortener {
       }
     }
     return responseString.toString();
+  }
+
+  public static void main(String[] args) throws Exception {
+    String path = "C:/Users/Administrator/Desktop/urls";
+    File[] files = new File(path).listFiles();
+    String line;
+    Set<String> sortedSet = new TreeSet<>();
+    UrlShortener shortener = UrlShortener.getInstance();
+    String ori;
+    for (File f : files) {
+      if (f.isDirectory()) {
+        continue;
+      }
+      System.out.println(f.getAbsolutePath());
+      sortedSet.clear();
+      try (BufferedReader br = new BufferedReader(
+        new InputStreamReader(new FileInputStream(f))); PrintWriter pw = new PrintWriter(
+        new OutputStreamWriter(new FileOutputStream(new File(f.getAbsolutePath() + ".original"))));) {
+        while ((line = br.readLine()) != null) {
+          line = StringUtils.trim(line);
+          if (line.startsWith("http://goo.mx") || line.startsWith("https://goo.mx")) {
+            ori = shortener.toOriginalURL(line);
+            System.out.println("\t" + line + "\t" + ori);
+            sortedSet.add(ori);
+          } else {
+            sortedSet.add(line);
+          }
+        }
+
+        for (String s : sortedSet) {
+          pw.write(s);
+          pw.write('\n');
+        }
+      }
+    }
   }
 }
