@@ -35,10 +35,10 @@ log_store_worker_count=5
 using_url_restore=true
 store_to_hbase=true
 
-log_file_path=/data/log/runlog/nav/${current_date}
+log_file_path=/data/log/runlog/nav/${current_date}/${current_min5}
 if [ ! -d ${log_file_path} ];then
-  sudo mkdir -p ${log_file_path}
-  sudo chmod a+w ${log_file_path}
+  mkdir -p ${log_file_path}
+  chmod a+w ${log_file_path}
 fi
 
 log_file=${log_file_path}/run.${current_min5}.log
