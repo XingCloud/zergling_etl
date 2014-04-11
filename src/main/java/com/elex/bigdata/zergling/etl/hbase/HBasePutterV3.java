@@ -75,7 +75,8 @@ public class HBasePutterV3<T extends GenericLog> implements Runnable {
           try {
             put = log.toPut(outerVersion, innerVersion);
           } catch (Exception e) {
-            LOGGER.warn(Thread.currentThread().getName() + " Put is not valid, ignore this log(" + log.toLine() + ")");
+            LOGGER
+              .warn(Thread.currentThread().getName() + " Put is not valid, ignore this log(" + log.getRawLine() + ")");
             continue;
           }
           puts.add(put);
@@ -88,7 +89,7 @@ public class HBasePutterV3<T extends GenericLog> implements Runnable {
           returnResult = purePut(puts);
         } else {
           for (GenericLog log : content) {
-            LOGGER.info("[LINE] - " + log.toLine());
+            LOGGER.info("[LINE] - " + log.getRawLine());
           }
           returnResult = null;
         }

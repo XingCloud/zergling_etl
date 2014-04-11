@@ -7,8 +7,17 @@ import org.apache.hadoop.hbase.client.Put;
  */
 public abstract class GenericLog {
 
+  protected String rawLine;
+
   public abstract Put toPut(int outerVersion, int innerVersion) throws Exception;
 
   public abstract String toLine();
 
+  public String getRawLine() {
+    return rawLine;
+  }
+
+  public void setRawLine(String rawLine) {
+    this.rawLine = rawLine;
+  }
 }

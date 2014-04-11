@@ -26,7 +26,7 @@ cat ${input_path}/* >> ${merged_and_local_history_file}
 
 compressed_local_history_file=${merged_and_local_history_file}.tar.gz
 echo "Compressing(Type=${type}, date=${processing_date})"
-sudo tar zcvf ${compressed_local_history_file} ${merged_and_local_history_file}
+tar zcvf ${compressed_local_history_file} ${merged_and_local_history_file}
 
 echo "Backuping(Type=${type}, date=${processing_date})"
 history_file=${hdfs_history_home}/${type}/${type}.${processing_date}.log.tar.gz
@@ -44,9 +44,9 @@ too_old_history_path1=${source_file_home}/${type}/${history_processing_date}
 too_old_history_path2=${local_history_home}/${type}/${type}.${history_processing_date}.log
 too_old_history_path3=${local_history_home}/${type}/${type}.${history_processing_date}.log.tar.gz
 echo "Cleaning(${too_old_history_path1})"
-sudo rm -rf ${too_old_history_path1}
+rm -rf ${too_old_history_path1}
 echo "Cleaning(${too_old_history_path2})"
-sudo rm -rf ${too_old_history_path2}
+rm -rf ${too_old_history_path2}
 echo "Cleaning(${too_old_history_path3})"
-sudo rm -rf ${too_old_history_path3}
+rm -rf ${too_old_history_path3}
 echo "All done"

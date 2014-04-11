@@ -100,7 +100,9 @@ public class AllInOneNavigatorETL extends ETLBase {
     uid = extractContent(requestURI, uidSep, stop);
     url = extractContent(requestURI, urlSep);
     userLocalTime = toLocalTime(dateString, nation);
-    return new AllInOneNavigatorLog(dateString, uid, ipLong, url, projectId, nation, userLocalTime);
+    AllInOneNavigatorLog log = new AllInOneNavigatorLog(dateString, uid, ipLong, url, projectId, nation, userLocalTime);
+    log.setRawLine(line);
+    return log;
   }
 
   private void putQueue(int batchSize, File input, InternalQueue<LogBatch<AllInOneNavigatorLog>> urlRestoreQueue,
@@ -166,7 +168,7 @@ public class AllInOneNavigatorETL extends ETLBase {
 
   private void extractAndRun(String fileInput, String hTableName, int batchSize, int urlRestoreWorkerCount,
                              int logStoreWorkerCount, boolean enableURLRestore, boolean enableHbasePut) throws
-    IOException, InterruptedException {
+    Exception {
     File input = new File(fileInput);
     if (!input.exists()) {
       throw new IOException("File not found - " + fileInput);
@@ -190,13 +192,17 @@ public class AllInOneNavigatorETL extends ETLBase {
     LOGGER.info("URL restore workers inited.");
 
     List<HBasePutterV3<AllInOneNavigatorLog>> logStoreWorkers = new ArrayList<>(urlRestoreWorkerCount);
-    HTableInterface htable;
+    HTableInterface htable = null;
     Vector<LogBatch<AllInOneNavigatorLog>> failedBatches = new Vector<>(100);
     for (int i = 0; i < logStoreWorkerCount; i++) {
       if (!enableHbasePut) {
         htable = null;
       } else {
-        htable = manager.getHTable(hTableName);
+        try {
+          htable = manager.getHTable(hTableName);
+        } catch (Exception e) {
+          System.exit(1);
+        }
       }
       logStoreWorkers
         .add(new HBasePutterV3<>(logStoreQueue, logStoreSignal, htable, enableHbasePut, pc, failedBatches));
