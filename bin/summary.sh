@@ -18,7 +18,7 @@ do
   for projectId in 22find 337 awesomehp delta-homes nationzoom portaldosites qvo6 sweet-page v9
   do
     num=`grep p=${projectId} /data/log/${type}/${processing_date}/* | grep nation=${nation} | wc -l`
-    echo "\t${projectId}=${num}"
+    echo "  ${projectId}=${num}"
   done
 done
 
