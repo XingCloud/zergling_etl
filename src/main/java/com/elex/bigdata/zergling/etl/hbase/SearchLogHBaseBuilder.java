@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 /**
  * Author: liqiang
  * Date: 14-3-17
- * Time: 下午2:14
+ * Time: 涓嬪崍2:14
  */
 public class SearchLogHBaseBuilder implements HBaseBuilder {
 
@@ -27,7 +27,7 @@ public class SearchLogHBaseBuilder implements HBaseBuilder {
         //cf:  extend : visit_time visit_counter uri ua http_referer
         SearchLog searchLog = parse22Find(line + "[");
         Put put = new Put(searchLog.getRowkey());
-        long ts = Long.parseLong(searchLog.getDateStr()); //使用点击的时间作为timestamp，避免重复插入过多版本
+        long ts = Long.parseLong(searchLog.getDateStr()); //浣跨敤鐐瑰嚮鐨勬椂闂翠綔涓簍imestamp锛岄伩鍏嶉噸澶嶆彃鍏ヨ繃澶氱増鏈�      
         List<ColumnInfo> columns = ETLUtils.getColumnInfos(searchLog);
         for(ColumnInfo colInfo : columns){
             put.add(colInfo.getColumnFamilyBytes(),colInfo.getQualifierBytes(),ts,colInfo.getValueBytes());
@@ -36,7 +36,7 @@ public class SearchLogHBaseBuilder implements HBaseBuilder {
     }
 
     private SearchLog parse22Find(String line){
-        //暂不抽象成对象，目前没有其他地方使用
+        //鏆備笉鎶借薄鎴愬璞★紝鐩墠娌℃湁鍏朵粬鍦版柟浣跨敤
         List<String> fields = new ArrayList<String>();
         fields.add("errno");
         fields.add("fip");
