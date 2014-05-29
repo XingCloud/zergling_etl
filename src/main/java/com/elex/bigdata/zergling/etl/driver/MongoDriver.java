@@ -25,7 +25,7 @@ public class MongoDriver {
     private Mongo mongo;
     private DB db;
     public DBCollection adColl;
-    private static final String mongodbHost = "web156";
+    private static final String mongodbHost = "mongodb";
     private static final int mongodbPort = 27017;
     private static final String mongodbDBName = "bigdata";
     private static final String mongodbDBCollectionName = "advertisement";
