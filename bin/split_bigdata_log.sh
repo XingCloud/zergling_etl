@@ -27,27 +27,27 @@ pc_log_new_path="/data/log/pc/${day}"
 ps_log_new_path="/data/log/ps/${day}"
 
 if [ ! -d ${nav_log_new_path} ]; then
-  mkdir ${nav_log_new_path}
+  mkdir -p ${nav_log_new_path}
   chown hadoop:hadoop ${nav_log_new_path}
 fi
 
 if [ ! -d ${ad_log_new_path} ]; then
-  mkdir ${ad_log_new_path}
+  mkdir -p ${ad_log_new_path}
   chown hadoop:hadoop ${ad_log_new_path}
 fi
 
 if [ ! -d ${nt_log_new_path} ]; then
-  mkdir ${nt_log_new_path}
+  mkdir -p ${nt_log_new_path}
   chown hadoop:hadoop ${nt_log_new_path}
 fi
 
 if [ ! -d ${pc_log_new_path} ]; then
-  mkdir ${pc_log_new_path}
+  mkdir -p ${pc_log_new_path}
   chown hadoop:hadoop ${pc_log_new_path}
 fi
 
 if [ ! -d ${ps_log_new_path} ]; then
-  mkdir ${ps_log_new_path}
+  mkdir -p ${ps_log_new_path}
   chown hadoop:hadoop ${ps_log_new_path}
 fi
 
