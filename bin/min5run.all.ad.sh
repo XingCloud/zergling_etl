@@ -11,13 +11,13 @@ table_name=ad_all_log
 workers=10
 batch_size=500
 project_id=all
-
-tmp_log_path=/data/bigdata/all/ad/tmp.log
+hdfs_path=/user/hadoop/history/${type}
+tmp_log_path=/data/bigdata/all/${type}/tmp.log
 
 if [ $# = 1 ] ; then
     fullPath=$1
 else
-    fullPath=/data/log/ad/$(date +"%Y%m%d")/ad_$(date +"%Y%m%d%H%M").log
+    fullPath=/data/log/${type}/$(date -d"-5 mins" +"%Y%m%d")/${type}_$(date -d"-5 mins" +"%Y%m%d%H%M").log
     sleep 30s #sleep 30s to wait the log been splited
 fi
 
@@ -29,17 +29,7 @@ fi
 #clear tmp log
 echo "begin import" > ${tmp_log_path}
 
-#每天凌晨0000,删除历史文件(暂不放到HDFS)
-minute=$(date +"%H%M")
-if [ "0000" = "${minute}" ]; then
-    history_path=/data/log/ad/$(date -u -d"${processing_day} 15 days ago" +%Y%m%d)
-    if [ -d ${history_path} ]; then
-            echo "Remove the directory ${history_path}"
-            rm -rf ${history_path}
-    fi
-fi
-
-daily_log_path="/data/bigdata/all/ad/ad_${day}.log"
+daily_log_path="/data/bigdata/all/${type}/${type}_${day}.log"
 echo "begin import ${fullPath} at "$(date +"%Y-%m-%d %H:%M:%S")
 
 ${java_bin}/java -jar ${jar_home} ${type} ${table_name} ${fullPath} ${workers} ${batch_size} ${project_id} > ${tmp_log_path}
@@ -53,4 +43,19 @@ else
 fi
 
 echo "end import ${fullPath} at "$(date +"%Y-%m-%d %H:%M:%S")
+
+#每天凌晨0000,删除历史文件
+minute=$(date +"%H%M")
+if [ "0000" = "${minute}" ]; then
+    history_day=$(date -u -d"${processing_day} 7 days ago" +%Y%m%d)
+    history_path=/data/log/${type}/${history_day}
+    if [ -d ${history_path} ]; then
+            cat ${history_path}/${type}_* > ${history_path}/${type}_${history_day}.log
+            echo "Copy ${history_path}/${type}_${history_day}.log to HDFS"
+            hadoop fs -copyFromLocal ${history_path}/${type}_${history_day}.log ${hdfs_path}/${history_day}.log
+            echo "Remove the directory ${history_path}"
+            rm -rf ${history_path}
+    fi
+fi
+
 echo ${line}
