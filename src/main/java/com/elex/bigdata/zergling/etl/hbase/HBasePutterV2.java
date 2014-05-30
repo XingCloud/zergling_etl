@@ -43,6 +43,7 @@ public class HBasePutterV2 implements Callable<String> {
             } catch (Exception e) {
                 IGNORE_LOGGER.info(line);
                 LOGGER.warn("get exception:" + e.getMessage() + ", ignore the log : " + line);
+                e.printStackTrace();
             }
         }
         if(puts.size()>0){
