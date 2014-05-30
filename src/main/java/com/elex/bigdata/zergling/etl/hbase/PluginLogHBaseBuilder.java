@@ -77,8 +77,8 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
 
         if(StringUtils.isBlank(params.get("uts")) || StringUtils.isBlank(params.get("nation"))
                 || StringUtils.isBlank(params.get("uid")) || StringUtils.isBlank(params.get("action"))
-                || StringUtils.isBlank(params.get("content")) ){
-            throw new Exception(" One ad params is null");
+                || StringUtils.isBlank(attrs.get(2)) ){
+            throw new Exception(" One pc params is null");
         }
 
         String[][] content = gson.fromJson(URLDecoder.decode(sepLines.get(1),"utf-8"), String[][].class);
