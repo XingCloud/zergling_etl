@@ -37,18 +37,12 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
     private byte[] titleCol = Bytes.toBytes("t");
     private byte[] metaCol = Bytes.toBytes("m");
     private byte[] langCol = Bytes.toBytes("l");
+    private byte[] drowPrefix = Bytes.toBytes("F");
 
     private String urlPreffix = "/pc.png?";
     private Gson gson = new Gson();
     private String pid = "new-tab";
 
-
-    private ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>(){
-        @Override
-        protected SimpleDateFormat initialValue() {
-            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        }
-    };
 //    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private Map<String,byte[]> adDetailKeys = new HashMap<String, byte[]>();
     private static final String LOG_ATTR_SEPRATOR = "\t";
@@ -194,7 +188,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         try{
             hashURL = BKDRHash.getIntFromStr(detail[1]);
 
-            Put put = new Put(Bytes.toBytes(hashURL));
+            Put put = new Put(Bytes.add(drowPrefix,Bytes.toBytes(hashURL)));
             put.add(dcf,titleCol,time,Bytes.toBytes(detail[0]));
             put.add(dcf,urlCol,time,Bytes.toBytes(detail[1]));
             put.add(dcf,langCol,time,Bytes.toBytes(detail[2]));
