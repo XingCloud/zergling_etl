@@ -51,6 +51,26 @@
         </layout>
     </appender>
 
+    <appender name="PC_RUN_LOG" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="/data/bigdata/all/pc/run.log" />
+        <param name="Append" value="true" />
+        <param name="Threshold" value="info" />
+        <param name="DatePattern" value="'.'yyyy-MM-dd" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyyMMddHHmmss} %-5p%c{2}: %m%n" />
+        </layout>
+    </appender>
+
+    <appender name="PC_IGNORE_LOG" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="/data/bigdata/all/pc/ignore.log" />
+        <param name="Append" value="true" />
+        <param name="Threshold" value="info" />
+        <param name="DatePattern" value="'.'yyyy-MM-dd" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%m%n" />
+        </layout>
+    </appender>
+
   <logger name="search">
     <level value="debug" />
     <appender-ref ref="SEARCH_RUN_LOG" />
@@ -64,9 +84,18 @@
      <level value="debug" />
      <appender-ref ref="AD_RUN_LOG" />
   </logger>
-    <logger name="ad_ignore">
+  <logger name="ad_ignore">
     <level value="info" />
     <appender-ref ref="AD_IGNORE_LOG" />
+  </logger>
+
+  <logger name="pc">
+    <level value="debug" />
+    <appender-ref ref="PC_RUN_LOG" />
+  </logger>
+  <logger name="pc_ignore">
+    <level value="info" />
+    <appender-ref ref="PC_IGNORE_LOG" />
   </logger>
 
   <root>
