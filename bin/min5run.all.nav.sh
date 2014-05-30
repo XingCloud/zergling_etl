@@ -4,7 +4,7 @@ line="############################################"
 # Code base
 code_home=/home/hadoop/git_project_home/zergling_etl
 jar_file=${code_home}/target/zergling_etl.AllInOneNavigatorETL.jar-with-dependencies.jar
-java_bin=/usr/java/jdk1.7.0_55/bin
+java_bin=/usr/java/jdk1.7.0_45/bin
 
 if [ "" = "$1" ];then
   echo "Input file is necessary."
