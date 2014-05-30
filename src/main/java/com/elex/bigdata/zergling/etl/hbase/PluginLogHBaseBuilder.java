@@ -93,14 +93,14 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         }
 
         long ip = 0;
-        if(StringUtils.isNotBlank("ip")){
+        if(StringUtils.isNotBlank(params.get("ip"))){
             ip = ETLUtils.ip2Long(params.get("ip"));
         }
 
         PluginType pluginType = PluginType.TAB; //0:所有tab;1:跳转;2:页面停留时间
         int duration = 0;
         if(content.length == 1){
-            if(StringUtils.isNotBlank("time")){
+            if(StringUtils.isNotBlank(params.get("time"))){
                 pluginType = PluginType.DURATION;
                 duration = Integer.parseInt(params.get("time"));
             }else{
@@ -109,7 +109,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         }
 
         int category = -1;
-        if(StringUtils.isNotBlank("category")){
+        if(StringUtils.isNotBlank(params.get("category"))){
             category = Integer.parseInt(params.get("content"));
         }
 
