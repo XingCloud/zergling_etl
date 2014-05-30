@@ -44,13 +44,9 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
     private Gson gson = new Gson();
     private Byte pid = metricMapping.getProjectURLByte("new-tab");
 
-//    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    private Map<String,byte[]> adDetailKeys = new HashMap<String, byte[]>();
     private static final String LOG_ATTR_SEPRATOR = "\t";
     private static final String LOG_URI_SEPRATOR = "&";
     private static final String LOG_URI_PARAM_SEPRATOR = "=";
-    private static final String LOG_HIT_SEPRATOR = ",";
-    private static final String LOG_HIT_KV_SEPRATOR = ".";
     private static final String COMBINE_NATION_SEPRATOR = "_";
     private static Set<String> historyNations;
     private static ConcurrentHashMap<String,String> newNations = new ConcurrentHashMap<String,String>();
@@ -66,7 +62,9 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         //        1  2014-03-31T14:24:23+08:00
         //        2  /pc.png?nation=us&ip=&action=click&category=0&uts=1401418227487&uid=395049983_1052515_989BEF9B&content=[[%22Google%22,%22http://www.google.com/%22,%22%22,%22%22,%22%22,%22us%22]]
 
-        List<String> attrs = split(line,LOG_ATTR_SEPRATOR);
+        //将content分开，里面有特殊字符
+        List<String> sepLines = split(line,"&content=");
+        List<String> attrs = split(sepLines.get(0),LOG_ATTR_SEPRATOR);
         List<String> uriParams = split(attrs.get(2).substring(urlPreffix.length()),LOG_URI_SEPRATOR);
 
         Map<String,String> params = new HashMap<String,String>();
@@ -83,7 +81,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
             throw new Exception(" One ad params is null");
         }
 
-        String[][] content = gson.fromJson(URLDecoder.decode(params.get("content"),"utf-8"), String[][].class);
+        String[][] content = gson.fromJson(URLDecoder.decode(sepLines.get(1),"utf-8"), String[][].class);
         long time = Long.parseLong(params.get("uts"));
 
         //添加到URL字典表
@@ -163,7 +161,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         int pos = 0, end;
         while ((end = line.indexOf(sep, pos)) >= 0) {
             attrs.add(line.substring(pos, end));
-            pos = end + 1;
+            pos = end + sep.length();
         }
         attrs.add(line.substring(pos)); //最后一个
         return attrs;
