@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -82,7 +83,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
             throw new Exception(" One ad params is null");
         }
 
-        String[][] content = gson.fromJson(params.get("content"), String[][].class);
+        String[][] content = gson.fromJson(URLDecoder.decode(params.get("content"),"utf-8"), String[][].class);
         long time = Long.parseLong(params.get("uts"));
 
         //添加到URL字典表
