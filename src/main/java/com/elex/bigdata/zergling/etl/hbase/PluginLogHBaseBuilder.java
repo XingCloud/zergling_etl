@@ -127,7 +127,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
                 put.add(ucf,durationCol,time,Bytes.toBytes(duration));
             }
 
-            put.add(dcf,urlCol,time,Bytes.toBytes(hashUrls[0]));
+            put.add(ucf,urlCol,time,Bytes.toBytes(hashUrls[0]));
             put.add(ucf,catCol,time,Bytes.toBytes(category));
             put.add(ucf,paCol,time,Bytes.toBytes(content[0][4]));
             put.add(ucf,projectCol,time,Bytes.toBytes(content[0][5]));
@@ -136,7 +136,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
             for(int i =1;i<hashUrls.length;i++){
                 strHashUrl += "," + hashUrls[i];
             }
-            put.add(dcf,urlCol,time,Bytes.toBytes(strHashUrl));
+            put.add(ucf,urlCol,time,Bytes.toBytes(strHashUrl));
         }
 
         //更新nation,nation放到mongo中，方便训练的时候使用
