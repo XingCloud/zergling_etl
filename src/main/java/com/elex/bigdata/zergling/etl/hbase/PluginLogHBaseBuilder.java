@@ -110,7 +110,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
 
         int category = -1;
         if(StringUtils.isNotBlank(params.get("category"))){
-            category = Integer.parseInt(params.get("content"));
+            category = Integer.parseInt(params.get("category"));
         }
 
         String nation = params.get("nation").toLowerCase();
