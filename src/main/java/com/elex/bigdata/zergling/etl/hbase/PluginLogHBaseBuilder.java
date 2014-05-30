@@ -42,7 +42,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
 
     private String urlPreffix = "/pc.png?";
     private Gson gson = new Gson();
-    private String pid = "new-tab";
+    private Byte pid = metricMapping.getProjectURLByte("new-tab");
 
 //    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private Map<String,byte[]> adDetailKeys = new HashMap<String, byte[]>();
