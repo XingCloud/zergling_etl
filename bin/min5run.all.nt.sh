@@ -6,7 +6,7 @@ jar_home=${code_home}/target/LogImport-jar-with-dependencies.jar
 hadoop_home=/usr/bin/
 java_bin=/usr/java/jdk1.7.0_55/bin
 
-type=nt
+type=pc
 table_name=dmp_user_action
 workers=10
 batch_size=500

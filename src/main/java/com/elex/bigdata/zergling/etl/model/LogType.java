@@ -22,7 +22,7 @@ public enum LogType {
         public HBaseBuilder getBuilder() {
             return new ADLogHBaseBuilder();
         }
-    },NT("nt"){ //插件new-tab
+    },PC("pc"){ //插件new-tab,why pc?
         @Override
         public HBaseBuilder getBuilder() {
             return new PluginLogHBaseBuilder();
