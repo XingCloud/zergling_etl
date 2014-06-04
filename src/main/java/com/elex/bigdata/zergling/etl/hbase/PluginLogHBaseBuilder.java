@@ -20,7 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PluginLogHBaseBuilder implements HBaseBuilder {
 
     public static final Log LOG = LogFactory.getLog(PluginLogHBaseBuilder.class);
-    public static MetricMapping metricMapping = MetricMapping.getInstance();
 
     //dmp_user_action
     private byte[] ucf = Bytes.toBytes("ua");
@@ -31,6 +30,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
     private byte[] projectCol = Bytes.toBytes("p");
     private byte[] catCol = Bytes.toBytes("cat");
     private byte[] ipCol = Bytes.toBytes("ip");
+    private byte[] nationCol = Bytes.toBytes("nt");
 
     //dmp_url_detail
     private String urlDetailTableName = "dmp_url_detail";
@@ -42,18 +42,12 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
 
     private String urlPreffix = "/pc.png?";
     private Gson gson = new Gson();
-    private Byte pid = metricMapping.getProjectURLByte("new-tab");
 
     private static final String LOG_ATTR_SEPRATOR = "\t";
     private static final String LOG_URI_SEPRATOR = "&";
     private static final String LOG_URI_PARAM_SEPRATOR = "=";
-    private static final String COMBINE_NATION_SEPRATOR = "_";
-    private static Set<String> historyNations;
-    private static ConcurrentHashMap<String,String> newNations = new ConcurrentHashMap<String,String>();
 
     public PluginLogHBaseBuilder(){
-        MongoDriver.getInstance();
-        historyNations = MetricMapping.getAllNationsAsSet();
     }
 
     @Override
@@ -112,12 +106,12 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         }
 
         String nation = params.get("nation").toLowerCase();
-        byte[] rowKeyPreffix = Bytes.add(new byte[]{(byte)pluginType.getType()},Bytes.toBytes(nation),Bytes.toBytes(time));
-        byte[] rowKey = Bytes.add(rowKeyPreffix, Bytes.toBytes(params.get("uid")));
+        byte[] rowKey = Bytes.add(new byte[]{(byte)pluginType.getType()},Bytes.toBytes(time),Bytes.toBytes(params.get("uid")));
 
         Put put = new Put(rowKey);
         put.add(ucf,actionCol,time,Bytes.toBytes(params.get("action")));
         put.add(ucf,ipCol,time,Bytes.toBytes(ip));
+        put.add(ucf,nationCol,time,Bytes.toBytes(nation));
 
         if(pluginType != PluginType.TAB){
 
@@ -137,22 +131,11 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
             put.add(ucf,urlCol,time,Bytes.toBytes(strHashUrl));
         }
 
-        //更新nation,nation放到mongo中，方便训练的时候使用
-        try{
-            String comNation = pid.toString() + COMBINE_NATION_SEPRATOR + nation;
-            if(!historyNations.contains(comNation) && newNations.get(comNation) == null){
-                newNations.put(comNation,"");
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
         return put;
     }
 
     @Override
     public void cleanup() throws Exception {
-        MetricMapping.insertNations(newNations.keySet());
     }
 
 
