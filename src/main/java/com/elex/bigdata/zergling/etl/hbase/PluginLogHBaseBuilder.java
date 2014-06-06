@@ -48,6 +48,13 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
     private static final String LOG_URI_SEPRATOR = "&";
     private static final String LOG_URI_PARAM_SEPRATOR = "=";
 
+    private ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>(){
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        }
+    };
+
     public PluginLogHBaseBuilder(){
     }
 
@@ -77,7 +84,8 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         }
 
         String[][] content = gson.fromJson(URLDecoder.decode(sepLines.get(1),"utf-8"), String[][].class);
-        long time = Long.parseLong(params.get("uts"));
+//        long time = Long.parseLong(params.get("uts"));
+        long time = sdf.get().parse(attrs.get(1)).getTime();
 
         //添加到URL字典表
         int[] hashUrls = new int[content.length];
