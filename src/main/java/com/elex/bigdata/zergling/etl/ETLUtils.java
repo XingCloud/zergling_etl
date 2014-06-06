@@ -210,4 +210,15 @@ public class ETLUtils {
     return sdf.format(d2) + "." + df.format(i);
   }
 
+    public static List<String> split(String line, String sep){
+        List<String> attrs = new ArrayList<String>();
+        int pos = 0, end;
+        while ((end = line.indexOf(sep, pos)) >= 0) {
+            attrs.add(line.substring(pos, end));
+            pos = end + sep.length();
+        }
+        attrs.add(line.substring(pos)); //最后一个
+        return attrs;
+    }
+
 }
