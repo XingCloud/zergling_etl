@@ -68,8 +68,8 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         //        1  2014-03-31T14:24:23+08:00
         //        2  /ad.png?p=www.awesomehp.com&ip=37.239.46.2&nation=IQ&uid=WDCXWD5000BPVT-22HXZT3_WD-WXL1A911029910299&aid=1883&t=
 
-        List<String> attrs = split(line,LOG_ATTR_SEPRATOR);
-        List<String> uriParams = split(attrs.get(2).substring(urlPreffix.length()),LOG_URI_SEPRATOR);
+        List<String> attrs = ETLUtils.split(line,LOG_ATTR_SEPRATOR);
+        List<String> uriParams = ETLUtils.split(attrs.get(2).substring(urlPreffix.length()),LOG_URI_SEPRATOR);
 
         Map<String,String> params = new HashMap<String,String>();
         for(String param : uriParams){
@@ -117,7 +117,7 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
 
         //命中情况
         if(StringUtils.isNotBlank(params.get("t"))){
-            List<String> scores = split(params.get("t"),LOG_HIT_SEPRATOR);
+            List<String> scores = ETLUtils.split(params.get("t"),LOG_HIT_SEPRATOR);
             //b.19,a.21,z.60 a.游戏 b.电商 z.未知
             for(String score : scores){
                 int pos = score.indexOf(LOG_HIT_KV_SEPRATOR);
@@ -147,18 +147,6 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
     @Override
     public void cleanup() throws Exception {
         MetricMapping.insertNations(newNations.keySet());
-    }
-
-
-    private List<String> split(String line, String sep){
-        List<String> attrs = new ArrayList<String>();
-        int pos = 0, end;
-        while ((end = line.indexOf(sep, pos)) >= 0) {
-            attrs.add(line.substring(pos, end));
-            pos = end + 1;
-        }
-        attrs.add(line.substring(pos)); //最后一个
-        return attrs;
     }
 
 }
