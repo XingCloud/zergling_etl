@@ -25,6 +25,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
     private byte[] ucf = Bytes.toBytes("ua");
     private byte[] actionCol = Bytes.toBytes("a");
     private byte[] urlCol = Bytes.toBytes("url");
+    private byte[] originalUrlCol = Bytes.toBytes("ou");
     private byte[] durationCol = Bytes.toBytes("d");
     private byte[] paCol = Bytes.toBytes("pa");
     private byte[] projectCol = Bytes.toBytes("p");
@@ -57,9 +58,9 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         //        2  /pc.png?nation=us&ip=&action=click&category=0&uts=1401418227487&uid=395049983_1052515_989BEF9B&content=[[%22Google%22,%22http://www.google.com/%22,%22%22,%22%22,%22%22,%22us%22]]
 
         //将content分开，里面有特殊字符
-        List<String> sepLines = split(line,"&content=");
-        List<String> attrs = split(sepLines.get(0),LOG_ATTR_SEPRATOR);
-        List<String> uriParams = split(attrs.get(2).substring(urlPreffix.length()),LOG_URI_SEPRATOR);
+        List<String> sepLines = ETLUtils.split(line,"&content=");
+        List<String> attrs = ETLUtils.split(sepLines.get(0),LOG_ATTR_SEPRATOR);
+        List<String> uriParams = ETLUtils.split(attrs.get(2).substring(urlPreffix.length()),LOG_URI_SEPRATOR);
 
         Map<String,String> params = new HashMap<String,String>();
         for(String param : uriParams){
@@ -120,6 +121,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
             }
 
             put.add(ucf,urlCol,time,Bytes.toBytes(hashUrls[0]));
+            put.add(ucf,originalUrlCol,time,Bytes.toBytes(content[0][1]));
             put.add(ucf,catCol,time,Bytes.toBytes(category));
             put.add(ucf,paCol,time,Bytes.toBytes(content[0][4]));
             put.add(ucf,projectCol,time,Bytes.toBytes(content[0][5]));
@@ -137,19 +139,6 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
     @Override
     public void cleanup() throws Exception {
     }
-
-
-    private List<String> split(String line, String sep){
-        List<String> attrs = new ArrayList<String>();
-        int pos = 0, end;
-        while ((end = line.indexOf(sep, pos)) >= 0) {
-            attrs.add(line.substring(pos, end));
-            pos = end + sep.length();
-        }
-        attrs.add(line.substring(pos)); //最后一个
-        return attrs;
-    }
-
 
     private enum PluginType {
 
