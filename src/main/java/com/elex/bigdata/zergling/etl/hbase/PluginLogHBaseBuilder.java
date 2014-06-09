@@ -88,9 +88,8 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         long time = sdf.get().parse(attrs.get(1)).getTime();
 
         //添加到URL字典表
-        int[] hashUrls = new int[content.length];
         for(int i=0;i<content.length;i++){
-            hashUrls[i] = putURLDetail(content[i],time);
+            putURLDetail(content[i],time);
         }
 
         long ip = 0;
@@ -128,17 +127,16 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
                 put.add(ucf,durationCol,time,Bytes.toBytes(duration));
             }
 
-            put.add(ucf,urlCol,time,Bytes.toBytes(hashUrls[0]));
-            put.add(ucf,originalUrlCol,time,Bytes.toBytes(content[0][1]));
+            put.add(ucf,urlCol,time,Bytes.toBytes(content[0][1]));
             put.add(ucf,catCol,time,Bytes.toBytes(category));
             put.add(ucf,paCol,time,Bytes.toBytes(content[0][4]));
             put.add(ucf,projectCol,time,Bytes.toBytes(content[0][5]));
         }else{
-            String strHashUrl = "" + hashUrls[0];
-            for(int i =1;i<hashUrls.length;i++){
-                strHashUrl += "," + hashUrls[i];
+            String strUrl = "" + content[0][1];
+            for(int i=1;i<content.length;i++){
+                strUrl += "," + content[i][1];
             }
-            put.add(ucf,urlCol,time,Bytes.toBytes(strHashUrl));
+            put.add(ucf,urlCol,time,Bytes.toBytes(strUrl));
         }
 
         return put;
@@ -165,11 +163,11 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         List<Put> urlDetailPuts = new ArrayList<Put>();
         int hashURL;
         try{
-            hashURL = BKDRHash.getIntFromStr(detail[1]);
+//            hashURL = BKDRHash.getIntFromStr(detail[1]);
 
-            Put put = new Put(Bytes.add(drowPrefix,Bytes.toBytes(hashURL)));
+            Put put = new Put(Bytes.add(drowPrefix,Bytes.toBytes(detail[1])));
             put.add(dcf,titleCol,time,Bytes.toBytes(detail[0]));
-            put.add(dcf,urlCol,time,Bytes.toBytes(detail[1]));
+//            put.add(dcf,urlCol,time,Bytes.toBytes(detail[1]));
             put.add(dcf,langCol,time,Bytes.toBytes(detail[2]));
             put.add(dcf,metaCol,time,Bytes.toBytes(detail[3]));
 
@@ -179,6 +177,6 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         }
 
         HBaseSimpleAPI.put(urlDetailTableName,urlDetailPuts);
-        return hashURL;
+        return 0;
     }
 }
