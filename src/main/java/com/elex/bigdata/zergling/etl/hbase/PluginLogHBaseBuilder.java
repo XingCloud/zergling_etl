@@ -159,15 +159,12 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         }
     }
 
-    private int putURLDetail(String[] detail,long time) throws Exception {
+    private void putURLDetail(String[] detail,long time) throws Exception {
         List<Put> urlDetailPuts = new ArrayList<Put>();
-        int hashURL;
         try{
-//            hashURL = BKDRHash.getIntFromStr(detail[1]);
 
             Put put = new Put(Bytes.add(drowPrefix,Bytes.toBytes(detail[1])));
             put.add(dcf,titleCol,time,Bytes.toBytes(detail[0]));
-//            put.add(dcf,urlCol,time,Bytes.toBytes(detail[1]));
             put.add(dcf,langCol,time,Bytes.toBytes(detail[2]));
             put.add(dcf,metaCol,time,Bytes.toBytes(detail[3]));
 
@@ -177,6 +174,5 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         }
 
         HBaseSimpleAPI.put(urlDetailTableName,urlDetailPuts);
-        return 0;
     }
 }
