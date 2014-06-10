@@ -91,11 +91,9 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
 
         //添加到URL字典表
 
-        for(int i=0;i<content.length;i++){
-            putURLDetail(content[i],time);
-        }
+        putURLDetail(content,time);
 
-        LOG.info("Insert  " + content.length + " url detail spend " + (System.currentTimeMillis() - begin) + "ms");
+        LOG.info("Parse and insert  " + content.length + " detail spend " + (System.currentTimeMillis() - begin) + "ms");
 
         long ip = 0;
         if(StringUtils.isNotBlank(params.get("ip"))){
@@ -164,16 +162,19 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         }
     }
 
-    private void putURLDetail(String[] detail,long time) throws Exception {
+    private void putURLDetail(String[][] content,long time) throws Exception {
         List<Put> urlDetailPuts = new ArrayList<Put>();
         try{
+            for(int i=0;i<content.length;i++){
+                String[] detail = content[i];
+                Put put = new Put(Bytes.add(drowPrefix,Bytes.toBytes(detail[1])));
+                put.add(dcf,titleCol,time,Bytes.toBytes(detail[0]));
+                put.add(dcf,langCol,time,Bytes.toBytes(detail[2]));
+                put.add(dcf,metaCol,time,Bytes.toBytes(detail[3]));
 
-            Put put = new Put(Bytes.add(drowPrefix,Bytes.toBytes(detail[1])));
-            put.add(dcf,titleCol,time,Bytes.toBytes(detail[0]));
-            put.add(dcf,langCol,time,Bytes.toBytes(detail[2]));
-            put.add(dcf,metaCol,time,Bytes.toBytes(detail[3]));
+                urlDetailPuts.add(put);
+            }
 
-            urlDetailPuts.add(put);
         }catch (Exception e){
             throw new Exception("Error when parse the url detail",e.getCause());
         }
