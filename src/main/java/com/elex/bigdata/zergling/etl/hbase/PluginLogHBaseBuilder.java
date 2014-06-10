@@ -4,6 +4,7 @@ import com.elex.bigdata.hashing.BKDRHash;
 import com.elex.bigdata.util.MetricMapping;
 import com.elex.bigdata.zergling.etl.ETLUtils;
 import com.elex.bigdata.zergling.etl.driver.MongoDriver;
+import com.elex.bigdata.zergling.etl.model.LogType;
 import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -19,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PluginLogHBaseBuilder implements HBaseBuilder {
 
-    public static final Log LOG = LogFactory.getLog(PluginLogHBaseBuilder.class);
+    public static final Log LOG = LogFactory.getLog(LogType.PC.getType());
 
     //dmp_user_action
     private byte[] ucf = Bytes.toBytes("ua");
@@ -93,7 +94,6 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
             putURLDetail(content[i],time);
         }
         LOG.info("Insert  " + content.length+ " url detail spend " + (System.currentTimeMillis() - begin ) + "ms");
-        System.out.println("Insert  " + content.length+ " url detail spend " + (System.currentTimeMillis() - begin ) + "ms");
 
         long ip = 0;
         if(StringUtils.isNotBlank(params.get("ip"))){
