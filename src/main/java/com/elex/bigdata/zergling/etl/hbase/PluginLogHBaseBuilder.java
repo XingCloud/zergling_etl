@@ -93,6 +93,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
             putURLDetail(content[i],time);
         }
         LOG.info("Insert  " + content.length+ " url detail spend " + (System.currentTimeMillis() - begin ) + "ms");
+        System.out.println("Insert  " + content.length+ " url detail spend " + (System.currentTimeMillis() - begin ) + "ms");
 
         long ip = 0;
         if(StringUtils.isNotBlank(params.get("ip"))){
