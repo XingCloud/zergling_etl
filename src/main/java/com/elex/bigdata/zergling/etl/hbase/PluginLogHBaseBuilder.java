@@ -65,7 +65,6 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         //        1  2014-03-31T14:24:23+08:00
         //        2  /pc.png?nation=us&ip=&action=click&category=0&uts=1401418227487&uid=395049983_1052515_989BEF9B&content=[[%22Google%22,%22http://www.google.com/%22,%22%22,%22%22,%22%22,%22us%22]]
 
-        long begin = System.currentTimeMillis();
         //将content分开，里面有特殊字符
         List<String> sepLines = ETLUtils.split(line,"&content=");
         List<String> attrs = ETLUtils.split(sepLines.get(0),LOG_ATTR_SEPRATOR);
@@ -93,8 +92,6 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
 
         putURLDetail(content,time);
 
-        LOG.info("Parse and insert  " + content.length + " detail spend " + (System.currentTimeMillis() - begin) + "ms");
-
         long ip = 0;
         if(StringUtils.isNotBlank(params.get("ip"))){
             ip = ETLUtils.ip2Long(params.get("ip"));
@@ -119,7 +116,6 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         String nation = params.get("nation").toLowerCase();
         byte[] rowKey = Bytes.add(new byte[]{(byte)pluginType.getType()},Bytes.toBytes(time),Bytes.toBytes(params.get("uid")));
 
-        LOG.info("Parse and build  " + content.length + " action spend " + (System.currentTimeMillis() - begin) + "ms");
         Put put = new Put(rowKey);
         put.add(ucf,actionCol,time,Bytes.toBytes(params.get("action")));
         put.add(ucf,ipCol,time,Bytes.toBytes(ip));
