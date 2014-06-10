@@ -119,6 +119,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         String nation = params.get("nation").toLowerCase();
         byte[] rowKey = Bytes.add(new byte[]{(byte)pluginType.getType()},Bytes.toBytes(time),Bytes.toBytes(params.get("uid")));
 
+        LOG.info("Parse and build  " + content.length + " action spend " + (System.currentTimeMillis() - begin) + "ms");
         Put put = new Put(rowKey);
         put.add(ucf,actionCol,time,Bytes.toBytes(params.get("action")));
         put.add(ucf,ipCol,time,Bytes.toBytes(ip));
