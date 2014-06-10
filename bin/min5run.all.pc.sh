@@ -32,7 +32,7 @@ echo "begin import" > ${tmp_log_path}
 daily_log_path="/data/bigdata/all/${type}/${type}_${day}.log"
 echo "begin import ${fullPath} at "$(date +"%Y-%m-%d %H:%M:%S")
 
-${java_bin}/java -jar ${jar_home} ${type} ${table_name} ${fullPath} ${workers} ${batch_size} ${project_id} > ${tmp_log_path}
+${java_bin}/java -Xmx1024m -Xms512m -jar ${jar_home} ${type} ${table_name} ${fullPath} ${workers} ${batch_size} ${project_id} > ${tmp_log_path}
 if grep -Fxq "Finished import log without error" ${tmp_log_path}
 then
     echo "Rename to ${fullPath} to ${fullPath}.completed as no exception"
