@@ -88,9 +88,11 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         long time = sdf.get().parse(attrs.get(1)).getTime();
 
         //添加到URL字典表
+        long begin = System.currentTimeMillis();
         for(int i=0;i<content.length;i++){
             putURLDetail(content[i],time);
         }
+        LOG.info("Insert  " + content.length+ " url detail spend " + (System.currentTimeMillis() - begin ) + "ms");
 
         long ip = 0;
         if(StringUtils.isNotBlank(params.get("ip"))){
