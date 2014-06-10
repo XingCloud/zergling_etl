@@ -65,6 +65,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         //        1  2014-03-31T14:24:23+08:00
         //        2  /pc.png?nation=us&ip=&action=click&category=0&uts=1401418227487&uid=395049983_1052515_989BEF9B&content=[[%22Google%22,%22http://www.google.com/%22,%22%22,%22%22,%22%22,%22us%22]]
 
+        long begin = System.currentTimeMillis();
         //将content分开，里面有特殊字符
         List<String> sepLines = ETLUtils.split(line,"&content=");
         List<String> attrs = ETLUtils.split(sepLines.get(0),LOG_ATTR_SEPRATOR);
@@ -89,11 +90,11 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         long time = sdf.get().parse(attrs.get(1)).getTime();
 
         //添加到URL字典表
-        long begin = System.currentTimeMillis();
+
         for(int i=0;i<content.length;i++){
             putURLDetail(content[i],time);
         }
-        LOG.info("Insert  " + content.length+ " url detail spend " + (System.currentTimeMillis() - begin ) + "ms");
+        LOG.info("Insert  " + content.length + " url detail spend " + (System.currentTimeMillis() - begin) + "ms");
 
         long ip = 0;
         if(StringUtils.isNotBlank(params.get("ip"))){
