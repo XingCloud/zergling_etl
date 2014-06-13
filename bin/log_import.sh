@@ -21,34 +21,23 @@ else
   processing_day=$4
 fi
 
+raw_log_path=$5
+current_op_file_name=$6
+history_op_file_name=$7
+
 workers=10
 batch_size=500
 
-processing_history_day=`date -u -d"${processing_day} 7 days ago" +%Y%m%d`
-raw_log_web=http://22find-log.22find.com/22find.log.${processing_day}
-raw_log_path=/data/raw/${project_id}/search
-hdfs_history_path=/user/hadoop/history/raw/${project_id}/search
-current_op_file_name=${project_id}.${processing_day}.log
-history_op_file_name=${project_id}.${processing_history_day}.log
-#output_path=/data/bigdata/${project_id}/nav
+hdfs_history_path=/user/hadoop/history/raw/${project_id}/${type}
 
 echo ${line}
 echo "[PROCESSING-DAY]="${processing_day}
-echo "[PROCESSING-HISTORY-DAY]="${processing_history_day}
+echo "[PROCESSING-HISTORY-FILE]="${history_op_file_name}
 echo "[PROJECT-ID]="${project_id}
-echo "[HTTP-RAW-LOG]="${raw_log_web}
 echo "[DOWNLOAD-OUTPUT]="${raw_log_path}
 echo "[FILE-NAME]="${current_op_file_name}
 echo ${line}
 
-wget ${raw_log_web} -O ${raw_log_path}/${current_op_file_name}
-if [ $? -ne 0 ];then
-  echo "Downloading from ${raw_log_web} is failed."
-  exit 1
-else
-  echo "Downloading from ${raw_log_web} is ok."
-fi
-echo ${line}
 
 echo "Copy local to hdfs backup."
 
@@ -76,6 +65,5 @@ else
   rm -rf ${raw_log_path}/${history_op_file_name}
 fi
 
-#mvn -f ${code_home}/pom.xml exec:java -Dexec.mainClass="com.elex.bigdata.zergling.etl.NavigatorETL" -Dexec.args="${project_id} ${raw_log_path}/${current_op_file_name}.log ${output_path}/${project_id}${table_name_suffix}.${processing_day}.nav.log nav_${project_id}${table_name_suffix} ${only_show} ${workers} ${batch_size}" -Dexec.classpathScope=runtime
-${java_bin}/java -jar ${jar_home} ${type} ${table_name} ${raw_log_path}/${current_op_file_name} ${workers} ${batch_size} ${project_id}
+${java_bin}/java  -jar ${jar_home} ${type} ${table_name} ${raw_log_path}/${current_op_file_name} ${workers} ${batch_size} ${project_id}
 echo "All done"

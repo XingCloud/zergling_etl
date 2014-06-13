@@ -4,7 +4,7 @@ line="-------------------"
 code_home=/home/hadoop/git_project_home/zergling_etl
 jar_home=${code_home}/target/LogImport-jar-with-dependencies.jar
 hadoop_home=/usr/bin/
-java_bin=/usr/java/jdk1.7.0_45/bin
+java_bin=/usr/java/jdk1.7.0_55/bin
 
 type=ad
 table_name=ad_all_log
