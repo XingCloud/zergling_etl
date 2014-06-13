@@ -78,9 +78,8 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
             params.put(key,value);
         }
 
-        if(StringUtils.isBlank(params.get("uts")) || StringUtils.isBlank(params.get("nation"))
-                || StringUtils.isBlank(params.get("uid")) || StringUtils.isBlank(params.get("action"))
-                || StringUtils.isBlank(attrs.get(2)) ){
+        if( StringUtils.isBlank(params.get("nation")) || StringUtils.isBlank(params.get("uid"))
+                || StringUtils.isBlank(params.get("action")) || StringUtils.isBlank(attrs.get(2)) ){
             throw new Exception(" One pc params is null");
         }
 
