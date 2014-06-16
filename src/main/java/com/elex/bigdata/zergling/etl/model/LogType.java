@@ -1,9 +1,6 @@
 package com.elex.bigdata.zergling.etl.model;
 
-import com.elex.bigdata.zergling.etl.hbase.ADLogHBaseBuilder;
-import com.elex.bigdata.zergling.etl.hbase.HBaseBuilder;
-import com.elex.bigdata.zergling.etl.hbase.PluginLogHBaseBuilder;
-import com.elex.bigdata.zergling.etl.hbase.SearchLogHBaseBuilder;
+import com.elex.bigdata.zergling.etl.hbase.*;
 
 /**
  * Author: liqiang
@@ -26,6 +23,11 @@ public enum LogType {
         @Override
         public HBaseBuilder getBuilder() {
             return new PluginLogHBaseBuilder();
+        }
+    },YAC("yac"){
+        @Override
+        public HBaseBuilder getBuilder() {
+            return new YACLogHBaseBuilder();
         }
     };
 

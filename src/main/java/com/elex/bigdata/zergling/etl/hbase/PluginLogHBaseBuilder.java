@@ -1,9 +1,6 @@
 package com.elex.bigdata.zergling.etl.hbase;
 
-import com.elex.bigdata.hashing.BKDRHash;
-import com.elex.bigdata.util.MetricMapping;
 import com.elex.bigdata.zergling.etl.ETLUtils;
-import com.elex.bigdata.zergling.etl.driver.MongoDriver;
 import com.elex.bigdata.zergling.etl.model.LogType;
 import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
@@ -15,8 +12,6 @@ import org.apache.hadoop.hbase.util.Bytes;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
 
 public class PluginLogHBaseBuilder implements HBaseBuilder {
 

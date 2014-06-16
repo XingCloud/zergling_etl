@@ -58,8 +58,18 @@ public class LogImport {
             String line;
             List<String> lines = new ArrayList<String>();
 
+            String firstLine = null;
+            if(logType == LogType.YAC){
+                firstLine = reader.readLine();
+                lines.add(firstLine);
+            }
+
             while((line =  reader.readLine()) != null){
-                lines.add(line);
+                if(firstLine != null){ //YAC日志的第一行为公共信息（uid ip nation）
+                    lines.add(firstLine + "\t" + line);
+                }else{
+                    lines.add(line);
+                }
                 ++totalCount;
                 if(lines.size() == batch){
                     System.out.print(".");
