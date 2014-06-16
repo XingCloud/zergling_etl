@@ -11,7 +11,7 @@ table_name=yac_user_action
 workers=10
 batch_size=500
 project_id=all
-logdir=/data/log/$(date -d"-5 mins" +"%Y%m%d")/
+logdir=/data/log/yac/$(date -d"-5 mins" +"%Y%m%d")/
 hdfs_path=/user/hadoop/history/${type}
 tmp_log_path=/data/bigdata/all/${type}/tmp.log
 
