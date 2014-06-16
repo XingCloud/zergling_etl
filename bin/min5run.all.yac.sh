@@ -28,12 +28,6 @@ for f in src_paths;do
   fi
 done
 
-echo ${line}
-
-for f in src_paths;do
-  import ${f}
-done
-
 #import per file
 function import(){
   path=$1
@@ -62,3 +56,9 @@ function import(){
   echo "end import ${path} at "$(date +"%Y-%m-%d %H:%M:%S")
 
 }
+
+for f in src_paths;do
+  import ${f}
+done
+
+echo ${line}
