@@ -22,7 +22,7 @@ else
 fi
 
 #move file to filename.ing to avoid be processed again
-for f in src_paths;do
+for f in ${src_paths};do
   if [ -s ${f} ]; then
     `mv ${f} ${f}.ing`
   fi
@@ -57,7 +57,7 @@ function import(){
 
 }
 
-for f in src_paths;do
+for f in ${src_paths};do
   import ${f}
 done
 
