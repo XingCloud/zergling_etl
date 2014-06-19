@@ -67,12 +67,15 @@ public class LogImport {
 
             while((line =  reader.readLine()) != null){
                 if(firstLine != null ){ //YAC日志的第一行为公共信息（uid ip nation）
-                    if(!YAC_UNICODE.equals(line))
+                    if(!YAC_UNICODE.equals(line)){
                         lines.add(firstLine + "\t" + line.replace(YAC_UNICODE,""));
+                        ++totalCount;
+                    }
                 }else{
                     lines.add(line);
+                    ++totalCount;
                 }
-                ++totalCount;
+
                 if(lines.size() == batch){
                     System.out.print(".");
                     jobs.add(service.submit(new HBasePutterV2(logType.getType(),builder,tableName,lines,counter)));
