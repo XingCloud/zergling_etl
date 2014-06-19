@@ -44,8 +44,8 @@ public class YACLogHBaseBuilder implements HBaseBuilder {
         //uid  ip nation ts url title 网站语言 metainfo 停留时间
         List<String> attrs = ETLUtils.split(line, LOG_ATTR_SEPRATOR);
 
-        if(attrs.size() != 9){
-            throw new Exception(" Yac log params format error");
+        if(attrs.size() < 9){
+            throw new Exception("Yac log params size less than 9");
         }
 
         //时间只有10位，手动加上3位随机数

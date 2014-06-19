@@ -63,12 +63,12 @@ public class LogImport {
             String firstLine = null;
             if(logType == LogType.YAC){
                 firstLine = reader.readLine().replace(YAC_UNICODE,"");
-                lines.add(firstLine);
             }
 
             while((line =  reader.readLine()) != null){
-                if(firstLine != null){ //YAC日志的第一行为公共信息（uid ip nation）
-                    lines.add(firstLine + "\t" + line.replace(YAC_UNICODE,""));
+                if(firstLine != null ){ //YAC日志的第一行为公共信息（uid ip nation）
+                    if(!YAC_UNICODE.equals(line))
+                        lines.add(firstLine + "\t" + line.replace(YAC_UNICODE,""));
                 }else{
                     lines.add(line);
                 }
