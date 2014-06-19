@@ -71,6 +71,26 @@
         </layout>
     </appender>
 
+    <appender name="YAC_RUN_LOG" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="/data/bigdata/all/yac/run.log" />
+        <param name="Append" value="true" />
+        <param name="Threshold" value="info" />
+        <param name="DatePattern" value="'.'yyyy-MM-dd" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyyMMddHHmmss} %-5p%c{2}: %m%n" />
+        </layout>
+    </appender>
+
+    <appender name="YAC_IGNORE_LOG" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="/data/bigdata/all/yac/ignore.log" />
+        <param name="Append" value="true" />
+        <param name="Threshold" value="info" />
+        <param name="DatePattern" value="'.'yyyy-MM-dd" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%m%n" />
+        </layout>
+    </appender>
+
   <logger name="search">
     <level value="debug" />
     <appender-ref ref="SEARCH_RUN_LOG" />
@@ -97,6 +117,15 @@
     <level value="info" />
     <appender-ref ref="PC_IGNORE_LOG" />
   </logger>
+
+    <logger name="yac">
+        <level value="debug" />
+        <appender-ref ref="YAC_RUN_LOG" />
+    </logger>
+    <logger name="yac_ignore">
+        <level value="info" />
+        <appender-ref ref="YAC_IGNORE_LOG" />
+    </logger>
 
   <root>
     <level value="info" />
