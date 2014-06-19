@@ -19,6 +19,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class LogImport {
 
+    public static String YAC_UNICODE = "\u0000";
+
     public static void main(String args[]) throws Exception {
         if(args.length != 6){
             throw new Exception("Please specify the type,tableName,filePath , batch size and project id");
@@ -60,13 +62,13 @@ public class LogImport {
 
             String firstLine = null;
             if(logType == LogType.YAC){
-                firstLine = reader.readLine();
+                firstLine = reader.readLine().replace(YAC_UNICODE,"");
                 lines.add(firstLine);
             }
 
             while((line =  reader.readLine()) != null){
                 if(firstLine != null){ //YAC日志的第一行为公共信息（uid ip nation）
-                    lines.add(firstLine + "\t" + line);
+                    lines.add(firstLine + "\t" + line.replace(YAC_UNICODE,""));
                 }else{
                     lines.add(line);
                 }
