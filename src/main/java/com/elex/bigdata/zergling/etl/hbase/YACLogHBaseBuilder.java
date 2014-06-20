@@ -62,7 +62,6 @@ public class YACLogHBaseBuilder implements HBaseBuilder {
         }
         long time = Long.parseLong(attrs.get(3) + timeSuffix);
 
-        LOG.info(time + " " + line);
         //添加到URL字典表
 //        putURLDetail(attrs,time);
 
