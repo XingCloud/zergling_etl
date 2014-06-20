@@ -10,6 +10,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class YACLogHBaseBuilder implements HBaseBuilder {
 
@@ -34,7 +35,7 @@ public class YACLogHBaseBuilder implements HBaseBuilder {
     private byte[] drowPrefix = Bytes.toBytes("F");
 
     private static final String LOG_ATTR_SEPRATOR = "\t";
-    private static final Long DEN = 1000000000000l;
+    private static Random random = new Random();
 
     public YACLogHBaseBuilder(){
     }
@@ -50,7 +51,7 @@ public class YACLogHBaseBuilder implements HBaseBuilder {
         }
 
         //时间只有10位，手动加上3位随机数
-        long timeSuffix = System.nanoTime()/DEN;
+        int timeSuffix = (random.nextInt(999)*100)%1000;
         long time = Long.parseLong(attrs.get(3) + timeSuffix);
 
         LOG.info(time + " " + line);
