@@ -51,11 +51,14 @@ public class YACLogHBaseBuilder implements HBaseBuilder {
         }
 
         //时间只有10位，手动加上3位随机数
-        int timeSuffix = random.nextInt(999);
-        if(timeSuffix<10){
-            timeSuffix *= 100;
-        }else if(timeSuffix<100){
-            timeSuffix *= 10;
+        int randomTime = random.nextInt(999);
+        String timeSuffix = null;
+        if(randomTime == 0){
+            timeSuffix = "000";
+        }if(randomTime<10){
+            timeSuffix = "00" + randomTime;
+        }else if(randomTime<100){
+            timeSuffix = "0" + randomTime;
         }
         long time = Long.parseLong(attrs.get(3) + timeSuffix);
 
