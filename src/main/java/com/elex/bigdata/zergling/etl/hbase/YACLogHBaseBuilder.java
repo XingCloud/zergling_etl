@@ -1,6 +1,7 @@
 package com.elex.bigdata.zergling.etl.hbase;
 
 import com.elex.bigdata.zergling.etl.ETLUtils;
+import com.elex.bigdata.zergling.etl.model.LogType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class YACLogHBaseBuilder implements HBaseBuilder {
 
-    public static final Log LOG = LogFactory.getLog(YACLogHBaseBuilder.class);
+    public static final Log LOG = LogFactory.getLog(LogType.YAC.getType());
 
     //yac_user_action
     private byte[] ucf = Bytes.toBytes("ua");

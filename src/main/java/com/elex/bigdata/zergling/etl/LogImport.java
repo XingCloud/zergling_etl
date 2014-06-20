@@ -68,7 +68,7 @@ public class LogImport {
             while((line =  reader.readLine()) != null){
                 if(firstLine != null ){ //YAC日志的第一行为公共信息（uid ip nation）
                     if(!YAC_UNICODE.equals(line)){
-                        lines.add((firstLine + "\t" + line).replace(YAC_UNICODE,""));
+                        lines.add(firstLine + "\t" + line.replace(YAC_UNICODE,""));
                         ++totalCount;
                     }
                 }else{
