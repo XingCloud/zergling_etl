@@ -61,4 +61,16 @@ for f in ${src_paths};do
   import ${f}
 done
 
+#每天凌晨0000,删除历史文件
+minute=$(date +"%H%M")
+if [ "0000" = "${minute}" ]; then
+    history_day=$(date -u -d"${processing_day} 7 days ago" +%Y%m%d)
+    history_path=/data/log/${type}/${history_day}
+    if [ -d ${history_path} ]; then
+            echo "Remove the directory ${history_path}"
+            rm -rf ${history_path}
+    fi
+fi
+
+
 echo ${line}
