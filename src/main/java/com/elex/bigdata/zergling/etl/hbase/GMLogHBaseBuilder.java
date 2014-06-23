@@ -89,8 +89,6 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
         }
 
         long time = Long.parseLong(params.get("ts"));
-        Date date = new Date(time);
-        //TODO：时区转换
 
         byte[] rowKey = Bytes.add(Bytes.toBytes(action.getShortHand()),Bytes.toBytes(time),Bytes.toBytes(params.get("gid")));
         rowKey = Bytes.add(rowKey,Bytes.toBytes(ETLConstants.ROWKEY_SEP),Bytes.toBytes(params.get("uid")));
@@ -98,23 +96,23 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
         Put put = new Put(rowKey);
 
         put.add(ucf,gidCol,time,Bytes.toBytes(params.get("gid")));
-        put.add(ucf,langCol,time,Bytes.toBytes(params.get("l")));
-        put.add(ucf,nationCol,time,Bytes.toBytes(params.get("na").toLowerCase()));
-        put.add(ucf,tzCol,time,Bytes.toBytes(params.get("tz")));
-        put.add(ucf,vipCol,time,Bytes.toBytes(params.get("v")));
-        put.add(ucf,vaCol,time,Bytes.toBytes(params.get("va")));
-        put.add(ucf,vpCol,time,Bytes.toBytes(params.get("vp")));
-        put.add(ucf,vlCol,time,Bytes.toBytes(params.get("vl")));
+        putNotNull(put,ucf,langCol,time,params.get("l"));
+        putNotNull(put,ucf,nationCol,time,params.get("na"));
+        putNotNull(put,ucf,tzCol,time,params.get("tz"));
+        putNotNull(put,ucf,vipCol,time,params.get("v"));
+        putNotNull(put,ucf,vaCol,time,params.get("va"));
+        putNotNull(put,ucf,vpCol,time,params.get("vp"));
+        putNotNull(put,ucf,vlCol,time,params.get("vl"));
 
         if(action == GMAction.HB){
-            put.add(ucf,tagCol,time,Bytes.toBytes(params.get("tag")));
-            put.add(ucf,titleCol,time,Bytes.toBytes(params.get("title")));
+            putNotNull(put,ucf,tagCol,time,params.get("tag"));
+            putNotNull(put,ucf,titleCol,time,params.get("title"));
         }else if(action == GMAction.LIKE || action == GMAction.UP){
-            put.add(ucf,countCol,time,Bytes.toBytes(params.get("c")));
-            put.add(ucf,gsCol,time,Bytes.toBytes(params.get("gs")));
+            putNotNull(put,ucf,countCol,time,params.get("c"));
+            putNotNull(put,ucf,gsCol,time,params.get("gs"));
         }else if(action == GMAction.SHARE){
-            put.add(ucf,fsCol,time,Bytes.toBytes(params.get("fs")));
-            put.add(ucf,gsCol,time,Bytes.toBytes(params.get("gs")));
+            putNotNull(put,ucf,fsCol,time,params.get("fs"));
+            putNotNull(put,ucf,gsCol,time,params.get("gs"));
         }else if(action == GMAction.PAY){
             put.add(ucf,cashCol,time,Bytes.toBytes(params.get("cash")));
         }
@@ -124,6 +122,12 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
 
     @Override
     public void cleanup() throws Exception {
+    }
+
+    private void putNotNull(Put put,byte[] cf,byte[] col,long time ,String value){
+        if(value != null){
+            put.add(cf,col,time,Bytes.toBytes(value));
+        }
     }
 
     private enum GMAction {
