@@ -90,6 +90,25 @@
             <param name="ConversionPattern" value="%m%n" />
         </layout>
     </appender>
+    <appender name="GM_RUN_LOG" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="/data/bigdata/all/gm/run.log" />
+        <param name="Append" value="true" />
+        <param name="Threshold" value="info" />
+        <param name="DatePattern" value="'.'yyyy-MM-dd" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyyMMddHHmmss} %-5p%c{2}: %m%n" />
+        </layout>
+    </appender>
+
+    <appender name="GM_IGNORE_LOG" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="/data/bigdata/all/gm/ignore.log" />
+        <param name="Append" value="true" />
+        <param name="Threshold" value="info" />
+        <param name="DatePattern" value="'.'yyyy-MM-dd" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%m%n" />
+        </layout>
+    </appender>
 
   <logger name="search">
     <level value="debug" />
@@ -126,7 +145,14 @@
         <level value="info" />
         <appender-ref ref="YAC_IGNORE_LOG" />
     </logger>
-
+    <logger name="gm">
+        <level value="debug" />
+        <appender-ref ref="GM_RUN_LOG" />
+    </logger>
+    <logger name="gm_ignore">
+        <level value="info" />
+        <appender-ref ref="GM_IGNORE_LOG" />
+    </logger>
   <root>
     <level value="info" />
     <appender-ref ref="CONSOLE" />

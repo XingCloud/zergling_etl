@@ -29,6 +29,11 @@ public enum LogType {
         public HBaseBuilder getBuilder() {
             return new YACLogHBaseBuilder();
         }
+    },GM("gm"){
+        @Override
+        public HBaseBuilder getBuilder() {
+            return new GMLogHBaseBuilder();
+        }
     };
 
     private LogType(String type){
