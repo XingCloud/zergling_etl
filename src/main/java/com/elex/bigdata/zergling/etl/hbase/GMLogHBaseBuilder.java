@@ -33,8 +33,8 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
     private byte[] tagCol = Bytes.toBytes("tag"); //游戏类型
     private byte[] titleCol = Bytes.toBytes("title"); //游戏标题
 
-    //like/up
-    private byte[] countCol = Bytes.toBytes("c"); //点赞次数
+    //down/up
+    private byte[] countCol = Bytes.toBytes("c"); //点赞/点踩次数
     private byte[] gsCol = Bytes.toBytes("gs"); //游戏评分
 
     //share
@@ -63,7 +63,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
     public Put buildPut(String line) throws Exception {
         //        0  10.1.20.152
         //        1  2014-03-31T14:24:23+08:00
-        //        2  /pc.png?nation=us&ip=&action=click&category=0&uts=1401418227487&uid=395049983_1052515_989BEF9B&content=[[%22Google%22,%22http://www.google.com/%22,%22%22,%22%22,%22%22,%22us%22]]
+        //        2  /gm.png?action=play&appid=337&uid=elex337_60794166&gid=mario_vs_sonic_racing&l=pt-BR&ts=1403279941636&tz=3
 
         //将content分开，里面有特殊字符
         List<String> attrs = ETLUtils.split(line,LOG_ATTR_SEPRATOR);
@@ -107,7 +107,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
         if(action == GMAction.HB){
             putNotNull(put,ucf,tagCol,time,params.get("tag"));
             putNotNull(put,ucf,titleCol,time,params.get("title"));
-        }else if(action == GMAction.LIKE || action == GMAction.UP){
+        }else if(action == GMAction.DOWN || action == GMAction.UP){
             putNotNull(put,ucf,countCol,time,params.get("c"));
             putNotNull(put,ucf,gsCol,time,params.get("gs"));
         }else if(action == GMAction.SHARE){
@@ -140,9 +140,9 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
             public String getShortHand(){
                 return "pl";
             }
-        },LIKE("like"){
+        },DOWN("down"){
             public String getShortHand(){
-                return "li";
+                return "do";
             }
         },UP("up"){
             public String getShortHand(){
