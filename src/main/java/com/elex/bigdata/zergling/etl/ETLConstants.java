@@ -1,6 +1,10 @@
 package com.elex.bigdata.zergling.etl;
 
 import com.elex.bigdata.util.MetricMapping;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.MasterNotRunningException;
+import org.apache.hadoop.hbase.ZooKeeperConnectionException;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -27,8 +31,11 @@ public class ETLConstants {
   public static final String UNKOWN_UID = "0000000000";
   public static final Pattern UID_PARTTERN = Pattern.compile("uid=([a-zA-Z0-9_\\\\-]+);", Pattern.CASE_INSENSITIVE);
 
+  public static final String ROWKEY_SEP = "\u0001";
+
+
   static {
-    STANDARD_OUTPUT_SDF.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
+      STANDARD_OUTPUT_SDF.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
 //    STANDARD_OUTPUT_SDF.setTimeZone(TimeZone.getTimeZone("GMT-06:00"));
   }
 
