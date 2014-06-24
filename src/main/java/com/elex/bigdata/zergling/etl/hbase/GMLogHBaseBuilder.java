@@ -89,7 +89,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
             throw new Exception("Unknown action type " + params.get("action"));
         }
 
-        long time = Long.parseLong(params.get("ts"));
+        long time = sdf.get().parse(attrs.get(1)).getTime();
 
         byte[] rowKey = Bytes.add(Bytes.toBytes(action.getShortHand()),Bytes.toBytes(time),Bytes.toBytes(params.get("gid")));
         rowKey = Bytes.add(rowKey,Bytes.toBytes(ETLConstants.ROWKEY_SEP),Bytes.toBytes(params.get("uid")));
