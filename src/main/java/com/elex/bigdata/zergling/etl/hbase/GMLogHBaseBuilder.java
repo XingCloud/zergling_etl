@@ -28,6 +28,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
     private byte[] vaCol = Bytes.toBytes("va"); //是否为年费
     private byte[] vpCol = Bytes.toBytes("vp"); //积分
     private byte[] vlCol = Bytes.toBytes("vl"); //VIP等级
+    private byte[] gameTypeCol = Bytes.toBytes("gt"); //游戏类别（web,mini）
 
     //HB
     private byte[] tagCol = Bytes.toBytes("tag"); //游戏类型
@@ -103,6 +104,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
         putNotNull(put,ucf,vaCol,time,params.get("va"));
         putNotNull(put,ucf,vpCol,time,params.get("vp"));
         putNotNull(put,ucf,vlCol,time,params.get("vl"));
+        putNotNull(put,ucf,gameTypeCol,time,params.get("gt"));
 
         if(action == GMAction.HB){
             putNotNull(put,ucf,tagCol,time,params.get("tag"));
