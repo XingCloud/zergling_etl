@@ -13,7 +13,7 @@ batch_size=500
 project_id=all
 logdir=/data/log/yac/$(date -d"-5 mins" +"%Y%m%d")/
 hdfs_path=/user/hadoop/history/${type}
-tmp_log_path=/data/bigdata/all/${type}/tmp.log
+tmp_log_path_prefix=/data/bigdata/all/${type}/tmp.log
 minute=$(date +"%H%M")
 
 if [ $# = 1 ] ; then
@@ -32,12 +32,13 @@ done
 #import per file
 function import(){
   path=$1
+  c = $2
   fullPath=${path}.ing
   if [ ! -s ${fullPath} ]; then
       echo "The ${fullPath} is empty, exit!!"
       return
   fi
-
+  tmp_log_path="${tmp_log_path_prefix}${c}"
   #clear tmp log
   echo "begin import" > ${tmp_log_path}
 
@@ -55,11 +56,13 @@ function import(){
   fi
 
   echo "end import ${path} at "$(date +"%Y-%m-%d %H:%M:%S")
-
+  rm -f ${tmp_log_path}
 }
 
+count=1
 for f in ${src_paths};do
-  import ${f}
+  import ${f} ${count}
+  count=`expr $a + 1`
 done
 
 #每天凌晨0000,删除历史文件
