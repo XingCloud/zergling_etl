@@ -32,13 +32,12 @@ done
 #import per file
 function import(){
   path=$1
-  c = $2
   fullPath=${path}.ing
   if [ ! -s ${fullPath} ]; then
       echo "The ${fullPath} is empty, exit!!"
       return
   fi
-  tmp_log_path="${tmp_log_path_prefix}${c}"
+  tmp_log_path="${tmp_log_path_prefix}$2"
   #clear tmp log
   echo "begin import" > ${tmp_log_path}
 
