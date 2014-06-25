@@ -13,6 +13,7 @@ batch_size=500
 project_id=all
 hdfs_path=/user/hadoop/history/${type}
 tmp_log_path=/data/bigdata/all/${type}/tmp.log
+minute=$(date +"%H%M")
 
 if [ $# = 1 ] ; then
     fullPath=$1
@@ -45,7 +46,6 @@ fi
 echo "end import ${fullPath} at "$(date +"%Y-%m-%d %H:%M:%S")
 
 #每天凌晨0000,删除历史文件
-minute=$(date +"%H%M")
 if [ "0000" = "${minute}" ]; then
     history_day=$(date -u -d"${processing_day} 7 days ago" +%Y%m%d)
     history_path=/data/log/${type}/${history_day}
