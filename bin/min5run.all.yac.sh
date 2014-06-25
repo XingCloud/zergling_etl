@@ -61,7 +61,7 @@ function import(){
 count=1
 for f in ${src_paths};do
   import ${f} ${count}
-  count=`expr $a + 1`
+  count=`expr ${count} + 1`
 done
 
 #每天凌晨0000,删除历史文件
