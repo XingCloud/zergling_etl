@@ -14,6 +14,7 @@ project_id=all
 logdir=/data/log/yac/$(date -d"-5 mins" +"%Y%m%d")/
 hdfs_path=/user/hadoop/history/${type}
 tmp_log_path=/data/bigdata/all/${type}/tmp.log
+minute=$(date +"%H%M")
 
 if [ $# = 1 ] ; then
   src_paths=($1)
@@ -62,7 +63,6 @@ for f in ${src_paths};do
 done
 
 #每天凌晨0000,删除历史文件
-minute=$(date +"%H%M")
 if [ "0000" = "${minute}" ]; then
     history_day=$(date -u -d"${processing_day} 7 days ago" +%Y%m%d)
     history_path=/data/log/${type}/${history_day}
