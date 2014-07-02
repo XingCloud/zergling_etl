@@ -26,6 +26,7 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
     public static MetricMapping metricMapping = MetricMapping.getInstance();
     private byte[] cf = Bytes.toBytes("basis");
     private byte[] scoreCf = Bytes.toBytes("h"); //hit 命中情况
+    private byte[] typeCol = Bytes.toBytes("t"); //计算出来的分类
     private byte[] aidCol = Bytes.toBytes("aid");
     private byte[] ipCol = Bytes.toBytes("ip");
     private byte[] urlCol = Bytes.toBytes("url");
@@ -117,14 +118,20 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
 
         //命中情况
         if(StringUtils.isNotBlank(params.get("t"))){
-            List<String> scores = ETLUtils.split(params.get("t"),LOG_HIT_SEPRATOR);
-            //b.19,a.21,z.60 a.游戏 b.电商 z.未知
-            for(String score : scores){
-                int pos = score.indexOf(LOG_HIT_KV_SEPRATOR);
-                String key = score.substring(0, pos);
-                Integer value = Integer.parseInt(score.substring(pos + 1));
-                put.add(scoreCf,Bytes.toBytes(key),time,Bytes.toBytes(value));
+            String t = params.get("t");
+            if(t.contains(LOG_HIT_SEPRATOR)){ //老版本
+                List<String> scores = ETLUtils.split(params.get("t"),LOG_HIT_SEPRATOR);
+                //b.19,a.21,z.60 a.游戏 b.电商 z.未知
+                for(String score : scores){
+                    int pos = score.indexOf(LOG_HIT_KV_SEPRATOR);
+                    String key = score.substring(0, pos);
+                    Integer value = Integer.parseInt(score.substring(pos + 1));
+                    put.add(scoreCf,Bytes.toBytes(key),time,Bytes.toBytes(value));
+                }
+            }else{
+                put.add(scoreCf,typeCol,time,Bytes.toBytes(t));
             }
+
             //0，未指定 1，游戏 2，电商 99，其他 ,冗余存一份，用于后期指定CF分析命中情况使用
             //具体是否命中不在这里计算，后期可能类型会有更新，这里不易枚举映射情况
             Object cat = adDetail.get("category");
