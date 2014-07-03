@@ -35,182 +35,200 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 /**
  * User: Z J Wu Date: 14-2-24 Time: 上午10:52 Package: com.elex.bigdata.zergling.etl
  */
 public class ETLUtils {
-  public static final Map<String, SimpleDateFormat> SDF_MAP = new HashMap<>();
+    public static final Map<String, SimpleDateFormat> SDF_MAP = new HashMap<>();
 
-  static {
-    SimpleDateFormat brSDF = new SimpleDateFormat("yyyyMMddHHmmss");
-    brSDF.setTimeZone(TimeZone.getTimeZone("-06:00"));
-    SimpleDateFormat frSDF = new SimpleDateFormat("yyyyMMddHHmmss");
-    frSDF.setTimeZone(TimeZone.getTimeZone("+01:00"));
-    SimpleDateFormat bjSDF = new SimpleDateFormat("yyyyMMddHHmmss");
-    frSDF.setTimeZone(TimeZone.getTimeZone("+08:00"));
-    SimpleDateFormat trSDF = new SimpleDateFormat("yyyyMMddHHmmss");
-    trSDF.setTimeZone(TimeZone.getTimeZone("+02:00"));
-    SDF_MAP.put("br", brSDF);
-    SDF_MAP.put("fr", frSDF);
-    SDF_MAP.put("bj", bjSDF);
-    SDF_MAP.put("tr", bjSDF);
-  }
 
-  private static final String HTTP_SCHEMA = "http";
-  private static final String HOST = "restore.url";
-  private static final int PORT = 8080;
-  private static final String PATH = "/ur/r";
-  private static final HttpClient CLIENT = HttpClients.createDefault();
+    private static String URL_FILTER_REG = ".*\\.(gif|GIF|jpg|JPG|png|PNG|ico|ICO|css|CSS|sit|SIT|eps|EPS|wmf|WMF|zip|ZIP|ppt|PPT|mpg|MPG|xls|XLS|gz|GZ|rpm|RPM|tgz|TGZ|mov|MOV|exe|EXE|jpeg|JPEG|bmp|BMP|js|JS)$";
+    private static Pattern URL_FILTER_PATTERN = Pattern.compile(URL_FILTER_REG);
 
-  public static String truncateURL(String url) {
-    if (StringUtils.isBlank(url)) {
-      return null;
-    }
-    int from = 0, to = url.length();
-    if (url.startsWith(HTTP_START)) {
-      from = HTTP_START_LENGTH;
-    } else if (url.startsWith(HTTPS_START)) {
-      from = HTTPS_START_LENGTH;
-    }
-    if (url.endsWith(URL_END)) {
-      --to;
-    }
-    return url.substring(from, to);
-  }
-
-  public static String long2Ip(long ip) {
-    StringBuilder sb = new StringBuilder(15);
-
-    for (int i = 0; i < 4; i++) {
-      sb.insert(0, Long.toString(ip & 0xff));
-      if (i < 3) {
-        sb.insert(0, '.');
-      }
-      ip >>= 8;
+    static {
+        SimpleDateFormat brSDF = new SimpleDateFormat("yyyyMMddHHmmss");
+        brSDF.setTimeZone(TimeZone.getTimeZone("-06:00"));
+        SimpleDateFormat frSDF = new SimpleDateFormat("yyyyMMddHHmmss");
+        frSDF.setTimeZone(TimeZone.getTimeZone("+01:00"));
+        SimpleDateFormat bjSDF = new SimpleDateFormat("yyyyMMddHHmmss");
+        frSDF.setTimeZone(TimeZone.getTimeZone("+08:00"));
+        SimpleDateFormat trSDF = new SimpleDateFormat("yyyyMMddHHmmss");
+        trSDF.setTimeZone(TimeZone.getTimeZone("+02:00"));
+        SDF_MAP.put("br", brSDF);
+        SDF_MAP.put("fr", frSDF);
+        SDF_MAP.put("bj", bjSDF);
+        SDF_MAP.put("tr", bjSDF);
     }
 
-    return sb.toString();
-  }
+    private static final String HTTP_SCHEMA = "http";
+    private static final String HOST = "restore.url";
+    private static final int PORT = 8080;
+    private static final String PATH = "/ur/r";
+    private static final HttpClient CLIENT = HttpClients.createDefault();
 
-  public static long ip2Long(String ip) {
-    int a = 0, b = ip.indexOf(IP_SEPERATOR);
-    long i1 = Long.valueOf(ip.substring(a, b)) << 24;
-    a = b + 1;
-    b = ip.indexOf(IP_SEPERATOR, a);
-    long i2 = Long.valueOf(ip.substring(a, b)) << 16;
-    a = b + 1;
-    b = ip.indexOf(IP_SEPERATOR, a);
-    long i3 = Long.valueOf(ip.substring(a, b)) << 8;
-    a = b + 1;
-    long i4 = Long.valueOf(ip.substring(a));
-    return i1 + i2 + i3 + i4;
-  }
-
-  private static String readResponse(HttpEntity responseEntity) throws IOException {
-    if (responseEntity == null) {
-      return null;
-    }
-    StringBuilder responseString = new StringBuilder();
-    String line;
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(responseEntity.getContent()));) {
-      while ((line = reader.readLine()) != null) {
-        line = StringUtils.trimToNull(line);
-        if (StringUtils.isNotEmpty(line)) {
-          responseString.append(line);
+    public static String truncateURL(String url) {
+        if (StringUtils.isBlank(url)) {
+            return null;
         }
-      }
+        int from = 0, to = url.length();
+        if (url.startsWith(HTTP_START)) {
+            from = HTTP_START_LENGTH;
+        } else if (url.startsWith(HTTPS_START)) {
+            from = HTTPS_START_LENGTH;
+        }
+        if (url.endsWith(URL_END)) {
+            --to;
+        }
+        return url.substring(from, to);
     }
-    return responseString.toString();
-  }
 
-  public static String restoreShortenedURL(String shortURL) throws Exception {
-    URIBuilder builder = new URIBuilder();
-    builder.setScheme(HTTP_SCHEMA);
-    builder.setHost(HOST);
-    builder.setPort(PORT);
-    builder.setPath(PATH);
-    builder.addParameter("url", shortURL);
+    public static String long2Ip(long ip) {
+        StringBuilder sb = new StringBuilder(15);
 
-    URI uri = builder.build();
-    HttpGet httpGet = new HttpGet(uri);
-    HttpResponse response = CLIENT.execute(httpGet);
-    StatusLine statusLine = response.getStatusLine();
-    int c = statusLine.getStatusCode();
-    String result;
-    if (200 == c) {
-      result = StringUtils.trimToNull(readResponse(response.getEntity()));
-      if (StringUtils.isBlank(result) || "err".equals(result)) {
-        throw new Exception("Invalid url result - " + shortURL);
-      } else {
-        return result;
-      }
-    } else {
-      throw new Exception("Error return code: " + String.valueOf(c));
+        for (int i = 0; i < 4; i++) {
+            sb.insert(0, Long.toString(ip & 0xff));
+            if (i < 3) {
+                sb.insert(0, '.');
+            }
+            ip >>= 8;
+        }
+
+        return sb.toString();
     }
-  }
 
-  public static long makeVersion(int outerVersion, int innerVersion) {
-    byte[] longBytes = new byte[8];
-    byte[] outerBytes = Bytes.toBytes(outerVersion);
-    byte[] innerBytes = Bytes.toBytes(innerVersion);
-    System.arraycopy(outerBytes, 0, longBytes, 0, outerBytes.length);
-    System.arraycopy(innerBytes, 0, longBytes, 4, innerBytes.length);
-    return Bytes.toLong(longBytes);
-  }
-
-  public static List<ColumnInfo> getColumnInfos(Object log) throws IllegalAccessException {
-    Field[] fields = log.getClass().getDeclaredFields();
-    BigDataColumn bigDataColumnAnno;
-    List<ColumnInfo> columnInfos = new ArrayList<>();
-    String cf, q, stringVal;
-    byte[] byteVal;
-    Object fieldVal;
-    HbaseDataType type;
-    for (Field field : fields) {
-      field.setAccessible(true);
-      bigDataColumnAnno = field.getAnnotation(BigDataColumn.class);
-      if (bigDataColumnAnno == null) {
-        continue;
-      }
-      fieldVal = field.get(log);
-      if (fieldVal == null) {
-        continue;
-      }
-      stringVal = fieldVal.toString();
-      if (StringUtils.isBlank(stringVal)) {
-        continue;
-      }
-
-      cf = bigDataColumnAnno.cf();
-      q = bigDataColumnAnno.q();
-      type = bigDataColumnAnno.type();
-
-      if (NUM.equals(type)) {
-        byteVal = Bytes.toBytes(Long.parseLong(stringVal));
-      } else {
-        byteVal = Bytes.toBytes(stringVal);
-      }
-      columnInfos.add(new ColumnInfo(cf, q, byteVal));
+    public static long ip2Long(String ip) {
+        int a = 0, b = ip.indexOf(IP_SEPERATOR);
+        long i1 = Long.valueOf(ip.substring(a, b)) << 24;
+        a = b + 1;
+        b = ip.indexOf(IP_SEPERATOR, a);
+        long i2 = Long.valueOf(ip.substring(a, b)) << 16;
+        a = b + 1;
+        b = ip.indexOf(IP_SEPERATOR, a);
+        long i3 = Long.valueOf(ip.substring(a, b)) << 8;
+        a = b + 1;
+        long i4 = Long.valueOf(ip.substring(a));
+        return i1 + i2 + i3 + i4;
     }
-    return columnInfos;
-  }
 
-  public static String last5Min() throws ParseException {
-    DecimalFormat df = new DecimalFormat("000");
-    Date d = new Date();
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-    Date d2 = sdf.parse(sdf.format(d));
-    long i = (d.getTime() - d2.getTime()) / 300000 - 1;
-
-    if (i < 0) {
-      i = 287;
-      d2 = new Date(d2.getTime() - 86400 * 1000);
+    private static String readResponse(HttpEntity responseEntity) throws IOException {
+        if (responseEntity == null) {
+            return null;
+        }
+        StringBuilder responseString = new StringBuilder();
+        String line;
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(responseEntity.getContent()));) {
+            while ((line = reader.readLine()) != null) {
+                line = StringUtils.trimToNull(line);
+                if (StringUtils.isNotEmpty(line)) {
+                    responseString.append(line);
+                }
+            }
+        }
+        return responseString.toString();
     }
-    return sdf.format(d2) + "." + df.format(i);
-  }
 
-    public static List<String> split(String line, String sep){
+
+    public static boolean validateURL(String url) {
+
+        return !URL_FILTER_PATTERN.matcher(url).matches() && url.length() < 1000 ;
+        //-\.(gif|GIF|jpg|JPG|png|PNG|ico|ICO|css|CSS|sit|SIT|eps|EPS|wmf|WMF|zip|ZIP|ppt|PPT|mpg|MPG|xls|XLS|gz|GZ|rpm|RPM|tgz|TGZ|mov|MOV|exe|EXE|jpeg|JPEG|bmp|BMP|js|JS)$
+    }
+
+    public static String restoreShortenedURL(String shortURL) throws Exception {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme(HTTP_SCHEMA);
+        builder.setHost(HOST);
+        builder.setPort(PORT);
+        builder.setPath(PATH);
+        builder.addParameter("url", shortURL);
+
+        URI uri = builder.build();
+        HttpGet httpGet = new HttpGet(uri);
+        HttpResponse response = CLIENT.execute(httpGet);
+        StatusLine statusLine = response.getStatusLine();
+        int c = statusLine.getStatusCode();
+        String result;
+        if (200 == c) {
+            result = StringUtils.trimToNull(readResponse(response.getEntity()));
+            if (StringUtils.isBlank(result) || "err".equals(result)) {
+                throw new Exception("Invalid url result - " + shortURL);
+            } else {
+                return result;
+            }
+        } else {
+            throw new Exception("Error return code: " + String.valueOf(c));
+        }
+    }
+
+    public static long makeVersion(int outerVersion, int innerVersion) {
+        byte[] longBytes = new byte[8];
+        byte[] outerBytes = Bytes.toBytes(outerVersion);
+        byte[] innerBytes = Bytes.toBytes(innerVersion);
+        System.arraycopy(outerBytes, 0, longBytes, 0, outerBytes.length);
+        System.arraycopy(innerBytes, 0, longBytes, 4, innerBytes.length);
+        return Bytes.toLong(longBytes);
+    }
+
+    public static List<ColumnInfo> getColumnInfos(Object log) throws IllegalAccessException {
+        Field[] fields = log.getClass().getDeclaredFields();
+        BigDataColumn bigDataColumnAnno;
+        List<ColumnInfo> columnInfos = new ArrayList<>();
+        String cf, q, stringVal;
+        byte[] byteVal;
+        Object fieldVal;
+        HbaseDataType type;
+        for (Field field : fields) {
+            field.setAccessible(true);
+            bigDataColumnAnno = field.getAnnotation(BigDataColumn.class);
+            if (bigDataColumnAnno == null) {
+                continue;
+            }
+            fieldVal = field.get(log);
+            if (fieldVal == null) {
+                continue;
+            }
+            stringVal = fieldVal.toString();
+            if (StringUtils.isBlank(stringVal)) {
+                continue;
+            }
+
+            cf = bigDataColumnAnno.cf();
+            q = bigDataColumnAnno.q();
+            type = bigDataColumnAnno.type();
+
+            if (NUM.equals(type)) {
+                byteVal = Bytes.toBytes(Long.parseLong(stringVal));
+            } else {
+                byteVal = Bytes.toBytes(stringVal);
+            }
+            columnInfos.add(new ColumnInfo(cf, q, byteVal));
+        }
+        return columnInfos;
+    }
+
+    public static String last5Min() throws ParseException {
+        DecimalFormat df = new DecimalFormat("000");
+        Date d = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        Date d2 = sdf.parse(sdf.format(d));
+        long i = (d.getTime() - d2.getTime()) / 300000 - 1;
+
+        if (i < 0) {
+            i = 287;
+            d2 = new Date(d2.getTime() - 86400 * 1000);
+        }
+        return sdf.format(d2) + "." + df.format(i);
+    }
+
+
+    public static Date transformTimeZone(long date, String srcTz, String desTz) {
+
+        return null;
+    }
+
+    public static List<String> split(String line, String sep) {
         List<String> attrs = new ArrayList<String>();
         int pos = 0, end;
         while ((end = line.indexOf(sep, pos)) >= 0) {
