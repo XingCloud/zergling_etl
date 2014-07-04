@@ -16,10 +16,11 @@ hdfs_path=/user/hadoop/history/${type}
 tmp_log_path_prefix=/data/bigdata/all/${type}/tmp.log
 minute=$(date +"%H%M")
 
+echo ${logdir}
 if [ $# = 1 ] ; then
   src_paths=($1)
 else
-  src_paths=`find ${logdir} -name *.log`
+  src_paths=`find ${logdir} -name "*.log"`
 fi
 
 #move file to filename.ing to avoid be processed again
