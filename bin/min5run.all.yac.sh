@@ -45,7 +45,7 @@ function import(){
   daily_log_path="/data/bigdata/all/${type}/${type}_${day}.log"
   echo "begin import ${fullPath} at "$(date +"%Y-%m-%d %H:%M:%S")
 
-  ${java_bin}/java -Xmx1024m -Xms1024m -jar ${jar_home} ${type} ${table_name} ${fullPath} ${workers} ${batch_size} ${project_id} > ${tmp_log_path}
+  ${java_bin}/java -Xmx2048m -Xms2048m -jar ${jar_home} ${type} ${table_name} ${fullPath} ${workers} ${batch_size} ${project_id} > ${tmp_log_path}
   if grep -Fxq "Finished import log without error" ${tmp_log_path}
   then
       echo "Rename to ${fullPath} to ${path}.completed as no exception"
