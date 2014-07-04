@@ -44,7 +44,7 @@ public class LogImport {
         }
         Logger LOGGER = Logger.getLogger(type);
 
-        ExecutorService service = new ThreadPoolExecutor(5,workers,60, TimeUnit.MILLISECONDS,new LinkedBlockingDeque<Runnable>());
+        ExecutorService service = new ThreadPoolExecutor(5,workers,60, TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
         FileInputStream fis = null;
         BufferedReader reader = null;
         List<Future<String>> jobs = new ArrayList<Future<String>>();
