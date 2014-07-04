@@ -19,7 +19,7 @@ minute=$(date +"%H%M")
 if [ $# = 1 ] ; then
   src_paths=($1)
 else
-  src_paths=`find ${logdir} -name *.dat`
+  src_paths=`find ${logdir} -name *.log`
 fi
 
 #move file to filename.ing to avoid be processed again
