@@ -8,8 +8,8 @@ java_bin=/usr/java/jdk1.7.0_55/bin
 
 type=yac
 table_name=yac_user_action
-workers=10
-batch_size=500
+workers=12
+batch_size=1000
 project_id=all
 logdir=/data/log/yac/$(date -d"-5 mins" +"%Y%m%d")/
 hdfs_path=/user/hadoop/history/${type}
