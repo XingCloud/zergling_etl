@@ -1,10 +1,6 @@
 package com.elex.bigdata.zergling.etl;
 
 import com.elex.bigdata.util.MetricMapping;
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.MasterNotRunningException;
-import org.apache.hadoop.hbase.ZooKeeperConnectionException;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;

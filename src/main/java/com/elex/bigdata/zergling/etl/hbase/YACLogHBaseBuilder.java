@@ -50,11 +50,11 @@ public class YACLogHBaseBuilder implements HBaseBuilder {
             throw new Exception("Yac log params size less than 9");
         }
 
-        if(!ETLUtils.validateURL(attrs.get(4))){
+/*        if(!ETLUtils.validateURL(attrs.get(4))){
             throw new Exception("The URL is invalid");
-        }
+        }*/
 
-        //时间只有10位，手动加上3位随机数
+/*        //时间只有10位，手动加上3位随机数
         int randomTime = random.nextInt(999);
         String timeSuffix = String.valueOf(randomTime);
         if(randomTime == 0){
@@ -63,8 +63,8 @@ public class YACLogHBaseBuilder implements HBaseBuilder {
             timeSuffix = "00" + randomTime;
         }else if(randomTime<100){
             timeSuffix = "0" + randomTime;
-        }
-        long time = Long.parseLong(attrs.get(3) + timeSuffix);
+        }*/
+        long time = Long.parseLong(attrs.get(3));
 
         //添加到URL字典表
 //        putURLDetail(attrs,time);
