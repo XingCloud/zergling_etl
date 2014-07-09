@@ -28,7 +28,7 @@
   </property>
   <property>
     <name>hbase.rpc.timeout</name>
-    <value>1000</value>
+    <value>300000</value>
   </property>
   <property>
     <name>hbase.client.pause</name>
@@ -36,7 +36,7 @@
   </property>
   <property>
     <name>hbase.client.retries.number</name>
-    <value>20</value>
+    <value>10</value>
   </property>
   <property>
     <name>hbase.ipc.client.tcpnodelay</name>
