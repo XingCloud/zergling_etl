@@ -20,7 +20,7 @@ if [ -s ${tdbyesterdaylastfile} ]; then
 fi
 
 echo "Parse ${yesterday} play log"
-`python /home/hadoop/git_project_home/zergling_etl/bin/gamelogformat.py ${destfile} ${fmtdestfile}` || { echo "command failed"; exit 1; }
+python /home/hadoop/git_project_home/zergling_etl/bin/gamelogformat.py ${destfile} ${fmtdestfile} || { echo "command failed"; exit 1; }
 `rm ${destfile}`
 
 echo "Copy ${fmtdestfile} to hdfs "
