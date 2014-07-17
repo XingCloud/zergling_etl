@@ -9,14 +9,9 @@
     <name>hbase.zookeeper.property.clientPort</name>
     <value>2181</value>
   </property>
-
   <property>
     <name>hbase.cluster.distributed</name>
     <value>true</value>
-  </property>
-  <property skipInDoc="true">
-    <name>hbase.defaults.for.version</name>
-    <value>0.94.15-cdh4.6.0</value>
   </property>
   <property>
     <name>hbase.client.ipc.pool.type</name>
@@ -36,11 +31,7 @@
   </property>
   <property>
     <name>hbase.client.retries.number</name>
-    <value>10</value>
-  </property>
-  <property>
-    <name>hbase.ipc.client.tcpnodelay</name>
-    <value>true</value>
+    <value>12</value>
   </property>
   <property>
     <name>ipc.ping.interval</name>
