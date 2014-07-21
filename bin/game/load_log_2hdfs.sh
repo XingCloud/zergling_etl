@@ -6,17 +6,18 @@ else
    offset=$1
 fi
 
+todayOff=`expr $offset - 1`
+tbyoff=`expr $offset + 1`
 if [ ${offset} -eq 1 ];then
-    today=`date -u +%Y%m%d`
     todayfmt=`date -u +%Y-%m-%d`
 else
-    today=`date -d "${offset-1} days ago" +%Y%m%d`
-    todayfmt=`date -d "${offset-1} days ago" +%Y-%m-%d`
+    todayfmt=`date -d "${todayOff} days ago" +%Y-%m-%d`
 fi
 
+echo ${offset-1}
 yesterday=`date -d "${offset} days ago" +%Y%m%d`
 yesterdayfmt=`date -d "${offset} days ago" +%Y-%m-%d`
-tdbyesterday=`date -d "${offset+1} days ago" +%Y%m%d`
+tdbyesterday=`date -d "${tbyoff} days ago" +%Y%m%d`
 
 gmpath="/data/log/gm"
 destpath="/data/log/gm/play"
