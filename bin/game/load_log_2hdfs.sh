@@ -37,12 +37,12 @@ echo "Parse ${yesterday} play log"
 python /home/hadoop/git_project_home/zergling_etl/bin/game/format_source_log.py ${destfile} ${fmtdestfile} || { echo "Format failed"; exit 1; }
 `rm ${destfile}`
 
-hadoop fs -test -e ${fmtdestfile}
+hadoop fs -test -e ${hdfspath}
 if [ $? -ne 0 ];then
-   echo "Copy directly(${fmtdestfile})."
+   echo "Copy directly(${hdfspath})."
 else
-   echo "Remove exists history file.(${fmtdestfile})."
-   hadoop fs -rm -r ${fmtdestfile}
+   echo "Remove exists history file.(${hdfspath})."
+   hadoop fs -rm -r ${hdfspath}
 fi
 
 echo "Load ${fmtdestfile} to hdfs "
