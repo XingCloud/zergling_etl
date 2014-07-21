@@ -18,3 +18,9 @@ echo "Count most user"
 hive -e "select gid,count(distinct uid) as total from game_play_count group by gid order by total desc limit 100" > /data/game/${yesterday}_mp.log || { echo "command failed"; exit 1; }
 
 python /home/hadoop/scripts/game/format_game_result.py ${yesterday}
+
+countmd5=`/usr/java/jdk/bin/java -jar /home/hadoop/MD5Digest.jar /data/game/${yesterday}_fmt.log`
+cp /data/game/${yesterday}_fmt.log /data/game/${countmd5}
+
+scp -r /data/game/${countmd5} elex@162.243.114.236:~/rec/count
+echo "end"
