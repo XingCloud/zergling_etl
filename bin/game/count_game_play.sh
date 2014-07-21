@@ -3,7 +3,7 @@
 if [ $# -eq 0 ];then
    yesterday=`date -d "1 days ago" +%Y%m%d`
 else
-   day=$1
+   yesterday=$1
 fi
 
 
