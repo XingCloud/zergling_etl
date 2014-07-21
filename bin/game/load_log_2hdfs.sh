@@ -26,6 +26,7 @@ tdbyesterdaylastfile="${gmpath}/${tdbyesterday}/gm_${tdbyesterday}2355.log.compl
 hdfspath="/user/gm/"
 
 echo "Collect ${yesterday} play log to ${destfile}"
+echo "cat ${gmpath}/${yesterday}/* | grep play | grep -v ${todayfmt} > ${destfile}"
 `cat ${gmpath}/${yesterday}/* | grep play | grep -v ${todayfmt} > ${destfile}`
 if [ -s ${tdbyesterdaylastfile} ]; then
     `grep ${yesterdayfmt} ${tdbyesterdaylastfile} | grep play >> ${destfile}`
