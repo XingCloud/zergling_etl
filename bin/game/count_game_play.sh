@@ -1,6 +1,12 @@
 #!/bin/sh
 
-yesterday=`date -d "1 days ago" +%Y%m%d`
+if [ $# -eq 0 ];then
+   yesterday=`date -d "1 days ago" +%Y%m%d`
+else
+   day=$1
+fi
+
+
 hdfspath="/user/gm/${yesterday}_fmt.log"
 
 ssh dmnode5 sh /home/hadoop/git_project_home/zergling_etl/game/bin/load_log_2hdfs.sh || { echo "command failed"; exit 1; }
