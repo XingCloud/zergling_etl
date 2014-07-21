@@ -1,10 +1,22 @@
 #!/bin/sh
 
-today=`date -u +%Y%m%d`
-todayfmt=`date -u +%Y-%m-%d`
-yesterday=`date -d "1 days ago" +%Y%m%d`
-yesterdayfmt=`date -d "1 days ago" +%Y-%m-%d`
-tdbyesterday=`date -d "2 days ago" +%Y%m%d`
+if [ $# -eq 0 ];then
+   offset=1
+else
+   offset=$1
+fi
+
+if [ ${offset} -eq 1 ];then
+    today=`date -u +%Y%m%d`
+    todayfmt=`date -u +%Y-%m-%d`
+else
+    today=`date -d "${offset-1} days ago" +%Y%m%d`
+    todayfmt=`date -d "${offset-1} days ago" +%Y-%m-%d`
+fi
+
+yesterday=`date -d "${offset} days ago" +%Y%m%d`
+yesterdayfmt=`date -d "${offset} days ago" +%Y-%m-%d`
+tdbyesterday=`date -d "${offset+1} days ago" +%Y%m%d`
 
 gmpath="/data/log/gm"
 destpath="/data/log/gm/play"

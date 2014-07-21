@@ -1,15 +1,16 @@
 #!/bin/sh
 
 if [ $# -eq 0 ];then
-   yesterday=`date -d "1 days ago" +%Y%m%d`
+   offset=1
 else
-   yesterday=$1
+   offset=$1
 fi
 
+yesterday = `date -d "${offset} days ago" +%Y%m%d`
 
 hdfspath="/user/gm/${yesterday}_fmt.log"
 
-ssh dmnode5 sh /home/hadoop/git_project_home/zergling_etl/game/bin/load_log_2hdfs.sh || { echo "command failed"; exit 1; }
+ssh dmnode5 sh /home/hadoop/git_project_home/zergling_etl/game/bin/load_log_2hdfs.sh ${offset} || { echo "command failed"; exit 1; }
 
 echo "Load ${hdfspath} into table game_play_action"
 hive -e "load data inpath '${hdfspath}' overwrite into table game_play_action partition(day='${yesterday}')"
