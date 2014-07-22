@@ -179,12 +179,12 @@ public class AllInOneNavigatorETL extends ETLBase {
     CountDownLatch urlRestoreSignal = new CountDownLatch(urlRestoreWorkerCount), logStoreSignal = new CountDownLatch(
       logStoreWorkerCount);
     PutterCounter pc = new PutterCounter();
-    HBaseResourceManager manager;
+/*    HBaseResourceManager manager;
     if (!enableHbasePut) {
       manager = null;
     } else {
       manager = new HBaseResourceManager((int) (logStoreWorkerCount * 1.5));
-    }
+    }*/
     List<UrlShorterWorker<AllInOneNavigatorLog>> urlRestoreWorkers = new ArrayList<>(urlRestoreWorkerCount);
     for (int i = 0; i < urlRestoreWorkerCount; i++) {
       urlRestoreWorkers.add(new UrlShorterWorker<>(urlRestoreQueue, logStoreQueue, urlRestoreSignal, enableURLRestore));
@@ -199,7 +199,7 @@ public class AllInOneNavigatorETL extends ETLBase {
         htable = null;
       } else {
         try {
-          htable = manager.getHTable(hTableName);
+          htable = HBaseResourceManager.getHTable(hTableName);
         } catch (Exception e) {
           System.exit(1);
         }
@@ -247,7 +247,7 @@ public class AllInOneNavigatorETL extends ETLBase {
     queueMonitor.stop();
     long t2 = System.currentTimeMillis();
     if (enableHbasePut) {
-      manager.close();
+        HBaseResourceManager.close();
     }
     LOGGER.info("Record error log if necessary.");
     logErrorLines(failedBatches, errorLines);

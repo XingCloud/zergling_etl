@@ -36,7 +36,7 @@ public class RowkeyRangeDeleter {
     String rowkeyStop = args[2];
     String output = args[3];
 
-    HBaseResourceManager manager = new HBaseResourceManager(20);
+//    HBaseResourceManager manager = new HBaseResourceManager(20);
 
     File f = new File(output);
     HTableInterface hTableInterface = null;
@@ -45,7 +45,7 @@ public class RowkeyRangeDeleter {
     int batch = 100, count = 0;
     List<Delete> deletes = new ArrayList<>(batch);
     try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(f)));) {
-      hTableInterface = manager.getHTable(table);
+      hTableInterface = HBaseResourceManager.getHTable(table);
       Scan scan = new Scan(Bytes.toBytes(rowkeyStart), Bytes.toBytes(rowkeyStop));
 
       rs = hTableInterface.getScanner(scan);

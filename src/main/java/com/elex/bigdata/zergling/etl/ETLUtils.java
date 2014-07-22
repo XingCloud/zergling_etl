@@ -43,8 +43,12 @@ import java.util.regex.Pattern;
 public class ETLUtils {
     public static final Map<String, SimpleDateFormat> SDF_MAP = new HashMap<>();
 
-    public static final String url_filter_suffix = "gif|GIF|jpg|JPG|png|PNG|ico|ICO|css|CSS|sit|SIT|eps|EPS|wmf|WMF|zip|ZIP|ppt|PPT|mpg|MPG|xls|XLS|gz|GZ|rpm|RPM|tgz|TGZ|mov|MOV|exe|EXE|jpeg|JPEG|bmp|BMP|js|JS|jxr";
-    public static String URL_FILTER_REG = ".*\\.("+url_filter_suffix+")(\\?.*|$)";
+    public static final String url_filter_keywords = "callback=|crossdomain\\.xml|google-analytics";
+    public static final String url_filter_suffix = "gif|GIF|jpg|JPG|png|PNG|ico|ICO|css|CSS|sit|SIT|eps|EPS|wmf|WMF|zip|ZIP|ppt|PPT|mpg|MPG|xls|XLS|gz|GZ|rpm|RPM|tgz|TGZ|mov|MOV|exe|EXE|jpeg|JPEG|bmp|BMP|js|JS|jxr|f3d|woff|svg";
+//    public static String URL_FILTER_REG = ".*(("+url_filter_keywords+")|(\\."+url_filter_suffix+"))";
+    public static String URL_FILTER_REG = ".*(("+url_filter_keywords+")|(\\.("+url_filter_suffix+"))).*";
+
+
 
     private static Pattern URL_FILTER_PATTERN = Pattern.compile(URL_FILTER_REG);
 

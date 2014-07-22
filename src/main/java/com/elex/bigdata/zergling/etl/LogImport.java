@@ -51,7 +51,7 @@ public class LogImport {
 
         AtomicLong counter = new AtomicLong();
         Long totalCount = 0l;
-        new HBaseResourceManager(workers);
+        HBaseResourceManager.init();
         System.out.println("Begin processing log " + filePath);
         HBaseBuilder builder = logType.getBuilder();
         try {
@@ -60,21 +60,9 @@ public class LogImport {
             String line;
             List<String> lines = new ArrayList<String>();
 
-/*            String firstLine = null;
-            if(logType == LogType.YAC){
-                firstLine = reader.readLine().replace(YAC_UNICODE,"");
-            }*/
-
             while((line =  reader.readLine()) != null){
- /*               if(firstLine != null ){ //YAC日志的第一行为公共信息（uid ip nation）
-                    if(!YAC_UNICODE.equals(line)){
-                        lines.add(firstLine + "\t" + line.replace(YAC_UNICODE,""));
-                        ++totalCount;
-                    }
-                }else{*/
-                    lines.add(line);
-                    ++totalCount;
-//                }
+                lines.add(line);
+                ++totalCount;
 
                 if(lines.size() == batch){
                     System.out.print(".");
@@ -122,6 +110,7 @@ public class LogImport {
 
         service.shutdownNow();
         builder.cleanup();
+        HBaseResourceManager.close();
         System.out.println(".");
         System.out.println("Finished import log " + (error? "with":"without") + " error");
         System.out.println("Insert " + counter.get() + "/" + totalCount + " lines spend " + (System.currentTimeMillis() - startTime) + "ms ");

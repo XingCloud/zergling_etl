@@ -2,9 +2,7 @@ package com.elex.bigdata.zergling.etl.hbase;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.client.HTableInterface;
-import org.apache.hadoop.hbase.client.HTablePool;
-import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.*;
 
 import java.io.IOException;
 
@@ -13,45 +11,52 @@ import java.io.IOException;
  */
 public class HBaseResourceManager {
 
-  private static HTablePool pool;
+    private static HConnection conn = null;
 
-  //TODO: 单例
-  public HBaseResourceManager(int poolSize) {
-    Configuration conf = HBaseConfiguration.create();
-    this.pool = new HTablePool(conf, poolSize);
-  }
-
-  public static HTableInterface getHTable(String tableName) throws IOException {
-    try {
-      return pool.getTable(tableName);
-    } catch (Exception e) {
-      throw new IOException("Cannot get htable from hbase(" + tableName + ").", e);
+    public static void init() throws IOException{
+        try {
+            conn = HConnectionManager.createConnection(HBaseConfiguration.create());
+        } catch (Exception e) {
+            throw new IOException("Cannot create hbase connection.", e);
+        }
     }
-  }
 
-  // This is a return operation.
-  public static void closeHTable(HTableInterface hTableInterface) {
-    if (hTableInterface == null) {
-      return;
+    public static synchronized HTableInterface getHTable(String tableName) throws IOException {
+        try {
+            if(conn == null){
+                init();
+            }
+            return conn.getTable(tableName);
+        } catch (Exception e) {
+            throw new IOException("Cannot get htable from hbase(" + tableName + ").", e);
+        }
     }
-    try {
-      hTableInterface.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
-  // This is a return operation.
-  public static void closeResultScanner(ResultScanner resultScanner) {
-    if (resultScanner == null) {
-      return;
+    // This is a return operation.
+    public static void closeHTable(HTableInterface hTableInterface) {
+        if (hTableInterface == null) {
+            return;
+        }
+        try {
+            hTableInterface.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    resultScanner.close();
-  }
 
-  // This is a shutdown operation.
-  public void close() throws IOException {
-    this.pool.close();
-  }
+    // This is a return operation.
+    public static void closeResultScanner(ResultScanner resultScanner) {
+        if (resultScanner == null) {
+            return;
+        }
+        resultScanner.close();
+    }
+
+    // This is a shutdown operation.
+    public static void close() throws IOException {
+        if(conn != null){
+            conn.close();
+        }
+    }
 
 }
