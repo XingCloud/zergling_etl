@@ -14,7 +14,6 @@ else
     todayfmt=`date -d "${todayOff} days ago" +%Y-%m-%d`
 fi
 
-echo ${offset-1}
 yesterday=`date -d "${offset} days ago" +%Y%m%d`
 yesterdayfmt=`date -d "${offset} days ago" +%Y-%m-%d`
 tdbyesterday=`date -d "${tbyoff} days ago" +%Y%m%d`
@@ -37,12 +36,12 @@ echo "Parse ${yesterday} play log"
 python /home/hadoop/git_project_home/zergling_etl/bin/game/format_source_log.py ${destfile} ${fmtdestfile} || { echo "Format failed"; exit 1; }
 `rm ${destfile}`
 
-hadoop fs -test -e ${hdfspath}/${fmtdestfile}
+hadoop fs -test -e ${hdfspath}/${yesterday}_fmt.log
 if [ $? -ne 0 ];then
    echo "Copy directly(${hdfspath})."
 else
    echo "Remove exists history file.(${hdfspath})."
-   hadoop fs -rm -r ${hdfspath}/${fmtdestfile}
+   hadoop fs -rm -r ${hdfspath}/${yesterday}_fmt.log
 fi
 
 echo "Load ${fmtdestfile} to hdfs "
