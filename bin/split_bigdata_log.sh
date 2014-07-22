@@ -20,6 +20,9 @@ ps_log=${access_log_path}/access.ps.log
 #337 game platform actions
 gm_log=${access_log_path}/access.gm.log
 
+#cookie uid map
+cu_log=${access_log_path}/access.cu.log
+
 suffix=$(date -d"-5 mins" +"%Y%m%d%H%M").log
 
 day=$(date -d"-5 mins" +"%Y%m%d")
@@ -29,6 +32,7 @@ nt_log_new_path="/data/log/nt/${day}"
 pc_log_new_path="/data/log/pc/${day}"
 ps_log_new_path="/data/log/ps/${day}"
 gm_log_new_path="/data/log/gm/${day}"
+cu_log_new_path="/data/log/cu/${day}"
 
 if [ ! -d ${nav_log_new_path} ]; then
   mkdir -p ${nav_log_new_path}
@@ -60,6 +64,11 @@ if [ ! -d ${gm_log_new_path} ]; then
   chown hadoop:hadoop ${gm_log_new_path}
 fi
 
+if [ ! -d ${cu_log_new_path} ]; then
+  mkdir -p ${cu_log_new_path}
+  chown hadoop:hadoop ${cu_log_new_path}
+fi
+
 echo "begin split ${suffix} "
 
 mv ${nav_log} ${nav_log_new_path}/nav_${suffix}
@@ -79,6 +88,9 @@ chown hadoop:hadoop ${ps_log_new_path}/ps_${suffix}
 
 mv ${gm_log} ${gm_log_new_path}/gm_${suffix}
 chown hadoop:hadoop ${gm_log_new_path}/gm_${suffix}
+
+mv ${cu_log} ${cu_log_new_path}/cu_${suffix}
+chown hadoop:hadoop ${cu_log_new_path}/cu_${suffix}
 
 /usr/sbin/nginx -s reopen
 
