@@ -45,7 +45,7 @@ public class HBasePutterV2 implements Callable<String> {
                 LOGGER.warn("get exception:" + e.getMessage() + ", ignore the log : " + line);
             }
         }
-        LOGGER.info("Build  " + puts.size() + " puts spend " + (System.currentTimeMillis() - begin ) + "ms");
+        //LOGGER.info("Build  " + puts.size() + " puts spend " + (System.currentTimeMillis() - begin ) + "ms");
         if(puts.size()>0){
             HTableInterface hTable = null;
             try {
