@@ -50,31 +50,13 @@ public class YACLogHBaseBuilder implements HBaseBuilder {
             throw new Exception("Yac log params size less than 9");
         }
 
-/*        if(!ETLUtils.validateURL(attrs.get(4))){
-            throw new Exception("The URL is invalid");
-        }*/
-
-/*        //时间只有10位，手动加上3位随机数
-        int randomTime = random.nextInt(999);
-        String timeSuffix = String.valueOf(randomTime);
-        if(randomTime == 0){
-            timeSuffix = "000";
-        }if(randomTime<10){
-            timeSuffix = "00" + randomTime;
-        }else if(randomTime<100){
-            timeSuffix = "0" + randomTime;
-        }*/
         long time = Long.parseLong(attrs.get(3));
-
-        //添加到URL字典表
-//        putURLDetail(attrs,time);
-
         long ip = 0;
         if(StringUtils.isNotBlank(attrs.get(1))){
             ip = ETLUtils.ip2Long(attrs.get(1));
         }
 
-        UrlType urlType = UrlType.CLICK; //0:所有tab;1:跳转;2:页面停留时间
+        UrlType urlType = UrlType.CLICK;
         int duration = 0;
         if(attrs.get(8).length() > 0){
             urlType = UrlType.DURATION;
