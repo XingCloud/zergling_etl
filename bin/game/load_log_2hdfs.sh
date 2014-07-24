@@ -8,11 +8,9 @@ fi
 
 todayOff=`expr $offset - 1`
 tbyoff=`expr $offset + 1`
-if [ ${offset} -eq 1 ];then
-    todayfmt=`date -u +%Y-%m-%d`
-else
-    todayfmt=`date -d "${todayOff} days ago" +%Y-%m-%d`
-fi
+
+todayfmt=`date -d "${todayOff} days ago" +%Y-%m-%d`
+
 
 yesterday=`date -d "${offset} days ago" +%Y%m%d`
 yesterdayfmt=`date -d "${offset} days ago" +%Y-%m-%d`
