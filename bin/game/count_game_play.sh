@@ -19,15 +19,15 @@ echo "Load game_play_action/${yesterday} to game_play_count"
 hive -e "insert into table game_play_count select day,uid,gid,count(*) from game_play_action where day=${yesterday} group by day,uid,gid"
 
 echo "Count most play"
-hive -e "select gid,sum(ct) as total from game_play_count group by gid order by total desc limit 100" > /data/game/${yesterday}_mt.log || { echo "command failed"; exit 1; }
+hive -e "select gid,sum(ct) as total from game_play_count group by gid order by total desc limit 100" > /data0/game/${yesterday}_mt.log || { echo "command failed"; exit 1; }
 
 echo "Count most user"
-hive -e "select gid,count(distinct uid) as total from game_play_count group by gid order by total desc limit 100" > /data/game/${yesterday}_mp.log || { echo "command failed"; exit 1; }
+hive -e "select gid,count(distinct uid) as total from game_play_count group by gid order by total desc limit 100" > /data0/game/${yesterday}_mp.log || { echo "command failed"; exit 1; }
 
 python /home/hadoop/scripts/game/format_game_result.py ${yesterday}
 
-countmd5=`/usr/java/jdk/bin/java -jar /home/hadoop/MD5Digest.jar /data/game/${yesterday}_fmt.log`
-cp /data/game/${yesterday}_fmt.log /data/game/${countmd5}
+countmd5=`/usr/java/jdk/bin/java -jar /home/hadoop/MD5Digest.jar /data0/game/${yesterday}_fmt.log`
+cp /data0/game/${yesterday}_fmt.log /data0/game/${countmd5}
 
 scp -r /data/game/${countmd5} elex@162.243.114.236:~/rec/count
 echo "end"
