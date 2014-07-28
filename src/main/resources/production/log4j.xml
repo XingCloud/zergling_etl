@@ -12,7 +12,7 @@
   </appender>
 
   <appender name="SEARCH_RUN_LOG" class="org.apache.log4j.DailyRollingFileAppender">
-    <param name="File" value="/data/bigdata/22find/search/search.run.log" />
+    <param name="File" value="/data0/bigdata/22find/search/search.run.log" />
     <param name="Append" value="true" />
     <param name="Threshold" value="info" />
     <param name="DatePattern" value="'.'yyyy-MM-dd" />
@@ -22,7 +22,7 @@
   </appender>
 
   <appender name="SEARCH_IGNORE_LOG" class="org.apache.log4j.DailyRollingFileAppender">
-    <param name="File" value="/data/bigdata/22find/search/search.ignore.log" />
+    <param name="File" value="/data0/bigdata/22find/search/search.ignore.log" />
     <param name="Append" value="true" />
     <param name="Threshold" value="info" />
     <param name="DatePattern" value="'.'yyyy-MM-dd" />
@@ -32,7 +32,7 @@
   </appender>
 
     <appender name="AD_RUN_LOG" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="/data/bigdata/all/ad/run.log" />
+        <param name="File" value="/data0/bigdata/all/ad/run.log" />
         <param name="Append" value="true" />
         <param name="Threshold" value="info" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
@@ -42,7 +42,7 @@
     </appender>
 
     <appender name="AD_IGNORE_LOG" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="/data/bigdata/all/ad/ignore.log" />
+        <param name="File" value="/data0/bigdata/all/ad/ignore.log" />
         <param name="Append" value="true" />
         <param name="Threshold" value="info" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
@@ -52,7 +52,7 @@
     </appender>
 
     <appender name="PC_RUN_LOG" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="/data/bigdata/all/pc/run.log" />
+        <param name="File" value="/data0/bigdata/all/pc/run.log" />
         <param name="Append" value="true" />
         <param name="Threshold" value="info" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
@@ -62,7 +62,7 @@
     </appender>
 
     <appender name="PC_IGNORE_LOG" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="/data/bigdata/all/pc/ignore.log" />
+        <param name="File" value="/data0/bigdata/all/pc/ignore.log" />
         <param name="Append" value="true" />
         <param name="Threshold" value="info" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
@@ -72,7 +72,7 @@
     </appender>
 
     <appender name="YAC_RUN_LOG" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="/data/bigdata/all/yac/run.log" />
+        <param name="File" value="/data0/bigdata/all/yac/run.log" />
         <param name="Append" value="true" />
         <param name="Threshold" value="info" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
@@ -82,7 +82,7 @@
     </appender>
 
     <appender name="YAC_IGNORE_LOG" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="/data/bigdata/all/yac/ignore.log" />
+        <param name="File" value="/data0/bigdata/all/yac/ignore.log" />
         <param name="Append" value="true" />
         <param name="Threshold" value="info" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
@@ -91,7 +91,7 @@
         </layout>
     </appender>
     <appender name="GM_RUN_LOG" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="/data/bigdata/all/gm/run.log" />
+        <param name="File" value="/data0/bigdata/all/gm/run.log" />
         <param name="Append" value="true" />
         <param name="Threshold" value="info" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
@@ -101,7 +101,7 @@
     </appender>
 
     <appender name="GM_IGNORE_LOG" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="/data/bigdata/all/gm/ignore.log" />
+        <param name="File" value="/data0/bigdata/all/gm/ignore.log" />
         <param name="Append" value="true" />
         <param name="Threshold" value="info" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
