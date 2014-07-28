@@ -2,8 +2,8 @@
 
 hadoop_home=/usr/bin/
 
-source_file_home=/data/log
-local_history_home=/data/local_history
+source_file_home=/data0/log
+local_history_home=/data0/local_history
 hdfs_history_home=/user/hadoop/history
 
 if [ "" = "$1" ];then

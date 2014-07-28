@@ -24,12 +24,12 @@ time_zone=GMT-06:00
 
 processing_history_day=`date -u -d"${processing_day} 7 days ago" +%Y-%m-%d`
 raw_log_web=http://log.goo.mx/clicklogs/log.goo.mx.access-${processing_day}.tar.gz
-raw_log_path=/data/raw/${project_id}/nav
+raw_log_path=/data0/raw/${project_id}/nav
 default_unpack_name=home/elex/serversoft/nginx/log/log.goo.mx.access.log
 hdfs_history_path=/user/hadoop/history/raw/${project_id}/nav
 current_op_file_name=${project_id}.${processing_day}
 history_op_file_name=${project_id}.${processing_history_day}
-output_path=/data/bigdata/${project_id}/nav
+output_path=/data0/bigdata/${project_id}/nav
 
 echo ${line}
 echo "[PROCESSING-DAY]="${processing_day}

@@ -11,9 +11,9 @@ table_name=yac_user_action
 workers=12
 batch_size=1000
 project_id=all
-logdir=/data/log/yac/$(date -d"-5 mins" +"%Y%m%d")/
+logdir=/data0/log/yac/$(date -d"-5 mins" +"%Y%m%d")/
 hdfs_path=/user/hadoop/history/${type}
-tmp_log_path_prefix=/data/bigdata/all/${type}/tmp.log
+tmp_log_path_prefix=/data0/bigdata/all/${type}/tmp.log
 minute=$(date +"%H%M")
 
 echo ${logdir}
@@ -42,7 +42,7 @@ function import(){
   #clear tmp log
   echo "begin import" > ${tmp_log_path}
 
-  daily_log_path="/data/bigdata/all/${type}/${type}_${day}.log"
+  daily_log_path="/data0/bigdata/all/${type}/${type}_${day}.log"
   echo "begin import ${fullPath} at "$(date +"%Y-%m-%d %H:%M:%S")
 
   ${java_bin}/java -Xmx2048m -Xms2048m -jar ${jar_home} ${type} ${table_name} ${fullPath} ${workers} ${batch_size} ${project_id} > ${tmp_log_path}
@@ -68,7 +68,7 @@ done
 #每天凌晨0000,删除历史文件
 if [ "0000" = "${minute}" ]; then
     history_day=$(date -u -d"${processing_day} 7 days ago" +%Y%m%d)
-    history_path=/data/log/${type}/${history_day}
+    history_path=/data0/log/${type}/${history_day}
     if [ -d ${history_path} ]; then
             echo "Remove the directory ${history_path}"
             rm -rf ${history_path}

@@ -16,8 +16,8 @@ yesterday=`date -d "${offset} days ago" +%Y%m%d`
 yesterdayfmt=`date -d "${offset} days ago" +%Y-%m-%d`
 tdbyesterday=`date -d "${tbyoff} days ago" +%Y%m%d`
 
-gmpath="/data/log/gm"
-destpath="/data/log/gm/play"
+gmpath="/data0/log/gm"
+destpath="/data0/log/gm/play"
 destfile="${destpath}/${yesterday}.log"
 fmtdestfile="${destpath}/${yesterday}_fmt.log"
 tdbyesterdaylastfile="${gmpath}/${tdbyesterday}/gm_${tdbyesterday}2355.log.completed"

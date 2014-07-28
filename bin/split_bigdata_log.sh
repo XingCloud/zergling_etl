@@ -1,6 +1,6 @@
 #!/bin/bash
 
-access_log_path="/data/log/all"
+access_log_path="/data0/log/all"
 
 # navigator log
 nav_log=${access_log_path}/access.nav.log
@@ -26,13 +26,13 @@ cu_log=${access_log_path}/access.cu.log
 suffix=$(date -d"-5 mins" +"%Y%m%d%H%M").log
 
 day=$(date -d"-5 mins" +"%Y%m%d")
-nav_log_new_path="/data/log/nav/${day}"
-ad_log_new_path="/data/log/ad/${day}"
-nt_log_new_path="/data/log/nt/${day}"
-pc_log_new_path="/data/log/pc/${day}"
-ps_log_new_path="/data/log/ps/${day}"
-gm_log_new_path="/data/log/gm/${day}"
-cu_log_new_path="/data/log/cu/${day}"
+nav_log_new_path="/data0/log/nav/${day}"
+ad_log_new_path="/data0/log/ad/${day}"
+nt_log_new_path="/data0/log/nt/${day}"
+pc_log_new_path="/data0/log/pc/${day}"
+ps_log_new_path="/data0/log/ps/${day}"
+gm_log_new_path="/data0/log/gm/${day}"
+cu_log_new_path="/data0/log/cu/${day}"
 
 if [ ! -d ${nav_log_new_path} ]; then
   mkdir -p ${nav_log_new_path}
