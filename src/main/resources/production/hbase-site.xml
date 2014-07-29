@@ -3,7 +3,7 @@
 
   <property>
     <name>hbase.zookeeper.quorum</name>
-    <value>dmnode1,dmnode2,dmnode3</value>
+    <value>dmnode3,dmnode4,dmnode5</value>
   </property>
   <property>
     <name>hbase.zookeeper.property.clientPort</name>
