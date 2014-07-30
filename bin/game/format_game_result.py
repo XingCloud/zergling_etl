@@ -9,12 +9,12 @@ def parseFile(path):
     return ",".join(data)
 
 def parseData(date):
-    mtpath = "/data/game/%s_mt.log"%(date)
-    mppath = "/data/game/%s_mp.log"%(date)
+    mtpath = "/data0/game/%s_mt.log"%(date)
+    mppath = "/data0/game/%s_mp.log"%(date)
     mt = parseFile(mtpath)
     mp = parseFile(mppath)
 
-    resultpath = "/data/game/%s_fmt.log"%(date)
+    resultpath = "/data0/game/%s_fmt.log"%(date)
     with open(resultpath, "w") as f:
         f.write("{\"mt\":{%s},\"mp\":{%s}}"%(mt,mp))
 
