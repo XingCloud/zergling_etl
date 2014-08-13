@@ -21,7 +21,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
     //gm_user_action
     private byte[] ucf = Bytes.toBytes("ua");
     private byte[] gidCol = Bytes.toBytes("gid"); //游戏ID
-    private byte[] langCol = Bytes.toBytes("l"); //语言
+    private byte[] langCol = Bytes.toBytes("l"); //语言（zh-CN）
     private byte[] nationCol = Bytes.toBytes("na"); //国家
     private byte[] tzCol = Bytes.toBytes("tz"); //时区
     private byte[] vipCol = Bytes.toBytes("v"); //是否为VIP用户
@@ -29,6 +29,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
     private byte[] vpCol = Bytes.toBytes("vp"); //积分
     private byte[] vlCol = Bytes.toBytes("vl"); //VIP等级
     private byte[] gameTypeCol = Bytes.toBytes("gt"); //游戏类别（web,mini）
+    private byte[] clCol = Bytes.toBytes("cl"); //新加的语言字段
 
     //HB
     private byte[] tagCol = Bytes.toBytes("tag"); //游戏类型
@@ -43,6 +44,10 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
 
     //pay
     private byte[] cashCol = Bytes.toBytes("cash"); //充值金额
+
+    //PLAY
+    private byte[] recTypeCol = Bytes.toBytes("rt"); //推荐类型
+    private byte[] recIdxCol = Bytes.toBytes("idx"); //推荐结果索引 （gid 或者 空）
 
     private String urlPreffix = "/gm.png?";
 
@@ -97,7 +102,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
         Put put = new Put(rowKey);
 
         put.add(ucf,gidCol,time,Bytes.toBytes(params.get("gid")));
-        putNotNull(put,ucf,langCol,time,params.get("l"));
+        putNotNull(put, ucf, langCol, time, params.get("l"));
         putNotNull(put,ucf,nationCol,time,params.get("na"));
         putNotNull(put,ucf,tzCol,time,params.get("tz"));
         putNotNull(put,ucf,vipCol,time,params.get("v"));
@@ -105,6 +110,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
         putNotNull(put,ucf,vpCol,time,params.get("vp"));
         putNotNull(put,ucf,vlCol,time,params.get("vl"));
         putNotNull(put,ucf,gameTypeCol,time,params.get("gt"));
+        putNotNull(put,ucf,clCol,time,params.get("cl"));
 
         if(action == GMAction.HB){
             putNotNull(put,ucf,tagCol,time,params.get("tag"));
@@ -117,6 +123,9 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
             putNotNull(put,ucf,gsCol,time,params.get("gs"));
         }else if(action == GMAction.PAY){
             put.add(ucf,cashCol,time,Bytes.toBytes(params.get("cash")));
+        }else if(action == GMAction.PLAY){
+            putNotNull(put,ucf,recTypeCol,time,params.get("rt"));
+            putNotNull(put,ucf,recIdxCol,time,params.get("idx"));
         }
 
         return put;
