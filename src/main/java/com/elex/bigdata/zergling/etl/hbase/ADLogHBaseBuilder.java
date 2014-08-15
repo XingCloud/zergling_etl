@@ -29,6 +29,7 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
     private byte[] typeCol = Bytes.toBytes("t"); //计算出来的分类
     private byte[] aidCol = Bytes.toBytes("aid");
     private byte[] ipCol = Bytes.toBytes("ip");
+    private byte[] uidCol = Bytes.toBytes("uid");
     private byte[] urlCol = Bytes.toBytes("url");
     private byte[] cpcCol = Bytes.toBytes("cpc");
     private byte[] categoryCol = Bytes.toBytes("c");
@@ -81,7 +82,7 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         }
 
         if(StringUtils.isBlank(params.get("p")) || StringUtils.isBlank(params.get("nation"))
-                || StringUtils.isBlank(params.get("uid")) || StringUtils.isBlank(params.get("aid"))
+                || StringUtils.isBlank(params.get("cookie")) || StringUtils.isBlank(params.get("aid"))
                 || StringUtils.isBlank(params.get("ip")) ){
             throw new Exception(" One ad params is null");
         }
@@ -102,11 +103,12 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         }
         String nation = params.get("nation").toLowerCase();
         byte[] rowKeyPreffix = Bytes.add(new byte[]{pid.byteValue()},Bytes.toBytes(nation),Bytes.toBytes(time));
-        byte[] rowKey = Bytes.add(rowKeyPreffix, Bytes.toBytes(params.get("uid")));
+        byte[] rowKey = Bytes.add(rowKeyPreffix, Bytes.toBytes(params.get("cookie")));
 
         Put put = new Put(rowKey);
         put.add(cf,aidCol,time,Bytes.toBytes(params.get("aid")));
         put.add(cf,ipCol,time,Bytes.toBytes(ip));
+        put.add(cf,uidCol,time,Bytes.toBytes(params.get("uid")));
 
         //广告明细
         for(Map.Entry<String,byte[]> adDetailKey : adDetailKeys.entrySet()){
