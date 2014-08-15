@@ -108,7 +108,9 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         Put put = new Put(rowKey);
         put.add(cf,aidCol,time,Bytes.toBytes(params.get("aid")));
         put.add(cf,ipCol,time,Bytes.toBytes(ip));
-        put.add(cf,uidCol,time,Bytes.toBytes(params.get("uid")));
+        if(StringUtils.isNotBlank(params.get("uid"))){
+            put.add(cf,uidCol,time,Bytes.toBytes(params.get("uid")));
+        }
 
         //广告明细
         for(Map.Entry<String,byte[]> adDetailKey : adDetailKeys.entrySet()){
