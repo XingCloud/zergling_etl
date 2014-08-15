@@ -14,7 +14,10 @@ def parsePayLog(inPath,outPath):
             if kv[1]:
                 params[kv[0]] = kv[1]
         if params.has_key("ts") and params.has_key("uid") and params.has_key("gid") and params.has_key("l"):
-            outfile.write("%s\t%s\t%s\t%s\n"%(parseTimeStamp(attrs[1][0:19]),params["uid"],params["gid"],params["l"]))
+            cl = params.has_key("l")[0:2]
+            if params.has_key("cl"):
+                cl = params["cl"]
+            outfile.write("%s\t%s\t%s\t%s\n"%(parseTimeStamp(attrs[1][0:19]),params["uid"],params["gid"],cl))
 
     outfile.close()
     infile.close()
