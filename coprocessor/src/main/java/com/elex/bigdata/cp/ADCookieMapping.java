@@ -1,10 +1,8 @@
 package com.elex.bigdata.cp;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.KeyValue;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.CoprocessorEnvironment;
+import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.coprocessor.BaseRegionObserver;
 import org.apache.hadoop.hbase.coprocessor.ObserverContext;
 import org.apache.hadoop.hbase.coprocessor.RegionCoprocessorEnvironment;
@@ -27,6 +25,9 @@ import java.util.List;
  */
 public class ADCookieMapping extends BaseRegionObserver{
 
+    private HConnection conn = null;
+    private final static String  INDEX_TABLE  = "cookie_uid_map";
+
     public static byte[] cf = Bytes.toBytes("basis");
     public static byte[] cuf = Bytes.toBytes("cu");
     public static byte[] uidCol = Bytes.toBytes("uid");
@@ -34,6 +35,12 @@ public class ADCookieMapping extends BaseRegionObserver{
     public static byte[] cookie_prefix = Bytes.toBytes("c_");
     public static byte[] uid_prefix = Bytes.toBytes("u_");
     public static byte[] mix_prefix = Bytes.toBytes("m_");
+
+    @Override
+    public void start(CoprocessorEnvironment env) throws IOException {
+        conn = HConnectionManager.createConnection(env.getConfiguration());
+    }
+
 
     @Override
     public void postPut(final ObserverContext<RegionCoprocessorEnvironment> e,
@@ -57,9 +64,8 @@ public class ADCookieMapping extends BaseRegionObserver{
 
             byte[] mixRow = Bytes.add(mix_prefix,md5HashBytes);
 
-            Configuration conf = new Configuration();
 
-            HTable table = new HTable(conf, "cookie_uid_map"); 
+            HTable table = (HTable)conn.getTable(INDEX_TABLE);
             Put cuPut = new Put(cookieRow);
             cuPut.add(cuf,uidCol,time,uid);
             cuPut.add(cuf,projectCol,time,p);
@@ -81,5 +87,10 @@ public class ADCookieMapping extends BaseRegionObserver{
 
             table.close();
         }
+    }
+
+    @Override
+    public void stop(CoprocessorEnvironment env) throws IOException {
+        conn.close();
     }
 }
