@@ -52,6 +52,7 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
     private static final String COMBINE_NATION_SEPRATOR = "_";
     private static Set<String> historyNations;
     private static ConcurrentHashMap<String,String> newNations = new ConcurrentHashMap<String,String>();
+    private static Map<String,String> gameTypeMapping = new HashMap<String,String>();
 
     public ADLogHBaseBuilder(){
         MongoDriver.getInstance();
@@ -60,6 +61,12 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         adDetailKeys.put("category",categoryCol);
         adDetailKeys.put("cpc",cpcCol);
         adDetailKeys.put("url",urlCol);
+
+        gameTypeMapping.put("a","1");
+        gameTypeMapping.put("b","2");
+        gameTypeMapping.put("c","3");
+        gameTypeMapping.put("d","4");
+        gameTypeMapping.put("z","0");
 
         historyNations = MetricMapping.getAllNationsAsSet();
     }
@@ -130,7 +137,11 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
                     int pos = score.indexOf(LOG_HIT_KV_SEPRATOR);
                     String key = score.substring(0, pos);
                     Integer value = Integer.parseInt(score.substring(pos + 1));
-                    put.add(scoreCf,Bytes.toBytes(key),time,Bytes.toBytes(value));
+                    if(value == 100 && gameTypeMapping.get(key) != null){
+                        put.add(scoreCf,typeCol,time,Bytes.toBytes(gameTypeMapping.get(key)));
+                        break;
+                    }
+
                 }
             }else if(t.contains(LOG_HIT_KV_SEPRATOR)){
                 put.add(scoreCf,typeCol,time,Bytes.toBytes(t.split(LOG_HIT_KV_SEPRATOR)[0]));
