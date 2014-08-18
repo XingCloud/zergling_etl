@@ -132,8 +132,8 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
                     Integer value = Integer.parseInt(score.substring(pos + 1));
                     put.add(scoreCf,Bytes.toBytes(key),time,Bytes.toBytes(value));
                 }
-            }else{
-                put.add(scoreCf,typeCol,time,Bytes.toBytes(t));
+            }else if(t.contains(LOG_HIT_KV_SEPRATOR)){
+                put.add(scoreCf,typeCol,time,Bytes.toBytes(t.split(LOG_HIT_KV_SEPRATOR)[0]));
             }
 
             //0，未指定 1，游戏 2，电商 99，其他 ,冗余存一份，用于后期指定CF分析命中情况使用
