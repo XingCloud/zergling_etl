@@ -17,8 +17,8 @@ def parsePlayLog(inPath,outPath):
             cl = params["l"][0:2]
             if params.has_key("cl"):
                 cl = params["cl"]
-            rt = ''
-            idx = ''
+            rt = '\N'
+            idx = '\N'
 
             if params.has_key("rt"):
                 rt = params["rt"]
