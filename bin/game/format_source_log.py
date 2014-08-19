@@ -17,17 +17,15 @@ def parsePlayLog(inPath,outPath):
             cl = params["l"][0:2]
             if params.has_key("cl"):
                 cl = params["cl"]
-            rt = '\N'
-            idx = '\N'
+            rt = ''
+            idx = ''
 
             if params.has_key("rt"):
                 rt = params["rt"]
             if params.has_key("idx"):
                 idx = params["idx"]
-            if rt == '\N':
-                outfile.write("%s\t%s\t%s\t%s\n"%(parseTimeStamp(attrs[1][0:19]),params["uid"],params["gid"],cl))
-            else:
-                outfile.write("%s\t%s\t%s\t%s\t%s\t%s\n"%(parseTimeStamp(attrs[1][0:19]),params["uid"],params["gid"],cl,rt,idx))
+
+            outfile.write("%s\t%s\t%s\t%s\t%s\t%s\n"%(parseTimeStamp(attrs[1][0:19]),params["uid"],params["gid"],cl,rt,idx))
 
     outfile.close()
     infile.close()
