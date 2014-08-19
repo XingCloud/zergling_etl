@@ -2,7 +2,7 @@ import datetime
 import sys
 
 #201.162.36.159  2014-07-13T23:55:10+08:00       /gm.png?action=hb&appid=337&uid=uK2C3FPAShRJjgnFBSOWAg6161&gid=sponge_bob_squarepants_anchovy_assault&l=es&ts=1405266916137&tz=5
-def parsePayLog(inPath,outPath):
+def parsePlayLog(inPath,outPath):
     infile = open(inPath)
     outfile = open(outPath,"w")
     for line in infile:
@@ -35,4 +35,4 @@ if __name__ == "__main__":
     inpath = sys.argv[1]
     outpath = sys.argv[2]
 
-    parsePayLog(inpath,outpath)
+    parsePlayLog(inpath,outpath)
