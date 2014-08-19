@@ -24,7 +24,10 @@ def parsePlayLog(inPath,outPath):
                 rt = params["rt"]
             if params.has_key("idx"):
                 idx = params["idx"]
-            outfile.write("%s\t%s\t%s\t%s\t%s\t%s\n"%(parseTimeStamp(attrs[1][0:19]),params["uid"],params["gid"],cl,rt,idx))
+            if rt == '\N':
+                outfile.write("%s\t%s\t%s\t%s\n"%(parseTimeStamp(attrs[1][0:19]),params["uid"],params["gid"],cl))
+            else:
+                outfile.write("%s\t%s\t%s\t%s\t%s\t%s\n"%(parseTimeStamp(attrs[1][0:19]),params["uid"],params["gid"],cl,rt,idx))
 
     outfile.close()
     infile.close()
