@@ -28,13 +28,13 @@ public class ADCookieMapping extends BaseRegionObserver{
     private HConnection conn = null;
     private final static String  INDEX_TABLE  = "cookie_uid_map";
 
-    public static byte[] cf = Bytes.toBytes("basis");
+    public static byte[] adcf = Bytes.toBytes("basis"); //AD的表family
     public static byte[] cuf = Bytes.toBytes("cu");
     public static byte[] uidCol = Bytes.toBytes("uid");
     public static byte[] projectCol = Bytes.toBytes("p");
-    public static byte[] cookie_prefix = Bytes.toBytes("c_");
-    public static byte[] uid_prefix = Bytes.toBytes("u_");
-    public static byte[] mix_prefix = Bytes.toBytes("m_");
+    public static byte[] cookie_prefix = Bytes.toBytes("c_"); //key: c_cookie, value: uid
+    public static byte[] uid_prefix = Bytes.toBytes("u_"); //key: u_uid, value: cookieid
+    public static byte[] mix_prefix = Bytes.toBytes("m_"); //HASH COOKIE+UID+P ,用来判断映射关系是否已经存在
 
     @Override
     public void start(CoprocessorEnvironment env) throws IOException {
@@ -45,12 +45,12 @@ public class ADCookieMapping extends BaseRegionObserver{
     @Override
     public void postPut(final ObserverContext<RegionCoprocessorEnvironment> e,
                         final Put put, final WALEdit edit, final boolean writeToWAL) throws IOException {
-        if(put.has(cf,uidCol)){
+        if(put.has(adcf,uidCol)){
 
-            long time = put.get(cf, uidCol).get(0).getTimestamp();
+            long time = put.get(adcf, uidCol).get(0).getTimestamp();
 
             byte[] cookie = Bytes.tail(put.getRow(), put.getRow().length - 11);
-            byte[] uid = put.get(cf,uidCol).get(0).getValue();
+            byte[] uid = put.get(adcf,uidCol).get(0).getValue();
 
             byte[] p = Bytes.toBytes(String.valueOf((int) put.getRow()[0]));
 
