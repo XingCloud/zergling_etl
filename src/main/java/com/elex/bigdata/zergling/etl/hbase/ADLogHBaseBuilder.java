@@ -75,6 +75,7 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
     public Put buildPut(String line) throws Exception {
         //        0  10.1.20.152
         //        1  2014-03-31T14:24:23+08:00
+        //           /ad.png?p=www.sweet-page.com&ip=86.85.76.22&nation=NL&uid=ST3808110AS_5LRD04LCXXXX5LRD04LC&cookie=ST3808110AS_5LRD04LCXXXX5LRD04LC&aid=22797&t=3.100&c=
         //        2  /ad.png?p=www.awesomehp.com&ip=37.239.46.2&nation=IQ&uid=WDCXWD5000BPVT-22HXZT3_WD-WXL1A911029910299&aid=1883&t=
 
         List<String> attrs = ETLUtils.split(line,LOG_ATTR_SEPRATOR);
@@ -144,7 +145,7 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
 
                 }
             }else if(t.contains(LOG_HIT_KV_SEPRATOR)){
-                put.add(scoreCf,typeCol,time,Bytes.toBytes(t.split(LOG_HIT_KV_SEPRATOR)[0]));
+                put.add(scoreCf,typeCol,time,Bytes.toBytes(t.substring(0,t.indexOf(LOG_HIT_KV_SEPRATOR))));
             }
 
             //0，未指定 1，游戏 2，电商 99，其他 ,冗余存一份，用于后期指定CF分析命中情况使用
