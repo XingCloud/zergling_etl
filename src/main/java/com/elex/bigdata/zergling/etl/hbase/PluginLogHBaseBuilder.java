@@ -100,6 +100,8 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
             }else{
                 pluginType =PluginType.CLICK;
             }
+        }else{
+            throw new Exception("Ignore the tab url"); //忽略tab的数据，暂时没有什么意义
         }
 
         int category = -1;
