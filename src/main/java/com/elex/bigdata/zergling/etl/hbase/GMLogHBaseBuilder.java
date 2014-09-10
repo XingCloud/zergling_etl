@@ -51,7 +51,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
     private byte[] recIdxCol = Bytes.toBytes("idx"); //推荐结果索引 （gid 或者 空）
 
     //LINK
-    private byte[] lkCol = Bytes.toBytes("lk"); //uid(cookieID)关联的注册id
+    private byte[] lidCol = Bytes.toBytes("lid"); //uid(cookieID)关联的注册id
 
     private String urlPreffix = "/gm.png?";
 
@@ -137,7 +137,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
             rowKey = Bytes.add(rowKey,Bytes.toBytes(params.get("uid")));
 
             put = new Put(rowKey);
-            put.add(ucf, lkCol, time, Bytes.toBytes(params.get("lk")));
+            put.add(ucf, lidCol, time, Bytes.toBytes(params.get("lid")));
             LK_LOG.info(params.get("uid") + "\t" + params.get("lk") + "\t" + time);
         }
         return put;
