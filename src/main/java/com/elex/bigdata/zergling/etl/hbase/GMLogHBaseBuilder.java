@@ -49,6 +49,9 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
     private byte[] recTypeCol = Bytes.toBytes("rt"); //推荐类型
     private byte[] recIdxCol = Bytes.toBytes("idx"); //推荐结果索引 （gid 或者 空）
 
+    //LINK
+    private byte[] lkCol = Bytes.toBytes("lk"); //uid(cookieID)关联的注册id
+
     private String urlPreffix = "/gm.png?";
 
     private static final String LOG_ATTR_SEPRATOR = "\t";
@@ -97,20 +100,25 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
         long time = sdf.get().parse(attrs.get(1)).getTime();
 
         byte[] rowKey = Bytes.add(Bytes.toBytes(action.getShortHand()),Bytes.toBytes(time),Bytes.toBytes(params.get("gid")));
+        if(action == GMAction.LINK){ //cookie 和 id映射
+            rowKey = Bytes.toBytes(action.getShortHand());
+        }
         rowKey = Bytes.add(rowKey,Bytes.toBytes(ETLConstants.ROWKEY_SEP),Bytes.toBytes(params.get("uid")));
 
         Put put = new Put(rowKey);
 
-        put.add(ucf,gidCol,time,Bytes.toBytes(params.get("gid")));
-        putNotNull(put, ucf, langCol, time, params.get("l"));
-        putNotNull(put,ucf,nationCol,time,params.get("na"));
-        putNotNull(put,ucf,tzCol,time,params.get("tz"));
-        putNotNull(put,ucf,vipCol,time,params.get("v"));
-        putNotNull(put,ucf,vaCol,time,params.get("va"));
-        putNotNull(put,ucf,vpCol,time,params.get("vp"));
-        putNotNull(put,ucf,vlCol,time,params.get("vl"));
-        putNotNull(put,ucf,gameTypeCol,time,params.get("gt"));
-        putNotNull(put,ucf,clCol,time,params.get("cl"));
+        if(action != GMAction.LINK){
+            put.add(ucf,gidCol,time,Bytes.toBytes(params.get("gid")));
+            putNotNull(put, ucf, langCol, time, params.get("l"));
+            putNotNull(put,ucf,nationCol,time,params.get("na"));
+            putNotNull(put,ucf,tzCol,time,params.get("tz"));
+            putNotNull(put,ucf,vipCol,time,params.get("v"));
+            putNotNull(put,ucf,vaCol,time,params.get("va"));
+            putNotNull(put,ucf,vpCol,time,params.get("vp"));
+            putNotNull(put,ucf,vlCol,time,params.get("vl"));
+            putNotNull(put,ucf,gameTypeCol,time,params.get("gt"));
+            putNotNull(put,ucf,clCol,time,params.get("cl"));
+        }
 
         if(action == GMAction.HB){
             putNotNull(put,ucf,tagCol,time,params.get("tag"));
@@ -126,6 +134,8 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
         }else if(action == GMAction.PLAY){
             putNotNull(put,ucf,recTypeCol,time,params.get("rt"));
             putNotNull(put,ucf,recIdxCol,time,params.get("idx"));
+        }else if(action == GMAction.LINK){
+            putNotNull(put,ucf,lkCol,time,params.get("lk"));
         }
 
         return put;
@@ -166,6 +176,10 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
         },PAY("pay"){
             public String getShortHand(){
                 return "pa";
+            }
+        },LINK("lk"){
+            public String getShortHand(){
+                return "lk";
             }
         };
 
