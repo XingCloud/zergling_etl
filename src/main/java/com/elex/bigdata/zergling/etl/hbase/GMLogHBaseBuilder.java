@@ -134,7 +134,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
             }
         }else{
             byte[] rowKey = Bytes.toBytes(action.getShortHand());
-            rowKey = Bytes.add(rowKey,Bytes.toBytes(ETLConstants.ROWKEY_SEP),Bytes.toBytes(params.get("uid")));
+            rowKey = Bytes.add(rowKey,Bytes.toBytes(params.get("uid")));
 
             put = new Put(rowKey);
             put.add(ucf, lkCol, time, Bytes.toBytes(params.get("lk")));
