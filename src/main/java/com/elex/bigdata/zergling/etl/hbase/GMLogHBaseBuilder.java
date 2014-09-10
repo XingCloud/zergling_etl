@@ -138,7 +138,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
 
             put = new Put(rowKey);
             put.add(ucf, lidCol, time, Bytes.toBytes(params.get("lid")));
-            LK_LOG.info(params.get("uid") + "\t" + params.get("lk") + "\t" + time);
+            LK_LOG.info(params.get("uid") + "\t" + params.get("lid") + "\t" + time);
         }
         return put;
     }
