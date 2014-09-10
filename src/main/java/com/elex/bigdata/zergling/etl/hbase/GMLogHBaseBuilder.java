@@ -99,15 +99,12 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
 
         long time = sdf.get().parse(attrs.get(1)).getTime();
 
-        byte[] rowKey = Bytes.add(Bytes.toBytes(action.getShortHand()),Bytes.toBytes(time),Bytes.toBytes(params.get("gid")));
-        if(action == GMAction.LINK){ //cookie 和 id映射
-            rowKey = Bytes.toBytes(action.getShortHand());
-        }
-        rowKey = Bytes.add(rowKey,Bytes.toBytes(ETLConstants.ROWKEY_SEP),Bytes.toBytes(params.get("uid")));
-
-        Put put = new Put(rowKey);
-
+        Put put;
         if(action != GMAction.LINK){
+            byte[] rowKey = Bytes.add(Bytes.toBytes(action.getShortHand()),Bytes.toBytes(time),Bytes.toBytes(params.get("gid")));
+            rowKey = Bytes.add(rowKey,Bytes.toBytes(ETLConstants.ROWKEY_SEP),Bytes.toBytes(params.get("uid")));
+
+            put = new Put(rowKey);
             put.add(ucf,gidCol,time,Bytes.toBytes(params.get("gid")));
             putNotNull(put, ucf, langCol, time, params.get("l"));
             putNotNull(put,ucf,nationCol,time,params.get("na"));
@@ -118,26 +115,27 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
             putNotNull(put,ucf,vlCol,time,params.get("vl"));
             putNotNull(put,ucf,gameTypeCol,time,params.get("gt"));
             putNotNull(put,ucf,clCol,time,params.get("cl"));
-        }
 
-        if(action == GMAction.HB){
-            putNotNull(put,ucf,tagCol,time,params.get("tag"));
-            putNotNull(put,ucf,titleCol,time,params.get("title"));
-        }else if(action == GMAction.DOWN || action == GMAction.UP){
-            putNotNull(put,ucf,countCol,time,params.get("c"));
-            putNotNull(put,ucf,gsCol,time,params.get("gs"));
-        }else if(action == GMAction.SHARE){
-            putNotNull(put,ucf,fsCol,time,params.get("fs"));
-            putNotNull(put,ucf,gsCol,time,params.get("gs"));
-        }else if(action == GMAction.PAY){
-            put.add(ucf,cashCol,time,Bytes.toBytes(params.get("cash")));
-        }else if(action == GMAction.PLAY){
-            putNotNull(put,ucf,recTypeCol,time,params.get("rt"));
-            putNotNull(put,ucf,recIdxCol,time,params.get("idx"));
-        }else if(action == GMAction.LINK){
-            putNotNull(put,ucf,lkCol,time,params.get("lk"));
+            if(action == GMAction.HB){
+                putNotNull(put,ucf,tagCol,time,params.get("tag"));
+                putNotNull(put,ucf,titleCol,time,params.get("title"));
+            }else if(action == GMAction.DOWN || action == GMAction.UP){
+                putNotNull(put,ucf,countCol,time,params.get("c"));
+                putNotNull(put,ucf,gsCol,time,params.get("gs"));
+            }else if(action == GMAction.SHARE){
+                putNotNull(put,ucf,fsCol,time,params.get("fs"));
+                putNotNull(put,ucf,gsCol,time,params.get("gs"));
+            }else if(action == GMAction.PAY){
+                put.add(ucf,cashCol,time,Bytes.toBytes(params.get("cash")));
+            }else if(action == GMAction.PLAY){
+                putNotNull(put,ucf,recTypeCol,time,params.get("rt"));
+                putNotNull(put,ucf,recIdxCol,time,params.get("idx"));
+            }
+        }else{
+            byte[] rowKey = Bytes.toBytes(action.getShortHand());
+            put = new Put(rowKey);
+            put.add(ucf, lkCol, time, Bytes.toBytes(params.get("lk")));
         }
-
         return put;
     }
 
