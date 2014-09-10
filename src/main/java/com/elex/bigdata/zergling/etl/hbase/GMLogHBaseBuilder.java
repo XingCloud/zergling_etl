@@ -17,6 +17,7 @@ import java.util.*;
 public class GMLogHBaseBuilder implements HBaseBuilder {
 
     public static final Log LOG = LogFactory.getLog(LogType.GM.getType());
+    public static final Log LK_LOG = LogFactory.getLog("gm_lk");
 
     //gm_user_action
     private byte[] ucf = Bytes.toBytes("ua");
@@ -133,8 +134,11 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
             }
         }else{
             byte[] rowKey = Bytes.toBytes(action.getShortHand());
+            rowKey = Bytes.add(rowKey,Bytes.toBytes(ETLConstants.ROWKEY_SEP),Bytes.toBytes(params.get("uid")));
+
             put = new Put(rowKey);
             put.add(ucf, lkCol, time, Bytes.toBytes(params.get("lk")));
+            LK_LOG.info(params.get("uid") + "\t" + params.get("lk") + "\t" + time);
         }
         return put;
     }
