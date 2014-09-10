@@ -110,6 +110,16 @@
         </layout>
     </appender>
 
+    <appender name="GM_LK" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="/data0/bigdata/all/gm/lk.log" />
+        <param name="Append" value="true" />
+        <param name="Threshold" value="info" />
+        <param name="DatePattern" value="'.'yyyy-MM-dd" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%m%n" />
+        </layout>
+    </appender>
+
   <logger name="search">
     <level value="debug" />
     <appender-ref ref="SEARCH_RUN_LOG" />
@@ -152,6 +162,10 @@
     <logger name="gm_ignore">
         <level value="info" />
         <appender-ref ref="GM_IGNORE_LOG" />
+    </logger>
+    <logger name="gm_lk">
+        <level value="info" />
+        <appender-ref ref="GM_LK" />
     </logger>
   <root>
     <level value="info" />
