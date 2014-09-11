@@ -59,3 +59,8 @@ if [ "0000" = "${minute}" ]; then
 fi
 
 echo ${line}
+
+#加索引
+echo "begin index ${fullPath} at "$(date +"%Y-%m-%d %H:%M:%S")
+python load2es.py ${fullPath}.completed ${type}
+echo "end index ${fullPath} at "$(date +"%Y-%m-%d %H:%M:%S")

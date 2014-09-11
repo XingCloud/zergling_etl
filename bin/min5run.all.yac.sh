@@ -77,3 +77,10 @@ fi
 
 
 echo ${line}
+
+#加索引
+for f in ${src_paths};do
+    echo "begin index ${f} at "$(date +"%Y-%m-%d %H:%M:%S")
+    python load2es.py ${f}.completed ${type}
+    echo "end index ${f} at "$(date +"%Y-%m-%d %H:%M:%S")
+done
