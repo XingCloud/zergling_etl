@@ -112,7 +112,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
             String nation = lang.length==2? lang[1] : lang[0];
 
             putNotNull(put, ucf, langCol, time, params.get("l"));
-            putNotNull(put,ucf,nationCol,time,nation);
+            putNotNull(put,ucf,nationCol,time,nation.toLowerCase());
             putNotNull(put,ucf,tzCol,time,params.get("tz"));
             putNotNull(put,ucf,vipCol,time,params.get("v"));
             putNotNull(put,ucf,vaCol,time,params.get("va"));
