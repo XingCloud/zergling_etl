@@ -108,7 +108,7 @@ public class GMLogHBaseBuilder implements HBaseBuilder {
             put = new Put(rowKey);
             put.add(ucf,gidCol,time,Bytes.toBytes(params.get("gid")));
 
-            String[] lang = params.get("na").split("-");
+            String[] lang = params.get("l").split("-");
             String nation = lang.length==2? lang[1] : lang[0];
 
             putNotNull(put, ucf, langCol, time, params.get("l"));
