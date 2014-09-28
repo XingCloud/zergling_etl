@@ -36,6 +36,7 @@ ps_log_new_path="/data0/log/ps/${day}"
 gm_log_new_path="/data0/log/gm/${day}"
 cu_log_new_path="/data0/log/cu/${day}"
 ac_log_new_path="/data1/user_log/ac/${day}"
+nv_log_new_path="/data1/user_log/nv/${day}"
 
 if [ ! -d ${nav_log_new_path} ]; then
   mkdir -p ${nav_log_new_path}
@@ -77,6 +78,12 @@ if [ ! -d ${ac_log_new_path} ]; then
   chown hadoop:hadoop ${ac_log_new_path}
 fi
 
+if [ ! -d ${nv_log_new_path} ]; then
+  mkdir -p ${nv_log_new_path}
+  chown hadoop:hadoop ${nv_log_new_path}
+fi
+
+
 echo "begin split ${suffix} "
 
 mv ${nav_log} ${nav_log_new_path}/nav_${suffix}
@@ -100,8 +107,11 @@ chown hadoop:hadoop ${gm_log_new_path}/gm_${suffix}
 mv ${cu_log} ${cu_log_new_path}/cu_${suffix}
 chown hadoop:hadoop ${cu_log_new_path}/cu_${suffix}
 
-mv ${ac_log} ${ac_log_new_path}/cu_${suffix}
+mv ${ac_log} ${ac_log_new_path}/ac_${suffix}
 chown hadoop:hadoop ${ac_log_new_path}/ac_${suffix}
+
+mv ${nv_log} ${nv_log_new_path}/nv_${suffix}
+chown hadoop:hadoop ${nv_log_new_path}/nv_${suffix}
 
 /usr/sbin/nginx -s reopen
 
