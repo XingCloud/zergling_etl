@@ -22,8 +22,10 @@ gm_log=${access_log_path}/access.gm.log
 
 #cookie uid map
 cu_log=${access_log_path}/access.cu.log
-
+#ad click
 ac_log=${access_log_path}/access.ac.log
+#nav visit
+nv_log=${access_log_path}/access.nv.log
 
 suffix=$(date -d"-5 mins" +"%Y%m%d%H%M").log
 
