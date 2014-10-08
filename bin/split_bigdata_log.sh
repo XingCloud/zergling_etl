@@ -26,8 +26,9 @@ cu_log=${access_log_path}/access.cu.log
 ac_log=${access_log_path}/access.ac.log
 #nav visit
 nv_log=${access_log_path}/access.nv.log
+
 #nav add site
-nv_log=${access_log_path}/access.as.log
+as_log=${access_log_path}/access.as.log
 
 suffix=$(date -d"-5 mins" +"%Y%m%d%H%M").log
 
