@@ -93,7 +93,6 @@ if [ ! -d ${as_log_new_path} ]; then
   chown hadoop:hadoop ${as_log_new_path}
 fi
 
-
 echo "begin split ${suffix} "
 
 mv ${nav_log} ${nav_log_new_path}/nav_${suffix}
