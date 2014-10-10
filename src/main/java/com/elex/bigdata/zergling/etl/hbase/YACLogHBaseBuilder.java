@@ -64,7 +64,7 @@ public class YACLogHBaseBuilder implements HBaseBuilder {
         }
 
         String nation = attrs.get(2).toLowerCase();
-        byte[] rowKey = Bytes.add(new byte[]{(byte) urlType.getType()}, Bytes.toBytes(time), Bytes.toBytes(attrs.get(0)));
+        byte[] rowKey = Bytes.add(new byte[]{(byte) urlType.getType()}, Bytes.toBytes(time), Bytes.toBytes(attrs.get(0).toLowerCase()));
 
         Put put = new Put(rowKey);
         put.add(ucf,ipCol,time,Bytes.toBytes(ip));

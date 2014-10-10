@@ -110,7 +110,7 @@ public class PluginLogHBaseBuilder implements HBaseBuilder {
         }
 
         String nation = params.get("nation").toLowerCase();
-        byte[] rowKey = Bytes.add(new byte[]{(byte)pluginType.getType()},Bytes.toBytes(time),Bytes.toBytes(params.get("uid")));
+        byte[] rowKey = Bytes.add(new byte[]{(byte)pluginType.getType()},Bytes.toBytes(time),Bytes.toBytes(params.get("uid").toLowerCase()));
 
         Put put = new Put(rowKey);
         put.add(ucf,actionCol,time,Bytes.toBytes(params.get("action")));

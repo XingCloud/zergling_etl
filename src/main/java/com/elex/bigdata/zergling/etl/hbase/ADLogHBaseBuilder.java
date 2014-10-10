@@ -111,13 +111,13 @@ public class ADLogHBaseBuilder implements HBaseBuilder {
         }
         String nation = params.get("nation").toLowerCase();
         byte[] rowKeyPreffix = Bytes.add(new byte[]{pid.byteValue()},Bytes.toBytes(nation),Bytes.toBytes(time));
-        byte[] rowKey = Bytes.add(rowKeyPreffix, Bytes.toBytes(params.get("cookie")));
+        byte[] rowKey = Bytes.add(rowKeyPreffix, Bytes.toBytes(params.get("cookie").toLowerCase()));
 
         Put put = new Put(rowKey);
         put.add(cf,aidCol,time,Bytes.toBytes(params.get("aid")));
         put.add(cf,ipCol,time,Bytes.toBytes(ip));
         if(StringUtils.isNotBlank(params.get("uid"))){
-            put.add(cf,uidCol,time,Bytes.toBytes(params.get("uid")));
+            put.add(cf,uidCol,time,Bytes.toBytes(params.get("uid").toLowerCase()));
         }
 
         //广告明细
