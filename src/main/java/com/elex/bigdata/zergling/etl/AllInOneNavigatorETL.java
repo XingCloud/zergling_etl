@@ -97,7 +97,7 @@ public class AllInOneNavigatorETL extends ETLBase {
     requestURI = line.substring(from);
     projectId = extractContent(requestURI, projectSep, stop);
     nation = extractContent(requestURI, nationSep, stop);
-    uid = extractContent(requestURI, uidSep, stop);
+    uid = extractContent(requestURI, uidSep, stop).toLowerCase();
     url = extractContent(requestURI, urlSep);
     userLocalTime = toLocalTime(dateString, nation);
     AllInOneNavigatorLog log = new AllInOneNavigatorLog(dateString, uid, ipLong, url, projectId, nation, userLocalTime);
