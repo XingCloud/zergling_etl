@@ -13,7 +13,7 @@ project_short = { "isearch.omiga-plus.com": "omiga-plus",
             "www.v9.com": "v9"}
 
 #13 hours
-US_TIMEDELTA = datetime.timedelta(hours=-13)
+US_TIMEDELTA = datetime.timedelta(hours=13)
 
 def get_ua(ua):
     for browser in browsers:
@@ -50,7 +50,7 @@ def parse_search_line(line):
                 kv[attr[:index]] = attr[index+1:]
 
         if len(kv["http_referer"]) == 0:
-            return None
+            return None,None
 
         reqID = None
         uid = None
@@ -74,12 +74,12 @@ def parse_search_line(line):
         nation = kv["country"]
         if reqID and uid and query and len(nation) == 2:
             #p time reqID uid nation ua keyword
-            return "%s\t%s\t%s\t%s\t%s\t%s\t%s"%(kv["project_id"],s_time,reqID,uid,nation,ua,query)
+            return s_time[:10].replace('-',''), "%s\t%s\t%s\t%s\t%s\t%s\t%s"%(kv["project_id"],s_time,reqID,uid,nation,ua,query)
 
     except Exception,e:
         print e
 
-    return None
+    return None,None
 
 #nav visit log
 def parse_nv_line(line):
@@ -99,7 +99,7 @@ def parse_nv_line(line):
             #v9 has multi domain ,eg: br.v9.com
             pid = "v9"
         else:
-            return None
+            return None,None
 
         params = {}
         for param in attrs[5][8:].split("&"):
@@ -109,23 +109,23 @@ def parse_nv_line(line):
         nation = params["User_nation"]
         if len(nation) != 2:
             if attrs[1] == '-':
-                return None
+                return None,None
             nation = attrs[1].lower()
 
         #p time reqid uid ip nation ua os width height refer
-        return "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(pid,time,params["reqID"],params["User_id"],attrs[0],
+        return time[:10].replace('-',''), "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(pid,time,params["reqID"],params["User_id"],attrs[0],
                 nation,ua,params["os"],params["Screen_width"],params["Screen_Height"],refer)
 
     except Exception,e:
         print e
 
-    return None
+    return None,None
 
 def parse_adimp_line(line):
     try:
         attrs = line.split("\t")
         if attrs[0].startswith("2014"): #201410091101
-            time = datetime.datetime.strftime(attrs[0],"%Y%m%d%H%M%S")
+            time = datetime.datetime.strptime(attrs[0],"%Y%m%d%H%M%S")
             attrs[0] = to_local_time(time)
         else: #timestamp
             attrs[0] = datetime.datetime.fromtimestamp(float(attrs[0])).strftime("%Y-%m-%dT%H:%M:%S")
@@ -134,34 +134,39 @@ def parse_adimp_line(line):
         attrs[1] = attrs[2]
         attrs[2] = uid
 
-        return "\t".join(attrs)
+        return attrs[0][:10].replace('-',''),"\t".join(attrs)
     except Exception,e:
         print e
 
-    return None
+    return None,None
 
-def parse_file(logtype, source_file, output_file, append=False):
-    if append:
-        output = open(output_file,"a")
-    else:
-        output = open(output_file,"w")
+def parse_file(logtype, source_file, output_files):
+    output_writers = {}
+
+    for (day,filename) in output_files.items():
+        output_writers[day] = open(filename, "a")
+
     with open(source_file) as f:
         for line in f:
+            fmt_line = None
             if line.find("reqID") > 0:
-                fmt_line = None
                 if logtype == "search":
-                    fmt_line = parse_search_line(line.strip())
+                    day, fmt_line = parse_search_line(line.strip())
                 elif logtype == "nv":
-                    fmt_line = parse_nv_line(line.strip())
-                elif logtype == "ad_imp":
-                    fmt_line = parse_adimp_line(line.strip())
-                if fmt_line:
-                    output.write(fmt_line + "\n")
-    output.close()
+                    day, fmt_line = parse_nv_line(line.strip())
+            if logtype == "ad_imp":
+                day, fmt_line = parse_adimp_line(line.strip())
+            if fmt_line:
+                output_writers[day].write(fmt_line + "\n")
 
-def parse_search_file():
+    for writer in output_writers.values():
+        writer.close()
+
+def parse_search_file(yesterday, today):
     print "begin at %s" % datetime.datetime.now()
     parent_path = "/data1/user_log/search"
+    outputpath = "/data1/user_log/search/format";
+
     logtype = "search"
     projects = {
         "isearch.omiga-plus.com": "search",
@@ -172,35 +177,47 @@ def parse_search_file():
         "www.sweet-page.com": "sweet-page",
         "www.v9.com": "v9"}
 
-    yesterday = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y%m%d")
     for (project, prefix) in projects.items():
         filename = "%s/%s/%s.log.%s" % (parent_path, project, prefix, yesterday)
+
+        output_files = {}
+        output_files[yesterday] = "%s/%s_%s.log"%(outputpath, project_short[project], yesterday)
+        output_files[today] = "%s/%s_%s.log"%(outputpath, project_short[project], today)
+
         print "format %s at %s" % (filename, datetime.datetime.now())
-        parse_file(logtype, filename, filename+"_fmt")
-        load2hdfs(yesterday, logtype, filename +"_fmt")
+        parse_file(logtype, filename, output_files)
+        #load2hdfs(day, logtype, filename +"_fmt")
     print "end at %s" % datetime.datetime.now()
 
-    hive_exec("use odin;alter table search add partition(day='%s') location '/user/hadoop/odin/%s/%s/'" % (yesterday, logtype, yesterday))
+    #hive_exec("use odin;alter table search add partition(day='%s') location '/user/hadoop/odin/%s/%s/'" % (day, logtype, day))
 
-def parse_nv_file():
+def parse_nv_file(yesterday, today):
     print "begin at %s" % datetime.datetime.now()
-    yesterday = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y%m%d")
-    path = "/data1/user_log/nv/%s"%yesterday
+
+    inputpath = "/data1/user_log/nv/%s"%yesterday
+    outputpath = "/data1/user_log/nv/format/"
+
+    output_files = {}
+    output_files[yesterday] = outputpath + yesterday + ".log"
+    output_files[today] = outputpath + today + ".log"
+
     logtype = "nv"
-    files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f.endswith("log")]
+    files = [os.path.join(inputpath, f) for f in os.listdir(inputpath) if os.path.isfile(os.path.join(inputpath, f)) and f.endswith("log")]
     for filename in files:
         print "format %s at %s" % (filename, datetime.datetime.now())
-        parse_file(logtype, filename, filename +"_fmt")
-        load2hdfs(yesterday, logtype, filename +"_fmt")
+        parse_file(logtype, filename, output_files)
+        #load2hdfs(day, logtype, filename +"_fmt",)
     print "end at %s" % datetime.datetime.now()
-    hive_exec("use odin;alter table nav_visit add partition(day='%s') location '/user/hadoop/odin/%s/%s/'" % (yesterday,logtype,yesterday))
+    #hive_exec("use odin;alter table nav_visit add partition(day='%s') location '/user/hadoop/odin/%s/%s/'" % (day,logtype,day))
 
-def parse_adimp_file():
+def parse_adimp_file(yesterday, today):
     print "begin at %s" % datetime.datetime.now()
-
-    yesterday = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y%m%d")
-    output_file = "/data1/user_log/odin/%s.log"%yesterday
+    outputpath = "/data1/user_log/odin/"
     logtype = "ad_imp"
+
+    output_files = {}
+    output_files[yesterday] = outputpath + yesterday + ".log"
+    output_files[today] = outputpath + today + ".log"
 
     servers = ["odin0","odin1"]
     for server in servers:
@@ -208,22 +225,26 @@ def parse_adimp_file():
         files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f.endswith("log")]
         for filename in files:
             print "format %s at %s" % (filename, datetime.datetime.now())
-            parse_file(logtype, filename, output_file, True)
-            load2hdfs(yesterday, logtype, output_file)
+            parse_file(logtype, filename, output_files)
+    #load2hdfs(day, logtype, output_file)
     print "end at %s" % datetime.datetime.now()
-    hive_exec("use odin;alter table ad_impression add partition(day='%s') location '/user/hadoop/odin/%s/%s/'" % (yesterday, logtype, yesterday))
+    #hive_exec("use odin;alter table ad_impression add partition(day='%s') location '/user/hadoop/odin/%s/%s/'" % (day, logtype, day))
 
 if __name__ == '__main__':
-    if len(sys.argv) == 3 and "all" == sys.argv[2]: #daily job
+    if len(sys.argv) >= 3 and "all" == sys.argv[2]: #daily job
+        if len(sys.argv) == 4:
+            yesterday = sys.argv[3]
+            today = (datetime.datetime.strptime(yesterday,"%Y%m%d") + datetime.timedelta(days=-1)).strftime("%Y%m%d")
+        else:
+            yesterday = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y%m%d")
+            today = datetime.datetime.now() .strftime("%Y%m%d")
+
         if sys.argv[1] == "search":
-            parse_search_file()
+            parse_search_file(yesterday, today)
         elif sys.argv[1] == "nv":
-            parse_nv_file()
+            parse_nv_file(yesterday, today)
         elif sys.argv[1] == "ad_imp":
-            parse_adimp_file()
-    elif len(sys.argv) == 4:
-        #inputfile outputfile
-        parse_file(sys.argv[1],sys.argv[2],sys.argv[3])
+            parse_adimp_file(yesterday, today)
 
     else:
         print "Usage: type inputfilename outputfilename"
