@@ -171,7 +171,10 @@ def parse_file(logtype, source_file, output_files, single_file=None):
                 try:
                     if single_file:
                         day = "0000"
-                    output_writers[day].write(fmt_line + "\n")
+                    if day in output_writers:
+                        output_writers[day].write(fmt_line + "\n")
+                    else:
+                        print "Can not find writer for %s"%day
                 except Exception,e:
                     print e
 
