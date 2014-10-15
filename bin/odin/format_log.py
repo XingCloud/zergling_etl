@@ -15,6 +15,8 @@ project_short = { "isearch.omiga-plus.com": "omiga-plus",
 #13 hours
 US_TIMEDELTA = datetime.timedelta(hours=13)
 
+expired_day = (datetime.datetime.now() + datetime.timedelta(days=-10)).strftime("%Y%m%d")
+
 def get_ua(ua):
     for browser in browsers:
         if ua.find(browser) >= 0:
@@ -191,7 +193,10 @@ def parse_search_file(yesterday, today):
         load2hdfs(yesterday, logtype, output_files[yesterday])
     print "end at %s" % datetime.datetime.now()
 
-    #hive_exec("use odin;alter table search add partition(day='%s') location '/user/hadoop/odin/%s/%s/'" % (day, logtype, day))
+    print "clean up"
+    os.system("rm %s/%s.log" % (outputpath, expired_day))
+    for (project, prefix) in projects.items():
+        os.system(" rm %s/%s/%s.log.%s" % (parent_path, project, prefix, expired_day))
 
 def parse_nv_file(yesterday, today):
     print "begin at %s" % datetime.datetime.now()
@@ -210,7 +215,10 @@ def parse_nv_file(yesterday, today):
         parse_file(logtype, filename, output_files)
         load2hdfs(yesterday, logtype, output_files[yesterday],)
     print "end at %s" % datetime.datetime.now()
-    #hive_exec("use odin;alter table nav_visit add partition(day='%s') location '/user/hadoop/odin/%s/%s/'" % (day,logtype,day))
+
+    print "clean up"
+    os.system("rm /data1/user_log/nv/format/%s.log" % expired_day)
+    os.system("rm -rf /data1/user_log/nv/%s/" % expired_day)
 
 def parse_adimp_file(yesterday, today):
     print "begin at %s" % datetime.datetime.now()
@@ -230,7 +238,11 @@ def parse_adimp_file(yesterday, today):
             parse_file(logtype, filename, output_files)
     load2hdfs(yesterday, logtype, output_files[yesterday])
     print "end at %s" % datetime.datetime.now()
-    #hive_exec("use odin;alter table ad_impression add partition(day='%s') location '/user/hadoop/odin/%s/%s/'" % (day, logtype, day))
+
+    print "clean up"
+    for server in servers:
+        os.system("rm -rf /data1/user_log/%s/%s"%(server, expired_day))
+    os.system("rm %s%s.log"%(outputpath, expired_day))
 
 if __name__ == '__main__':
     if len(sys.argv) >= 3 and "all" == sys.argv[2]: #daily job
