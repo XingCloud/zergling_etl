@@ -20,7 +20,7 @@ do
 
     filename=${host}_${day}.tar.gz
     echo "tar ${filename}"
-    ssh elex@${host} "cd ${remote_log_dir} && tar -czf ${filename} odin-${day}*"
+    ssh elex@${host} "cd ${remote_log_dir} && tar -czf ${filename} odin-*${day}*"
 
 
     echo "scp ${filename}"
