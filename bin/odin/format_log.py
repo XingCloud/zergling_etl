@@ -271,7 +271,8 @@ if __name__ == '__main__':
             parse_nv_file(yesterday, today)
         elif sys.argv[1] == "ad_imp":
             parse_adimp_file(yesterday, today)
-
+    elif len(sys.argv) == 4 and "single" == sys.argv[2]:
+        parse_file(sys.argv[1], sys.argv[3], None, sys.argv[4])
     else:
         print "Usage: type[search|nv|ad_imp] all (day)"
         sys.exit(-1)
