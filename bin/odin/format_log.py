@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 import sys
 import datetime
 import os
@@ -35,11 +37,13 @@ def load2hdfs(day,logtype,filename):
     (status, output) = commands.getstatusoutput('hadoop fs -test -d %s' % hdfs_path)
     if status != 0:
         os.system('hadoop fs -mkdir %s' % hdfs_path)
+    #todo remove if exist?
     (status, output) = commands.getstatusoutput('hadoop fs -put %s %s'%(filename,hdfs_path))
     if status == 0:
         print "load %s to hdfs success"% filename
     else:
         print "load %s to hdfs fail"% filename
+
 #nav search log
 def parse_search_line(line):
     try:
@@ -144,16 +148,19 @@ def parse_adimp_line(line):
 
     return None,None
 
-def parse_file(logtype, source_file, output_files):
+def parse_file(logtype, source_file, output_files, single_file=None):
     output_writers = {}
 
-    for (day,filename) in output_files.items():
-        output_writers[day] = open(filename, "a")
+    if single_file:
+        output_writers["0000"] = open(single_file, "w")
+    else:
+        for (day,filename) in output_files.items():
+            output_writers[day] = open(filename, "a")
 
     with open(source_file) as f:
         for line in f:
             fmt_line = None
-            if line.find("reqID") > 0:
+            if line.find("reqID") > 0: #search and visit must contain reqID
                 if logtype == "search":
                     day, fmt_line = parse_search_line(line.strip())
                 elif logtype == "nv":
@@ -161,7 +168,12 @@ def parse_file(logtype, source_file, output_files):
             if logtype == "ad_imp":
                 day, fmt_line = parse_adimp_line(line.strip())
             if fmt_line:
-                output_writers[day].write(fmt_line + "\n")
+                try:
+                    if not single_file:
+                        day = "0000"
+                    output_writers[day].write(fmt_line + "\n")
+                except Exception,e:
+                    print e
 
     for writer in output_writers.values():
         writer.close()
@@ -261,7 +273,7 @@ if __name__ == '__main__':
             parse_adimp_file(yesterday, today)
 
     else:
-        print "Usage: type inputfilename outputfilename"
+        print "Usage: type[search|nv|ad_imp] all (day)"
         sys.exit(-1)
 
 
