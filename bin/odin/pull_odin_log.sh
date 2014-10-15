@@ -1,5 +1,8 @@
 #! /bin/sh
 
+bin=`dirname $0`
+bin=`cd "$bin">/dev/null; pwd`
+
 if [ $# = 1 ] ; then
     day=$1
 else
@@ -22,7 +25,6 @@ do
     echo "tar ${filename}"
     ssh elex@${host} "cd ${remote_log_dir} && tar -czf ${filename} odin-*${day}*"
 
-
     echo "scp ${filename}"
     scp elex@${host}:${remote_log_dir}/${filename} ${local_log_dir}
 
@@ -32,5 +34,7 @@ do
     ssh elex@${host} rm ${remote_log_dir}/${filename}
     rm ${local_log_dir}/${filename}
 
+    echo "format odin log"
+    python $bin/format_log.py ad_imp all
     echo "done"
 done
