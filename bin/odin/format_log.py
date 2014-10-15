@@ -22,10 +22,10 @@ def get_ua(ua):
     return "Other"
 
 def to_local_time(date):
-    return (date + US_TIMEDELTA).strftime("%Y-%m-%dT%H:%M:%S")
+    return (date + US_TIMEDELTA).strftime("%Y-%m-%d %H:%M:%S")
 
 def hive_exec(sql):
-    os.system('ssh dmnode1 hive -e \"%s\"' % sql)
+    os.system("ssh dmnode1 'hive -e \"%s\"" % sql)
 
 
 def load2hdfs(day,logtype,filename):
@@ -70,11 +70,12 @@ def parse_search_line(line):
         query = kv["query"].replace("\t","")
 
         #format for hive to use
-        s_time = datetime.datetime.fromtimestamp(float(kv["ts"])).strftime("%Y-%m-%dT%H:%M:%S")
+        s_time = datetime.datetime.fromtimestamp(float(kv["ts"])).strftime("%Y-%m-%d %H:%M:%S")
         nation = kv["country"]
         if reqID and uid and query and len(nation) == 2:
             #p time reqID uid nation ua keyword
-            return s_time[:10].replace('-',''), "%s\t%s\t%s\t%s\t%s\t%s\t%s"%(kv["project_id"],s_time,reqID,uid,nation,ua,query)
+            day = s_time[:4] + s_time[5:7] + s_time[8:10]
+            return day, "%s\t%s\t%s\t%s\t%s\t%s\t%s"%(kv["project_id"],s_time,reqID,uid,nation,ua,query)
 
     except Exception,e:
         print e
@@ -113,7 +114,8 @@ def parse_nv_line(line):
             nation = attrs[1].lower()
 
         #p time reqid uid ip nation ua os width height refer
-        return time[:10].replace('-',''), "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(pid,time,params["reqID"],params["User_id"],attrs[0],
+        day = time[:4] + time[5:7] + time[8:10]
+        return day, "%s\t%s %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(pid, time[:10],time[11:],params["reqID"],params["User_id"],attrs[0],
                 nation,ua,params["os"],params["Screen_width"],params["Screen_Height"],refer)
 
     except Exception,e:
@@ -128,13 +130,13 @@ def parse_adimp_line(line):
             time = datetime.datetime.strptime(attrs[0],"%Y%m%d%H%M%S")
             attrs[0] = to_local_time(time)
         else: #timestamp
-            attrs[0] = datetime.datetime.fromtimestamp(float(attrs[0])).strftime("%Y-%m-%dT%H:%M:%S")
+            attrs[0] = datetime.datetime.fromtimestamp(float(attrs[0])).strftime("%Y-%m-%d %H:%M:%S")
         #switch the uid and reqid
         uid = attrs[1]
         attrs[1] = attrs[2]
         attrs[2] = uid
-
-        return attrs[0][:10].replace('-',''),"\t".join(attrs)
+        day = attrs[0][:4] + attrs[0][5:7] + attrs[0][8:10]
+        return day,"\t".join(attrs)
     except Exception,e:
         print e
 
@@ -186,7 +188,7 @@ def parse_search_file(yesterday, today):
 
         print "format %s at %s" % (filename, datetime.datetime.now())
         parse_file(logtype, filename, output_files)
-        #load2hdfs(day, logtype, filename +"_fmt")
+        load2hdfs(yesterday, logtype, output_files[yesterday])
     print "end at %s" % datetime.datetime.now()
 
     #hive_exec("use odin;alter table search add partition(day='%s') location '/user/hadoop/odin/%s/%s/'" % (day, logtype, day))
@@ -206,7 +208,7 @@ def parse_nv_file(yesterday, today):
     for filename in files:
         print "format %s at %s" % (filename, datetime.datetime.now())
         parse_file(logtype, filename, output_files)
-        #load2hdfs(day, logtype, filename +"_fmt",)
+        load2hdfs(yesterday, logtype, output_files[yesterday],)
     print "end at %s" % datetime.datetime.now()
     #hive_exec("use odin;alter table nav_visit add partition(day='%s') location '/user/hadoop/odin/%s/%s/'" % (day,logtype,day))
 
@@ -226,7 +228,7 @@ def parse_adimp_file(yesterday, today):
         for filename in files:
             print "format %s at %s" % (filename, datetime.datetime.now())
             parse_file(logtype, filename, output_files)
-    #load2hdfs(day, logtype, output_file)
+    load2hdfs(yesterday, logtype, output_files[yesterday])
     print "end at %s" % datetime.datetime.now()
     #hive_exec("use odin;alter table ad_impression add partition(day='%s') location '/user/hadoop/odin/%s/%s/'" % (day, logtype, day))
 
@@ -234,7 +236,7 @@ if __name__ == '__main__':
     if len(sys.argv) >= 3 and "all" == sys.argv[2]: #daily job
         if len(sys.argv) == 4:
             yesterday = sys.argv[3]
-            today = (datetime.datetime.strptime(yesterday,"%Y%m%d") + datetime.timedelta(days=-1)).strftime("%Y%m%d")
+            today = (datetime.datetime.strptime(yesterday,"%Y%m%d") + datetime.timedelta(days=1)).strftime("%Y%m%d")
         else:
             yesterday = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y%m%d")
             today = datetime.datetime.now() .strftime("%Y%m%d")
