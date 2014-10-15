@@ -30,6 +30,8 @@ nv_log=${access_log_path}/access.nv.log
 #nav add site
 as_log=${access_log_path}/access.as.log
 
+gdp_log=${access_log_path}/access.gdp.log
+
 suffix=$(date -d"-5 mins" +"%Y%m%d%H%M").log
 
 day=$(date -d"-5 mins" +"%Y%m%d")
@@ -43,6 +45,7 @@ cu_log_new_path="/data0/log/cu/${day}"
 ac_log_new_path="/data1/user_log/ac/${day}"
 nv_log_new_path="/data1/user_log/nv/${day}"
 as_log_new_path="/data1/user_log/as/${day}"
+gdp_log_new_path="/data1/user_log/gdp/${day}"
 
 if [ ! -d ${nav_log_new_path} ]; then
   mkdir -p ${nav_log_new_path}
@@ -94,6 +97,11 @@ if [ ! -d ${as_log_new_path} ]; then
   chown hadoop:hadoop ${as_log_new_path}
 fi
 
+if [ ! -d ${gdp_log_new_path} ]; then
+  mkdir -p ${gdp_log_new_path}
+  chown hadoop:hadoop ${gdp_log_new_path}
+fi
+
 echo "begin split ${suffix} "
 
 mv ${nav_log} ${nav_log_new_path}/nav_${suffix}
@@ -125,6 +133,9 @@ chown hadoop:hadoop ${nv_log_new_path}/nv_${suffix}
 
 mv ${as_log} ${as_log_new_path}/as_${suffix}
 chown hadoop:hadoop ${as_log_new_path}/as_${suffix}
+
+mv ${gdp_log} ${gdp_log_new_path}/gdp_${suffix}
+chown hadoop:hadoop ${gdp_log_new_path}/gdp_${suffix}
 
 /usr/sbin/nginx -s reopen
 
