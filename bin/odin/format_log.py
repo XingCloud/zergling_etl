@@ -225,7 +225,8 @@ def parse_nv_file(yesterday, today):
     for filename in files:
         print "format %s at %s" % (filename, datetime.datetime.now())
         parse_file(logtype, filename, output_files)
-        load2hdfs(yesterday, logtype, output_files[yesterday],)
+
+    load2hdfs(yesterday, logtype, output_files[yesterday],)
     print "end at %s" % datetime.datetime.now()
 
     print "clean up"
