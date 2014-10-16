@@ -37,8 +37,8 @@ def mergeAndLoad(yesterday,logtype,orig_filename,tdby_output_file,yesterday_file
     stand_yesterday = "%s-%s-%s"%(yesterday[:4], yesterday[4:6], yesterday[6:])
 
     if os.path.isfile(tdby_output_file): #first time does not have this file
-        os.system("grep %s %s > %s"%(stand_yesterday, tdby_output_file, yesterday_filename))
-    os.system("grep %s %s >> %s"%(stand_yesterday, orig_filename, yesterday_filename))
+        os.system("grep \"%s \" %s > %s"%(stand_yesterday, tdby_output_file, yesterday_filename))
+    os.system("grep %s \"%s \" >> %s"%(stand_yesterday, orig_filename, yesterday_filename))
 
     hdfs_path = 'odin/%s/%s'%(logtype,yesterday)
     (status, output) = commands.getstatusoutput('hadoop fs -test -d %s' % hdfs_path)
