@@ -159,13 +159,13 @@ def parse_file(logtype, source_file, output_file):
             fmt_line = None
             if line.find("reqID") > 0: #search and visit must contain reqID
                 if logtype == "search":
-                    day, fmt_line = parse_search_line(line.strip())
+                    fmt_line = parse_search_line(line.strip())
                 elif logtype == "nv":
-                    day, fmt_line = parse_nv_line(line.strip())
+                    fmt_line = parse_nv_line(line.strip())
             if logtype == "ad_imp":
-                day, fmt_line = parse_adimp_line(line.strip())
+                fmt_line = parse_adimp_line(line.strip())
             if fmt_line:
-                output_writer[day].write(fmt_line + "\n")
+                output_writer.write(fmt_line + "\n")
     output_writer.close()
 
 def parse_search_file(yesterday, tdb_yesterday):
