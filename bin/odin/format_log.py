@@ -31,18 +31,25 @@ def to_local_time(date):
 def hive_exec(sql):
     os.system("ssh dmnode1 'hive -e \"%s\"" % sql)
 
+def mergeAndLoad(yesterday,logtype,orig_filename,tdby_output_file,yesterday_filename):
 
-def load2hdfs(day,logtype,filename):
-    hdfs_path = 'odin/%s/%s'%(logtype,day)
+    #merge orig date to natural day
+    stand_yesterday = "%s-%s-%s"%(yesterday[:4], yesterday[4:6], yesterday[6:])
+
+    if os.path.isfile(tdby_output_file): #first time does not have this file
+        os.system("grep %s %s > %s"%(stand_yesterday, tdby_output_file, yesterday_filename))
+    os.system("grep %s %s >> %s"%(stand_yesterday, orig_filename, yesterday_filename))
+
+    hdfs_path = 'odin/%s/%s'%(logtype,yesterday)
     (status, output) = commands.getstatusoutput('hadoop fs -test -d %s' % hdfs_path)
     if status != 0:
         os.system('hadoop fs -mkdir %s' % hdfs_path)
     #todo remove if exist?
-    (status, output) = commands.getstatusoutput('hadoop fs -put %s %s'%(filename,hdfs_path))
+    (status, output) = commands.getstatusoutput('hadoop fs -put %s %s'%(yesterday_filename,hdfs_path))
     if status == 0:
-        print "load %s to hdfs success"% filename
+        print "load %s to hdfs success"% yesterday_filename
     else:
-        print "load %s to hdfs fail"% filename
+        print "load %s to hdfs fail"% yesterday_filename
 
 #nav search log
 def parse_search_line(line):
@@ -55,14 +62,12 @@ def parse_search_line(line):
             if index > 0:
                 kv[attr[:index]] = attr[index+1:]
 
-        if len(kv["http_referer"]) == 0:
-            return None,None
+        if len(kv["http_referer"]) == 0: return None
 
         reqID = None
         uid = None
         for r in kv["query_string"].split("&"):
-            if r.startswith("reqID"):
-                reqID = r[6:]
+            if r.startswith("reqID"): reqID = r[6:]
 
         for c in kv["cookies"].split("; "):
             if c.startswith("uid="):
@@ -80,13 +85,12 @@ def parse_search_line(line):
         nation = kv["country"]
         if reqID and uid and query and len(nation) == 2:
             #p time reqID uid nation ua keyword
-            day = s_time[:4] + s_time[5:7] + s_time[8:10]
-            return day, "%s\t%s\t%s\t%s\t%s\t%s\t%s"%(kv["project_id"],s_time,reqID,uid,nation,ua,query)
+            return "%s\t%s\t%s\t%s\t%s\t%s\t%s"%(kv["project_id"],s_time,reqID,uid,nation,ua,query)
 
     except Exception,e:
         print e
 
-    return None,None
+    return None
 
 #nav visit log
 def parse_nv_line(line):
@@ -106,7 +110,7 @@ def parse_nv_line(line):
             #v9 has multi domain ,eg: br.v9.com
             pid = "v9"
         else:
-            return None,None
+            return None
 
         params = {}
         for param in attrs[5][8:].split("&"):
@@ -116,18 +120,17 @@ def parse_nv_line(line):
         nation = params["User_nation"]
         if len(nation) != 2:
             if attrs[1] == '-':
-                return None,None
+                return None
             nation = attrs[1].lower()
 
         #p time reqid uid ip nation ua os width height refer
-        day = time[:4] + time[5:7] + time[8:10]
-        return day, "%s\t%s %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(pid, time[:10],time[11:],params["reqID"],params["User_id"],attrs[0],
+        return "%s\t%s %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(pid, time[:10],time[11:],params["reqID"],params["User_id"],attrs[0],
                 nation,ua,params["os"],params["Screen_width"],params["Screen_Height"],refer)
 
     except Exception,e:
         print e
 
-    return None,None
+    return None
 
 def parse_adimp_line(line):
     try:
@@ -141,22 +144,16 @@ def parse_adimp_line(line):
         uid = attrs[1]
         attrs[1] = attrs[2]
         attrs[2] = uid
-        day = attrs[0][:4] + attrs[0][5:7] + attrs[0][8:10]
-        return day,"\t".join(attrs)
+
+        return "\t".join(attrs)
     except Exception,e:
         print e
 
-    return None,None
+    return None
 
-def parse_file(logtype, source_file, output_files, single_file=None):
-    output_writers = {}
+def parse_file(logtype, source_file, output_file):
 
-    if single_file:
-        output_writers["0000"] = open(single_file, "w")
-    else:
-        for (day,filename) in output_files.items():
-            output_writers[day] = open(filename, "a")
-
+    output_writer = open(output_file, "w")
     with open(source_file) as f:
         for line in f:
             fmt_line = None
@@ -168,20 +165,13 @@ def parse_file(logtype, source_file, output_files, single_file=None):
             if logtype == "ad_imp":
                 day, fmt_line = parse_adimp_line(line.strip())
             if fmt_line:
-                if single_file:
-                    day = "0000"
-                if day in output_writers:
-                    output_writers[day].write(fmt_line + "\n")
-                else:
-                    print "Can not find writer for %s"%day
+                output_writer[day].write(fmt_line + "\n")
+    output_writer.close()
 
-    for writer in output_writers.values():
-        writer.close()
-
-def parse_search_file(yesterday, today):
+def parse_search_file(yesterday, tdb_yesterday):
     print "begin at %s" % datetime.datetime.now()
     parent_path = "/data1/user_log/search"
-    outputpath = "/data1/user_log/search/format";
+    outputpath = "/data1/user_log/search/format"
 
     logtype = "search"
     projects = {
@@ -196,51 +186,48 @@ def parse_search_file(yesterday, today):
     for (project, prefix) in projects.items():
         filename = "%s/%s/%s.log.%s" % (parent_path, project, prefix, yesterday)
 
-        output_files = {}
-        output_files[yesterday] = "%s/%s_%s.log"%(outputpath, project_short[project], yesterday)
-        output_files[today] = "%s/%s_%s.log"%(outputpath, project_short[project], today)
+        output_file = "%s/%s_%s_orig.log"%(outputpath, project_short[project], yesterday)
+        tdby_output_file = "%s/%s_%s_orig.log"%(outputpath, project_short[project], tdb_yesterday)
 
         print "format %s at %s" % (filename, datetime.datetime.now())
-        parse_file(logtype, filename, output_files)
-        load2hdfs(yesterday, logtype, output_files[yesterday])
+        parse_file(logtype, filename, output_file)
+        mergeAndLoad(yesterday, logtype, output_file, tdby_output_file, "%s/%s_%s.log"%(outputpath,project_short[project], yesterday))
     print "end at %s" % datetime.datetime.now()
 
     print "clean up"
-    os.system("rm %s/%s.log" % (outputpath, expired_day))
+    os.system("rm -f %s/%s.log" % (outputpath, expired_day))
     for (project, prefix) in projects.items():
-        os.system(" rm %s/%s/%s.log.%s" % (parent_path, project, prefix, expired_day))
+        os.system(" rm -f %s/%s/%s.log.%s" % (parent_path, project, prefix, expired_day))
 
-def parse_nv_file(yesterday, today):
+def parse_nv_file(yesterday, tdb_yesterday):
     print "begin at %s" % datetime.datetime.now()
 
     inputpath = "/data1/user_log/nv/%s"%yesterday
     outputpath = "/data1/user_log/nv/format/"
 
-    output_files = {}
-    output_files[yesterday] = outputpath + yesterday + ".log"
-    output_files[today] = outputpath + today + ".log"
+    output_file = outputpath + yesterday + "_orig.log"
+    tdby_output_file = outputpath + tdb_yesterday + "_orig.log"
 
     logtype = "nv"
     files = [os.path.join(inputpath, f) for f in os.listdir(inputpath) if os.path.isfile(os.path.join(inputpath, f)) and f.endswith("log")]
     for filename in files:
         print "format %s at %s" % (filename, datetime.datetime.now())
-        parse_file(logtype, filename, output_files)
+        parse_file(logtype, filename, output_file)
 
-    load2hdfs(yesterday, logtype, output_files[yesterday],)
+    mergeAndLoad(yesterday, logtype, output_file, tdby_output_file, outputpath + yesterday + ".log")
     print "end at %s" % datetime.datetime.now()
 
     print "clean up"
-    os.system("rm /data1/user_log/nv/format/%s.log" % expired_day)
+    os.system("rm -f /data1/user_log/nv/format/%s*.log" % expired_day)
     os.system("rm -rf /data1/user_log/nv/%s/" % expired_day)
 
-def parse_adimp_file(yesterday, today):
+def parse_adimp_file(yesterday, tdb_yesterday):
     print "begin at %s" % datetime.datetime.now()
     outputpath = "/data1/user_log/odin/"
     logtype = "ad_imp"
 
-    output_files = {}
-    output_files[yesterday] = outputpath + yesterday + ".log"
-    output_files[today] = outputpath + today + ".log"
+    output_file = outputpath + yesterday + "_orig.log"
+    tdby_output_file = outputpath + tdb_yesterday + "_orig.log"
 
     servers = ["odin0","odin1"]
     for server in servers:
@@ -248,32 +235,32 @@ def parse_adimp_file(yesterday, today):
         files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f.endswith("log")]
         for filename in files:
             print "format %s at %s" % (filename, datetime.datetime.now())
-            parse_file(logtype, filename, output_files)
-    load2hdfs(yesterday, logtype, output_files[yesterday])
+            parse_file(logtype, filename, output_file)
+    mergeAndLoad(yesterday, logtype, output_file,tdby_output_file,outputpath + yesterday + ".log")
     print "end at %s" % datetime.datetime.now()
 
     print "clean up"
     for server in servers:
         os.system("rm -rf /data1/user_log/%s/%s"%(server, expired_day))
-    os.system("rm %s%s.log"%(outputpath, expired_day))
+    os.system("rm %s%s*.log"%(outputpath, expired_day))
 
 if __name__ == '__main__':
     if len(sys.argv) >= 3 and "all" == sys.argv[2]: #daily job
         if len(sys.argv) == 4:
             yesterday = sys.argv[3]
-            today = (datetime.datetime.strptime(yesterday,"%Y%m%d") + datetime.timedelta(days=1)).strftime("%Y%m%d")
+            tdb_yesterday = (datetime.datetime.strptime(yesterday,"%Y%m%d") + datetime.timedelta(days=-11)).strftime("%Y%m%d")
         else:
             yesterday = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y%m%d")
-            today = datetime.datetime.now() .strftime("%Y%m%d")
+            tdb_yesterday = (datetime.datetime.now() + datetime.timedelta(days=-2)).strftime("%Y%m%d")
 
         if sys.argv[1] == "search":
-            parse_search_file(yesterday, today)
+            parse_search_file(yesterday, tdb_yesterday)
         elif sys.argv[1] == "nv":
-            parse_nv_file(yesterday, today)
+            parse_nv_file(yesterday, tdb_yesterday)
         elif sys.argv[1] == "ad_imp":
-            parse_adimp_file(yesterday, today)
+            parse_adimp_file(yesterday, tdb_yesterday)
     elif len(sys.argv) == 5 and "single" == sys.argv[2]:
-        parse_file(sys.argv[1], sys.argv[3], None, sys.argv[4])
+        parse_file(sys.argv[1], sys.argv[3], sys.argv[4])
     else:
         print "Usage: type[search|nv|ad_imp] all (day)"
         sys.exit(-1)
