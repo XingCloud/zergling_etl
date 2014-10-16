@@ -151,9 +151,9 @@ def parse_adimp_line(line):
 
     return None
 
-def parse_file(logtype, source_file, output_file):
+def parse_file(logtype, source_file, output_file, mode="w"):
 
-    output_writer = open(output_file, "w")
+    output_writer = open(output_file, mode)
     with open(source_file) as f:
         for line in f:
             fmt_line = None
@@ -230,12 +230,14 @@ def parse_adimp_file(yesterday, tdb_yesterday):
     tdby_output_file = outputpath + tdb_yesterday + "_orig.log"
 
     servers = ["odin0","odin1"]
+    mode = "w"  # cover the output file at beginning.
     for server in servers:
         path = "/data1/user_log/%s/%s"%(server, yesterday)
         files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f.endswith("log")]
         for filename in files:
             print "format %s at %s" % (filename, datetime.datetime.now())
-            parse_file(logtype, filename, output_file)
+            parse_file(logtype, filename, output_file, mode)
+            mode = "a"
     mergeAndLoad(yesterday, logtype, output_file,tdby_output_file,outputpath + yesterday + ".log")
     print "end at %s" % datetime.datetime.now()
 
