@@ -209,7 +209,7 @@ def parse_nv_file(yesterday, tdb_yesterday):
     tdby_output_file = outputpath + tdb_yesterday + "_orig.log"
 
     logtype = "nv"
-    files = [os.path.join(inputpath, f) for f in os.listdir(inputpath) if os.path.isfile(os.path.join(inputpath, f)) and f.endswith("log")]
+    files = sorted([os.path.join(inputpath, f) for f in os.listdir(inputpath) if os.path.isfile(os.path.join(inputpath, f)) and f.endswith("log")])
     for filename in files:
         print "format %s at %s" % (filename, datetime.datetime.now())
         parse_file(logtype, filename, output_file)
@@ -233,7 +233,8 @@ def parse_adimp_file(yesterday, tdb_yesterday):
     mode = "w"  # cover the output file at beginning.
     for server in servers:
         path = "/data1/user_log/%s/%s"%(server, yesterday)
-        files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f.endswith("log")]
+        files = sorted([os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))
+                and f.startswith("odin-%s"%yesterday) and f.endswith("log")])
         for filename in files:
             print "format %s at %s" % (filename, datetime.datetime.now())
             parse_file(logtype, filename, output_file, mode)
