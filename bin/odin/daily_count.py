@@ -16,8 +16,6 @@ insert overwrite local directory '/data1/odin/dayily_count'
 row format delimited
 fields terminated by ','
 select * from (
-select '' pid,'nav visit' pv,'visit reqid' pr,'visit uid' pu,'search' sv,'search reqid' sr,'search uid' su,'ad imp' iv,'imp reqid' ir,'imp uid' iu from odin.dual
-union all
 select visit.pid,visit.pv,visit.pr,visit.pu,se.sv,se.sr,se.su,'' iv,'' ir,'' iu from
 (select pid, count(*) pv , count(distinct reqid) pr, count(distinct uid) pu from odin.nav_visit where day='%s' group by pid ) visit join
 (select pid, count(*) sv, count(distinct reqid) sr, count(distinct uid) su from odin.search where day='%s' group by pid) se on visit.pid = se.pid
@@ -69,8 +67,9 @@ def count_odin(day):
     daily_sql = sql%(day, day, day, day, day)
     print "hive -e \"%s\"" % daily_sql
     os.system("hive -e \"%s\"" % daily_sql)
-    os.system('cat /data1/odin/dayily_count/part* > /data1/odin/odin_count_%s.csv' % day)
-    os.system('rm -f /data1/odin/dayily_count/part*')
+    os.system('cat ",nav visit,visit reqid,visit uid,search,search reqid,search uid,ad imp,imp reqid,imp uid" > /data1/odin/odin_count_%s.csv' % day)
+    os.system('cat /data1/odin/dayily_count/0000* >> /data1/odin/odin_count_%s.csv' % day)
+    os.system('rm -f /data1/odin/dayily_count/0000*')
     sendMail(day,'','/data1/odin/odin_count_%s.csv' % day)
 
 if __name__ == '__main__':
