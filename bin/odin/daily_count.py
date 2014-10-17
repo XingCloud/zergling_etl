@@ -12,7 +12,7 @@ mail_user = "xamonitor@xingcloud.com"
 mail_pass = "22C1NziwxZI5F"
 
 sql = '''
-insert overwrite local directory '/data1/odin/dayily_count/'
+insert overwrite local directory '/data1/odin/dayily_count'
 row format delimited
 fields terminated by ','
 select * from (
