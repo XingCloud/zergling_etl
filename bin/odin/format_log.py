@@ -210,9 +210,11 @@ def parse_nv_file(yesterday, tdb_yesterday):
 
     logtype = "nv"
     files = sorted([os.path.join(inputpath, f) for f in os.listdir(inputpath) if os.path.isfile(os.path.join(inputpath, f)) and f.endswith("log")])
+    mode = "w"
     for filename in files:
         print "format %s at %s" % (filename, datetime.datetime.now())
-        parse_file(logtype, filename, output_file)
+        parse_file(logtype, filename, output_file,mode)
+        mode = "a"
 
     mergeAndLoad(yesterday, logtype, output_file, tdby_output_file, outputpath + yesterday + ".log")
     print "end at %s" % datetime.datetime.now()
