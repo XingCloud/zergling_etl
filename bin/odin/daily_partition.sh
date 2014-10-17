@@ -1,5 +1,9 @@
 
-day=`date +%Y%m%d`
+if [ $# = 1 ] ; then
+    day=$1
+else
+    day=`date +%Y%m%d`
+fi
 
 for project in nv search ad_imp
 do
