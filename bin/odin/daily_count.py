@@ -16,7 +16,7 @@ insert overwrite local directory '/data1/odin/dayily_count'
 row format delimited
 fields terminated by ','
 select * from (
-select '','nav visit','visit reqid','visit uid','search','search reqid','search uid','ad imp','imp reqid','imp uid' from dual
+select '','nav visit','visit reqid','visit uid','search','search reqid','search uid','ad imp','imp reqid','imp uid' from odin.dual
 union all
 select visit.pid,visit.pr,visit.pv,visit.pu,se.sv,se.sr,se.su,'','','' from
 (select pid, count(*) pv , count(distinct reqid) pr, count(distinct uid) pu from odin.nav_visit where day='%s' group by pid ) visit join
