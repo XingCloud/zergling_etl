@@ -77,3 +77,5 @@ if __name__ == '__main__':
     else:
         day = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y%m%d")
 
+    count_odin(day)
+
