@@ -22,9 +22,9 @@ select visit.pid,visit.pr,visit.pv,visit.pu,se.sv,se.sr,se.su,'','','' from
 (select pid, count(*) sv, count(distinct reqid) sr, count(distinct uid) su from odin.search where day='%s' group by pid) se on visit.pid = se.pid
 union all
 select tv.pid,tv.pr,tv.pv,tv.pu,ts.sv,ts.sr,ts.su,ti.iv,ti.ir,ti.iu from
-(select "total" pid, count(*) pv , count(distinct reqid) pr,count(distinct uid) pu from odin.nav_visit where day='%s') tv join
-(select "total" pid, count(*) sv, count(distinct reqid) sr,count(distinct uid) su from odin.search where day='%s') ts on tv.pid = ts.pid join
-(select "total" pid, count(*) iv, count(distinct reqid) ir, count(distinct uid) iu from odin.ad_impression where day='%s') ti on ti.pid = ts.pid ) tmp
+(select 'total' pid, count(*) pv , count(distinct reqid) pr,count(distinct uid) pu from odin.nav_visit where day='%s') tv join
+(select 'total' pid, count(*) sv, count(distinct reqid) sr,count(distinct uid) su from odin.search where day='%s') ts on tv.pid = ts.pid join
+(select 'total' pid, count(*) iv, count(distinct reqid) ir, count(distinct uid) iu from odin.ad_impression where day='%s') ti on ti.pid = ts.pid ) tmp
 '''
 
 def sendMail(subject,content, filename):
