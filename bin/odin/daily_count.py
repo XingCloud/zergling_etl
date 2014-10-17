@@ -16,13 +16,13 @@ insert overwrite local directory '/data1/odin/dayily_count'
 row format delimited
 fields terminated by ','
 select * from (
-select '','nav visit','visit reqid','visit uid','search','search reqid','search uid','ad imp','imp reqid','imp uid' from odin.dual
+select '' pid,'nav visit' pv,'visit reqid' pr,'visit uid' pu,'search' sv,'search reqid' sr,'search uid' su,'ad imp' iv,'imp reqid' ir,'imp uid' iu from odin.dual
 union all
-select visit.pid,visit.pr,visit.pv,visit.pu,se.sv,se.sr,se.su,'','','' from
+select visit.pid,visit.pv,visit.pr,visit.pu,se.sv,se.sr,se.su,'' iv,'' ir,'' iu from
 (select pid, count(*) pv , count(distinct reqid) pr, count(distinct uid) pu from odin.nav_visit where day='%s' group by pid ) visit join
 (select pid, count(*) sv, count(distinct reqid) sr, count(distinct uid) su from odin.search where day='%s' group by pid) se on visit.pid = se.pid
 union all
-select tv.pid,tv.pr,tv.pv,tv.pu,ts.sv,ts.sr,ts.su,ti.iv,ti.ir,ti.iu from
+select tv.pid,tv.pv,tv.pr,tv.pu,ts.sv,ts.sr,ts.su,ti.iv,ti.ir,ti.iu from
 (select 'total' pid, count(*) pv , count(distinct reqid) pr,count(distinct uid) pu from odin.nav_visit where day='%s') tv join
 (select 'total' pid, count(*) sv, count(distinct reqid) sr,count(distinct uid) su from odin.search where day='%s') ts on tv.pid = ts.pid join
 (select 'total' pid, count(*) iv, count(distinct reqid) ir, count(distinct uid) iu from odin.ad_impression where day='%s') ti on ti.pid = ts.pid ) tmp
