@@ -65,11 +65,15 @@ def attach_file(filename):
 
 def count_odin(day):
     daily_sql = sql%(day, day, day, day, day)
-    print "hive -e \"%s\"" % daily_sql
+    print 'rm -rf /data1/odin/dayily_count/'
     os.system('rm -rf /data1/odin/dayily_count/')
+    print "hive -e \"%s\"" % daily_sql
     os.system("hive -e \"%s\"" % daily_sql)
+    print 'echo ",nav visit,visit reqid,visit uid,search,search reqid,search uid,ad imp,imp reqid,imp uid" > /data1/odin/odin_count_%s.csv' % day
     os.system('echo ",nav visit,visit reqid,visit uid,search,search reqid,search uid,ad imp,imp reqid,imp uid" > /data1/odin/odin_count_%s.csv' % day)
+    print 'cat /data1/odin/dayily_count/0000* >> /data1/odin/odin_count_%s.csv' % day
     os.system('cat /data1/odin/dayily_count/0000* >> /data1/odin/odin_count_%s.csv' % day)
+    print 'send mail /data1/odin/odin_count_%s.csv '%day
     sendMail(day,'','/data1/odin/odin_count_%s.csv' % day)
 
 if __name__ == '__main__':
