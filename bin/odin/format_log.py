@@ -81,7 +81,7 @@ def parse_search_line(line):
                 uid = c[4:]
                 break
 
-        ua = ''
+        ua = 'Other'
         if "ua" in kv:
             ua = get_ua(kv["ua"])
 
@@ -142,11 +142,7 @@ def parse_nv_line(line):
 def parse_adimp_line(line):
     try:
         attrs = line.split("\t")
-        if attrs[0].startswith("2014"): #201410091101
-            time = datetime.datetime.strptime(attrs[0],"%Y%m%d%H%M%S")
-            attrs[0] = to_local_time(time)
-        else: #timestamp
-            attrs[0] = datetime.datetime.fromtimestamp(float(attrs[0])).strftime("%Y-%m-%d %H:%M:%S")
+        attrs[0] = datetime.datetime.fromtimestamp(float(attrs[0])).strftime("%Y-%m-%d %H:%M:%S")
         #switch the uid and reqid
         uid = attrs[1]
         attrs[1] = attrs[2]
