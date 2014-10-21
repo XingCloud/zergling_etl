@@ -4,6 +4,7 @@ import sys
 import datetime
 import os
 import commands
+import urllib
 
 browsers = ["Opera", "Chrome", "Firefox", "Safari", "MSIE"]
 project_short = { "isearch.omiga-plus.com": "omiga-plus",
@@ -14,9 +15,6 @@ project_short = { "isearch.omiga-plus.com": "omiga-plus",
             "www.sweet-page.com": "sweet-page",
             "www.v9.com": "v9"}
 
-#13 hours
-US_TIMEDELTA = datetime.timedelta(hours=13)
-
 expired_day = (datetime.datetime.now() + datetime.timedelta(days=-10)).strftime("%Y%m%d")
 
 def get_ua(ua):
@@ -24,9 +22,6 @@ def get_ua(ua):
         if ua.find(browser) >= 0:
             return browser
     return "Other"
-
-def to_local_time(date):
-    return (date + US_TIMEDELTA).strftime("%Y-%m-%d %H:%M:%S")
 
 def hive_exec(sql):
     os.system("ssh dmnode1 'hive -e \"%s\"" % sql)
@@ -61,6 +56,9 @@ def mergeAndLoad(yesterday,logtype,orig_filename,tdby_output_file,yesterday_file
 #nav search log
 def parse_search_line(line):
     try:
+        if line.find("reqID") < 0:
+            return None
+
         attrs = line.split("] ")
 
         kv = {}
@@ -102,6 +100,9 @@ def parse_search_line(line):
 #nav visit log
 def parse_nv_line(line):
     try:
+        if line.find("reqID") < 0:
+            return None
+
         attrs = line.split("\t")
         time = attrs[2][:19]
         ua = get_ua(attrs[3])
@@ -143,6 +144,7 @@ def parse_adimp_line(line):
     try:
         attrs = line.split("\t")
         attrs[0] = datetime.datetime.fromtimestamp(float(attrs[0])).strftime("%Y-%m-%d %H:%M:%S")
+
         #switch the uid and reqid
         uid = attrs[1]
         attrs[1] = attrs[2]
@@ -154,19 +156,35 @@ def parse_adimp_line(line):
 
     return None
 
-def parse_file(logtype, source_file, output_file, mode="w"):
+def parse_gdp_line(line):
+    try:
+        attrs = line.split("\t")
+        ip = attrs[0].split(" ")[0]
+        time = attrs[1][:19]
+        nation = attrs[2].lower()
 
+        params = {}
+        for param in attrs[3][9:].split("&"):
+            index = param.find("=")
+            params[param[:index]] = param[index+1:]
+
+        title = urllib.unquote(params["title"])
+        meta = urllib.unquote(params["meta"])
+        url = urllib.unquote(params["url"])
+
+        #time uid ip nation lang os ptid title meta url
+        return "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(time[:10]+time[11:],params["uid"],ip,nation,
+            params["lang"],params["os"],params["ptid"],title,meta,url)
+    except Exception,e:
+        print e
+
+    return None
+
+def parse_file(parser, source_file, output_file, mode="w"):
     output_writer = open(output_file, mode)
     with open(source_file) as f:
         for line in f:
-            fmt_line = None
-            if line.find("reqID") > 0: #search and visit must contain reqID
-                if logtype == "search":
-                    fmt_line = parse_search_line(line.strip())
-                elif logtype == "nv":
-                    fmt_line = parse_nv_line(line.strip())
-            if logtype == "ad_imp":
-                fmt_line = parse_adimp_line(line.strip())
+            fmt_line = parser(line.strip())
             if fmt_line:
                 output_writer.write(fmt_line + "\n")
     output_writer.close()
@@ -193,7 +211,7 @@ def parse_search_file(yesterday, tdb_yesterday):
         tdby_output_file = "%s/%s_%s_orig.log"%(outputpath, project_short[project], tdb_yesterday)
 
         print "format %s at %s" % (filename, datetime.datetime.now())
-        parse_file(logtype, filename, output_file)
+        parse_file(parse_search_line, filename, output_file)
         mergeAndLoad(yesterday, logtype, output_file, tdby_output_file, "%s/%s_%s.log"%(outputpath,project_short[project], yesterday))
     print "end at %s" % datetime.datetime.now()
 
@@ -216,7 +234,7 @@ def parse_nv_file(yesterday, tdb_yesterday):
     mode = "w"
     for filename in files:
         print "format %s at %s" % (filename, datetime.datetime.now())
-        parse_file(logtype, filename, output_file,mode)
+        parse_file(parse_nv_line, filename, output_file,mode)
         mode = "a"
 
     mergeAndLoad(yesterday, logtype, output_file, tdby_output_file, outputpath + yesterday + ".log")
@@ -225,6 +243,28 @@ def parse_nv_file(yesterday, tdb_yesterday):
     print "clean up"
     os.system("rm -f /data1/user_log/nv/format/%s*.log" % expired_day)
     os.system("rm -rf /data1/user_log/nv/%s/" % expired_day)
+
+def parse_gdp_file(yesterday, tdb_yesterday):
+    print "begin at %s" % datetime.datetime.now()
+    inputpath = "/data1/user_log/gdp/%s"%yesterday
+    outputpath = "/data1/user_log/gdp/format/"
+    output_file = outputpath + yesterday + "_orig.log"
+    tdby_output_file = outputpath + tdb_yesterday + "_orig.log"
+
+    logtype = "gdp"
+    files = sorted([os.path.join(inputpath, f) for f in os.listdir(inputpath) if os.path.isfile(os.path.join(inputpath, f)) and f.endswith("log")])
+    mode = "w"
+    for filename in files:
+        print "format %s at %s" % (filename, datetime.datetime.now())
+        parse_file(parse_gdp_line, filename, output_file,mode)
+        mode = "a"
+
+    mergeAndLoad(yesterday, logtype, output_file, tdby_output_file, outputpath + yesterday + ".log")
+    print "end at %s" % datetime.datetime.now()
+
+    print "clean up"
+    os.system("rm -f /data1/user_log/gdp/format/%s*.log" % expired_day)
+    os.system("rm -rf /data1/user_log/gdp/%s/" % expired_day)
 
 def parse_adimp_file(yesterday, tdb_yesterday):
     print "begin at %s" % datetime.datetime.now()
@@ -242,7 +282,7 @@ def parse_adimp_file(yesterday, tdb_yesterday):
                 and f.startswith("odin-%s"%yesterday) and f.endswith("log")])
         for filename in files:
             print "format %s at %s" % (filename, datetime.datetime.now())
-            parse_file(logtype, filename, output_file, mode)
+            parse_file(parse_adimp_line, filename, output_file, mode)
             mode = "a"
     mergeAndLoad(yesterday, logtype, output_file,tdby_output_file,outputpath + yesterday + ".log")
     print "end at %s" % datetime.datetime.now()
@@ -256,7 +296,7 @@ if __name__ == '__main__':
     if len(sys.argv) >= 3 and "all" == sys.argv[2]: #daily job
         if len(sys.argv) == 4:
             yesterday = sys.argv[3]
-            tdb_yesterday = (datetime.datetime.strptime(yesterday,"%Y%m%d") + datetime.timedelta(days=-11)).strftime("%Y%m%d")
+            tdb_yesterday = (datetime.datetime.strptime(yesterday,"%Y%m%d") + datetime.timedelta(days=-1)).strftime("%Y%m%d")
         else:
             yesterday = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y%m%d")
             tdb_yesterday = (datetime.datetime.now() + datetime.timedelta(days=-2)).strftime("%Y%m%d")
@@ -267,10 +307,22 @@ if __name__ == '__main__':
             parse_nv_file(yesterday, tdb_yesterday)
         elif sys.argv[1] == "ad_imp":
             parse_adimp_file(yesterday, tdb_yesterday)
+        elif sys.argv[1] == "gdp":
+            parse_gdp_file(yesterday, tdb_yesterday)
     elif len(sys.argv) == 5 and "single" == sys.argv[2]:
-        parse_file(sys.argv[1], sys.argv[3], sys.argv[4])
+        func = None
+        if sys.argv[1] == "search":
+            func = parse_search_line
+        elif sys.argv[1] == "nv":
+            func = parse_nv_line
+        elif sys.argv[1] == "ad_imp":
+            func = parse_adimp_line
+        elif sys.argv[1] == "gdp":
+            func = parse_gdp_line
+        if func:
+            parse_file(func, sys.argv[3], sys.argv[4])
     else:
-        print "Usage: type[search|nv|ad_imp] all (day)"
+        print "Usage: type[search|nv|ad_imp|gdp] all (day)"
         sys.exit(-1)
 
 
