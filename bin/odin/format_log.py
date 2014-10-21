@@ -130,9 +130,9 @@ def parse_nv_line(line):
             if attrs[1] == '-':
                 return None
             nation = attrs[1].lower()
-
+        ip = attrs[0].split(", ")[0]
         #p time reqid uid ip nation ua os width height refer
-        return "%s\t%s %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(pid, time[:10],time[11:],params["reqID"],params["User_id"],attrs[0],
+        return "%s\t%s %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(pid, time[:10],time[11:],params["reqID"],params["User_id"],ip,
                 nation,ua,params["os"],params["Screen_width"],params["Screen_Height"],refer)
 
     except Exception,e:
