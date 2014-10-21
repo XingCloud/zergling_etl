@@ -173,7 +173,7 @@ def parse_gdp_line(line):
         url = urllib.unquote(params["url"])
 
         #time uid ip nation lang os ptid title meta url
-        return "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(time[:10]+time[11:],params["uid"],ip,nation,
+        return "%s %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(time[:10],time[11:],params["uid"],ip,nation,
             params["lang"],params["os"],params["ptid"],title,meta,url)
     except Exception,e:
         print e
