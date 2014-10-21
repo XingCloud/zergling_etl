@@ -6,7 +6,7 @@ import os
 import commands
 import urllib
 
-browsers = ["Opera", "Chrome", "Firefox", "Safari", "MSIE"]
+browsers = {"Opera":"Opera", "Chrome":"Chrome", "Firefox":"Firefox", "Safari":"Safari", "MSIE":"MSIE", "Trident":"MSIE"}
 project_short = { "isearch.omiga-plus.com": "omiga-plus",
             "istart.webssearches.com": "webssearches",
             "www.22find.com": "22find",
@@ -18,9 +18,9 @@ project_short = { "isearch.omiga-plus.com": "omiga-plus",
 expired_day = (datetime.datetime.now() + datetime.timedelta(days=-10)).strftime("%Y%m%d")
 
 def get_ua(ua):
-    for browser in browsers:
-        if ua.find(browser) >= 0:
-            return browser
+    for (browser_type, name) in browsers.items():
+        if ua.find(browser_type) >= 0:
+            return name
     return "Other"
 
 def hive_exec(sql):
