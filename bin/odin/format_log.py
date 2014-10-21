@@ -45,7 +45,7 @@ def mergeAndLoad(yesterday,logtype,orig_filename,tdby_output_file,yesterday_file
 
     (status, output) = commands.getstatusoutput('hadoop fs -test -e %s/%s' % (hdfs_path, os.path.basename(yesterday_filename)))
     if status == 0:
-        os.system('hadoop fs -rm %s/%s' % (hdfs_path,yesterday_filename))
+        os.system('hadoop fs -rm %s/%s' % (hdfs_path, os.path.basename(yesterday_filename)))
     #todo remove if exist?
     (status, output) = commands.getstatusoutput('hadoop fs -put %s %s'%(yesterday_filename,hdfs_path))
     if status == 0:
