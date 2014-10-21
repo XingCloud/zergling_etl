@@ -5,7 +5,7 @@ else
     day=`date +%Y%m%d`
 fi
 
-for project in nv search ad_imp
+for project in nv search ad_imp gdp
 do
     hadoop fs -mkdir odin/$project/$day
 done
