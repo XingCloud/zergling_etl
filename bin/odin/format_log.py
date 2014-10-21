@@ -160,7 +160,7 @@ def parse_adimp_line(line):
 def parse_gdp_line(line):
     try:
         attrs = line.split("\t")
-        ip = attrs[0].split(" ")[0]
+        ip = attrs[0].split(", ")[0]
         time = attrs[1][:19]
         nation = attrs[2].lower()
 
