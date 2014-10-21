@@ -6,7 +6,7 @@ import email.MIMEMultipart
 import email.MIMEText
 import email.MIMEBase
 
-mailto_list = ["liqiang@xingcloud.com"]
+mailto_list = ["liqiang@xingcloud.com","zhangyi1942@gmail.com","chengen@elex-tech.com","wuzhongju@elex-tech.comv","chenshihua@elex-tech.com"]
 mail_host = "smtp.qq.com"
 mail_user = "xamonitor@xingcloud.com"
 mail_pass = "22C1NziwxZI5F"
@@ -17,10 +17,9 @@ row format delimited
 fields terminated by ','
 select * from (
 select visit.pid,visit.pv,visit.pr,visit.pu,se.sv,se.sr,se.su,an.iv,an.ir,an.iu from
-(select pid, count(*) pv , count(distinct reqid) pr, count(distinct uid) pu from odin.nav_visit where day='%s' group by pid ) visit join
+(select pid, count(*) pv, count(distinct reqid) pr, count(distinct uid) pu from odin.nav_visit where day='%s' group by pid ) visit join
 (select pid, count(*) sv, count(distinct reqid) sr, count(distinct uid) su from odin.search where day='%s' group by pid) se on visit.pid = se.pid join
-(select nv.pid, count(*) iv, count(distinct ai.reqid) ir,count(distinct ai.uid) iu from odin.ad_impression ai join odin.nav_visit nv
- on ai.reqid = nv.reqid and ai.day = nv.day where ai.day='%s' group by nv.pid) an on an.pid = se.pid
+(select pid, count(*) iv, count(distinct reqid) ir, count(distinct uid) iu from odin.ad_impression where day='%s' group by pid) an on an.pid = se.pid
 union all
 select tv.pid,tv.pv,tv.pr,tv.pu,ts.sv,ts.sr,ts.su,ti.iv,ti.ir,ti.iu from
 (select 'total' pid, count(*) pv , count(distinct reqid) pr,count(distinct uid) pu from odin.nav_visit where day='%s') tv join
@@ -31,7 +30,7 @@ select tv.pid,tv.pv,tv.pr,tv.pu,ts.sv,ts.sr,ts.su,ti.iv,ti.ir,ti.iu from
 def sendMail(subject,content, filename):
     me="xamonitor@xingcloud.com"
     msg = email.MIMEMultipart.MIMEMultipart()
-    msg['Subject'] = "odin log count " + subject
+    msg['Subject'] = "odin daily log count " + subject
     msg['From'] = "liqiang@xingcloud.com"
     msg['To'] = ";".join(mailto_list)
     try:
