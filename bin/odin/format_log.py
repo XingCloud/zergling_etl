@@ -146,10 +146,9 @@ def parse_adimp_line(line):
         attrs[0] = datetime.datetime.fromtimestamp(float(attrs[0])).strftime("%Y-%m-%d %H:%M:%S")
 
         #switch the uid and reqid
-        if len(attrs) == 6:
-            uid = attrs[1]
-            attrs[1] = attrs[2]
-            attrs[2] = uid
+        uid = attrs[1]
+        attrs[1] = attrs[2]
+        attrs[2] = uid
 
         return "\t".join(attrs)
     except Exception,e:
