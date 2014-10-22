@@ -32,7 +32,8 @@ CREATE external table ad_impression(
   uid string,
   slot string,
   adid string,
-  adtype string)
+  adtype string,
+  pid string)
  partitioned by(day string)
  ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
 
