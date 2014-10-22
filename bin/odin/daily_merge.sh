@@ -3,10 +3,10 @@
 if [ $# = 1 ] ; then
     day=$1
 else
-    day=`date +%Y%m%d`
+    day=`date -d "1 days ago" +%Y%m%d`
 fi
 
-hive -e " insert into table odin.req_detail partition(day='$day')
+hive -e " insert overwrite into table odin.req_detail partition(day='$day')
           select nv.pid, nv.time, nv.reqid, nv.uid, nv.ip, nv.nation, nv.ua, nv.os, nv.width, nv.height, ai.im, s.kw
           from odin.nav_visit nv
           left outer join
