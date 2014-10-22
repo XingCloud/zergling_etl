@@ -7,7 +7,7 @@ else
 fi
 
 hive -e " insert into table odin.req_detail partition(day='$day')
-          select nv.pid, nv.time, nv.reqid, nv.uid, nv.ip, nv.nation, nv.os, nv.width, nv.height, ai.im, s.kw
+          select nv.pid, nv.time, nv.reqid, nv.uid, nv.ip, nv.nation, nv.ua, nv.os, nv.width, nv.height, ai.im, s.kw
           from odin.nav_visit nv
           left outer join
           (select reqid, concat_ws(',',collect_set(concat(time,'|',slot,'|',adid)) ) im from odin.ad_impression  where day = '$day' group by reqid) ai on nv.reqid = ai.reqid
