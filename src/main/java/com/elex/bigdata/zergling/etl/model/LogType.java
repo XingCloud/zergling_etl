@@ -34,6 +34,11 @@ public enum LogType {
         public HBaseBuilder getBuilder() {
             return new GMLogHBaseBuilder();
         }
+    },NAV("nav"){
+        @Override
+        public HBaseBuilder getBuilder() {
+            return new NavLogHBaseBuilder();
+        }
     };
 
     private LogType(String type){
