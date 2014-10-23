@@ -1,4 +1,3 @@
-
 if [ $# = 1 ] ; then
     day=$1
 else
