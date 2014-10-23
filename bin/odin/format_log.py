@@ -180,6 +180,21 @@ def parse_gdp_line(line):
 
     return None
 
+def parse_ac_line(line):
+    try:
+        attrs = line.split("\t")
+        time = attrs[1][:19]
+        params = {}
+        for param in attrs[2][8:].split("&"):
+            index = param.find("=")
+            params[param[:index]] = param[index+1:]
+
+        #time reqid
+        return "%s %s\t%s"%(time[:10],time[11:],params["reqid"])
+    except Exception,e:
+        print e
+    return None
+
 def parse_file(parser, source_file, output_file, mode="w"):
     output_writer = open(output_file, mode)
     with open(source_file) as f:
@@ -244,27 +259,27 @@ def parse_nv_file(yesterday, tdb_yesterday):
     os.system("rm -f /data1/user_log/nv/format/%s*.log" % expired_day)
     os.system("rm -rf /data1/user_log/nv/%s/" % expired_day)
 
-def parse_gdp_file(yesterday, tdb_yesterday):
+def parse_default_file(logtype,yesterday, tdb_yesterday):
     print "begin at %s" % datetime.datetime.now()
-    inputpath = "/data1/user_log/gdp/%s"%yesterday
-    outputpath = "/data1/user_log/gdp/format/"
+    parentpath = "/data1/user_log/%s"%logtype
+    inputpath = "%s/%s"%(parentpath,yesterday)
+    outputpath = "%s/format/"%parentpath
     output_file = outputpath + yesterday + "_orig.log"
     tdby_output_file = outputpath + tdb_yesterday + "_orig.log"
 
-    logtype = "gdp"
     files = sorted([os.path.join(inputpath, f) for f in os.listdir(inputpath) if os.path.isfile(os.path.join(inputpath, f)) and f.endswith("log")])
     mode = "w"
     for filename in files:
         print "format %s at %s" % (filename, datetime.datetime.now())
-        parse_file(parse_gdp_line, filename, output_file,mode)
+        parse_file("parse_%s_line"%logtype, filename, output_file,mode)
         mode = "a"
 
     mergeAndLoad(yesterday, logtype, output_file, tdby_output_file, outputpath + yesterday + ".log")
     print "end at %s" % datetime.datetime.now()
 
     print "clean up"
-    os.system("rm -f /data1/user_log/gdp/format/%s*.log" % expired_day)
-    os.system("rm -rf /data1/user_log/gdp/%s/" % expired_day)
+    os.system("rm -f %s/format/%s*.log" % (parentpath, expired_day))
+    os.system("rm -rf %s/%s/" % (parentpath, expired_day))
 
 def parse_adimp_file(yesterday, tdb_yesterday):
     print "begin at %s" % datetime.datetime.now()
@@ -307,8 +322,8 @@ if __name__ == '__main__':
             parse_nv_file(yesterday, tdb_yesterday)
         elif sys.argv[1] == "ad_imp":
             parse_adimp_file(yesterday, tdb_yesterday)
-        elif sys.argv[1] == "gdp":
-            parse_gdp_file(yesterday, tdb_yesterday)
+        elif sys.argv[1] == "gdp" or sys.argv[1] == "ac":
+            parse_default_file(sys.argv[1], yesterday, tdb_yesterday)
     elif len(sys.argv) == 5 and "single" == sys.argv[2]:
         func = None
         if sys.argv[1] == "search":
