@@ -144,7 +144,8 @@ def parse_nv_line(line):
 def parse_adimp_line(line):
     try:
         attrs = line.split("\t")
-        if attrs[6] not in project_short.values() or not "10004" == attrs[3]:
+        #attrs[6] not in project_short.values() or
+        if not "10004" == attrs[3]:
             return None
         attrs[0] = datetime.datetime.fromtimestamp(float(attrs[0])).strftime("%Y-%m-%d %H:%M:%S")
 
