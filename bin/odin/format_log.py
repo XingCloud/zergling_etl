@@ -144,7 +144,7 @@ def parse_nv_line(line):
 def parse_adimp_line(line):
     try:
         attrs = line.split("\t")
-        if attrs[7] not in project_short.values():
+        if attrs[6] not in project_short.values() or not "10004" == attrs[3]:
             return None
         attrs[0] = datetime.datetime.fromtimestamp(float(attrs[0])).strftime("%Y-%m-%d %H:%M:%S")
 
@@ -273,7 +273,7 @@ def parse_adimp_file(yesterday, tdb_yesterday):
     for server in servers:
         path = "/data1/user_log/%s/%s"%(server, yesterday)
         files = sorted([os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))
-                and f.startswith("odin-%s"%yesterday) and f.endswith("log")])
+                                                                           and f.startswith("odin-%s"%yesterday) and f.endswith("log")])
         for filename in files:
             print "format %s at %s" % (filename, datetime.datetime.now())
             parse_file('parse_adimp_line', filename, output_file, mode)
