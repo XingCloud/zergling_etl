@@ -144,6 +144,8 @@ def parse_nv_line(line):
 def parse_adimp_line(line):
     try:
         attrs = line.split("\t")
+        if attrs[7] not in project_short.values():
+            return None
         attrs[0] = datetime.datetime.fromtimestamp(float(attrs[0])).strftime("%Y-%m-%d %H:%M:%S")
 
         #switch the uid and reqid
