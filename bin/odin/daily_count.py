@@ -77,6 +77,11 @@ def count_odin(day):
     print 'send mail /data1/odin/odin_count_%s.csv '%day
     sendMail(day,'',['/data1/odin/odin_count_%s.csv' % day])
 
+    print 'clean history'
+    expired_day = (datetime.datetime.now() + datetime.timedelta(days=-5)).strftime("%Y%m%d")
+    os.system('rm /data1/odin/odin_count_%s.csv'%expired_day)
+
+
 if __name__ == '__main__':
     if len(sys.argv) == 2:
         day = sys.argv[1]
