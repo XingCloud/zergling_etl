@@ -5,6 +5,7 @@ import datetime
 import os
 import commands
 import urllib
+import re
 
 browsers = {"Opera":"Opera", "Chrome":"Chrome", "Firefox":"Firefox", "Safari":"Safari", "MSIE":"MSIE", "Trident":"MSIE"}
 project_short = { "isearch.omiga-plus.com": "omiga-plus",
@@ -18,11 +19,14 @@ project_short = { "isearch.omiga-plus.com": "omiga-plus",
 expired_day = (datetime.datetime.now() + datetime.timedelta(days=-10)).strftime("%Y%m%d")
 this = __import__(__name__)
 
-def get_ua(ua):
+def get_browser(ua):
     for (browser_type, name) in browsers.items():
         if ua.find(browser_type) >= 0:
             return name
     return "Other"
+
+def check_uid(uid):
+    return re.match(r'.*[;!@#$%^&*()-=+\[\]\{\}"\'<>\\\.].*' , uid)
 
 def hive_exec(sql):
     os.system("ssh dmnode1 'hive -e \"%s\"" % sql)
@@ -82,14 +86,14 @@ def parse_search_line(line):
 
         ua = 'Other'
         if "ua" in kv:
-            ua = get_ua(kv["ua"])
+            ua = get_browser(kv["ua"])
 
         query = kv["query"].replace("\t","")
 
         #format for hive to use
         s_time = datetime.datetime.fromtimestamp(float(kv["ts"])).strftime("%Y-%m-%d %H:%M:%S")
         nation = kv["country"]
-        if reqID and uid and query and len(nation) == 2:
+        if reqID and uid and check_uid(uid) and query and len(nation) == 2:
             #p time reqID uid nation ua keyword
             return "%s\t%s\t%s\t%s\t%s\t%s\t%s"%(kv["project_id"],s_time,reqID,uid,nation,ua,query)
 
@@ -106,7 +110,7 @@ def parse_nv_line(line):
 
         attrs = line.split("\t")
         time = attrs[2][:19]
-        ua = get_ua(attrs[3])
+        ua = get_browser(attrs[3])
         refer = attrs[4]
 
         project = refer[7:]
@@ -126,6 +130,9 @@ def parse_nv_line(line):
             kv = param.split("=")
             params[kv[0]] = kv[1]
 
+        if not check_uid(params["User_id"]):
+            return None
+
         nation = params["User_nation"]
         if len(nation) != 2:
             if attrs[1] == '-':
@@ -144,8 +151,7 @@ def parse_nv_line(line):
 def parse_adimp_line(line):
     try:
         attrs = line.split("\t")
-        #attrs[6] not in project_short.values() or
-        if not "10004" == attrs[3]:
+        if attrs[6] not in project_short.values() or not "10004" == attrs[3]:
             return None
         attrs[0] = datetime.datetime.fromtimestamp(float(attrs[0])).strftime("%Y-%m-%d %H:%M:%S")
 
