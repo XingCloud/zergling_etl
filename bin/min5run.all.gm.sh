@@ -62,6 +62,6 @@ echo ${line}
 
 
 #加索引
-echo "begin index ${fullPath} at "$(date +"%Y-%m-%d %H:%M:%S")
-python /data1/liqiang/es/load2es.py ${fullPath}.completed game
-echo "end index ${fullPath} at "$(date +"%Y-%m-%d %H:%M:%S")
+#echo "begin index ${fullPath} at "$(date +"%Y-%m-%d %H:%M:%S")
+#python /data1/liqiang/es/load2es.py ${fullPath}.completed game
+#echo "end index ${fullPath} at "$(date +"%Y-%m-%d %H:%M:%S")
