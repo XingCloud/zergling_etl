@@ -16,15 +16,17 @@ insert overwrite local directory '/data1/odin/dayily_count'
 row format delimited
 fields terminated by ','
 select * from (
-select visit.pid,visit.pv,visit.pr,visit.pu,se.sv,se.sr,se.su,an.iv,an.ir,an.iu from
+select visit.pid,visit.pv,visit.pr,visit.pu,se.sv,se.sr,se.su,an.iv,an.ir,an.iu,ac.cv,ac.cr,ac.cu from
 (select pid, count(*) pv, count(distinct reqid) pr, count(distinct uid) pu from odin.nav_visit where day='%s' group by pid ) visit join
 (select pid, count(*) sv, count(distinct reqid) sr, count(distinct uid) su from odin.search where day='%s' group by pid) se on visit.pid = se.pid left outer join
-(select pid, count(*) iv, count(distinct reqid) ir, count(distinct uid) iu from odin.ad_impression where day='%s' group by pid) an on an.pid = se.pid
+(select pid, count(*) iv, count(distinct reqid) ir, count(distinct uid) iu from odin.ad_impression where day='%s' group by pid) an on an.pid = se.pid left outer join
+(select pid, count(*) cv,count(distinct ai.reqid) cr, count(distinct ai.uid) cu from  ad_click ac  join ad_impression ai on ai.reqid = ac.reqid and ai.day = ac.day  where ac.day = '%s' group by pid) ac on ac.pid = se.pid
 union all
-select tv.pid,tv.pv,tv.pr,tv.pu,ts.sv,ts.sr,ts.su,ti.iv,ti.ir,ti.iu from
+select tv.pid,tv.pv,tv.pr,tv.pu,ts.sv,ts.sr,ts.su,ti.iv,ti.ir,ti.iu,tc.cv,tc.cr,tc.cu from
 (select 'total' pid, count(*) pv , count(distinct reqid) pr,count(distinct uid) pu from odin.nav_visit where day='%s') tv join
 (select 'total' pid, count(*) sv, count(distinct reqid) sr,count(distinct uid) su from odin.search where day='%s') ts on tv.pid = ts.pid join
-(select 'total' pid, count(*) iv, count(distinct reqid) ir, count(distinct uid) iu from odin.ad_impression where day='%s') ti on ti.pid = ts.pid ) tmp
+(select 'total' pid, count(*) iv, count(distinct reqid) ir, count(distinct uid) iu from odin.ad_impression where day='%s') ti on ti.pid = ts.pid join
+(select 'total' pid, count(*) cv, count(distinct reqid) cr, '' cu from odin.ad_click where day='%s') tc on tc.pid = ts.pid ) tmp
 '''
 
 def sendMail(subject,content, filename):
@@ -65,22 +67,17 @@ def attach_file(filename):
     return file_msg
 
 def count_odin(day):
-    daily_sql = sql%(day, day, day, day, day, day)
+    daily_sql = sql%(day, day, day, day, day, day,day,day)
     print 'rm -rf /data1/odin/dayily_count/'
     os.system('rm -rf /data1/odin/dayily_count/')
     print "hive -e \"%s\"" % daily_sql
     os.system("hive -e \"%s\"" % daily_sql)
     print 'echo ",nav visit,visit reqid,visit uid,search,search reqid,search uid,ad imp,imp reqid,imp uid" > /data1/odin/odin_count_%s.csv' % day
-    os.system('echo ",nav visit,visit reqid,visit uid,search,search reqid,search uid,ad imp,imp reqid,imp uid" > /data1/odin/odin_count_%s.csv' % day)
+    os.system('echo ",nav visit,visit reqid,visit uid,search,search reqid,search uid,ad imp,imp reqid,imp uid, ad_click, click_reqid, click_uid" > /data1/odin/odin_count_%s.csv' % day)
     print 'cat /data1/odin/dayily_count/0000* >> /data1/odin/odin_count_%s.csv' % day
     os.system('cat /data1/odin/dayily_count/0000* >> /data1/odin/odin_count_%s.csv' % day)
     print 'send mail /data1/odin/odin_count_%s.csv '%day
     sendMail(day,'',['/data1/odin/odin_count_%s.csv' % day])
-
-    print 'clean history'
-    expired_day = (datetime.datetime.now() + datetime.timedelta(days=-5)).strftime("%Y%m%d")
-    os.system('rm /data1/odin/odin_count_%s.csv'%expired_day)
-
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
