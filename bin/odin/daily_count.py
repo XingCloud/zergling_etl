@@ -16,7 +16,7 @@ insert overwrite local directory '/data1/odin/dayily_count'
 row format delimited
 fields terminated by ','
 select * from (
-select visit.pid,visit.pv,visit.pr,visit.pu,se.sv,se.sr,se.su,an.iv,an.ir,an.iu,ac.cv,ac.cr,ac.cu from
+select visit.pid,visit.pv,visit.pr,visit.pu,se.sv,se.sr,se.su,an.iv,an.ir,an.iu,ic.cv,ic.cr,ic.cu from
 (select pid, count(*) pv, count(distinct reqid) pr, count(distinct uid) pu from odin.nav_visit where day='%s' group by pid ) visit join
 (select pid, count(*) sv, count(distinct reqid) sr, count(distinct uid) su from odin.search where day='%s' group by pid) se on visit.pid = se.pid left outer join
 (select pid, count(*) iv, count(distinct reqid) ir, count(distinct uid) iu from odin.ad_impression where day='%s' group by pid) an on an.pid = se.pid left outer join
@@ -77,7 +77,7 @@ def count_odin(day):
     print 'cat /data1/odin/dayily_count/0000* >> /data1/odin/odin_count_%s.csv' % day
     os.system('cat /data1/odin/dayily_count/0000* >> /data1/odin/odin_count_%s.csv' % day)
     print 'send mail /data1/odin/odin_count_%s.csv '%day
-    sendMail(day,'',['/data1/odin/odin_count_%s.csv' % day])
+    #sendMail(day,'',['/data1/odin/odin_count_%s.csv' % day])
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
