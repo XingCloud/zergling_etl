@@ -77,7 +77,7 @@ def count_odin(day):
     print 'cat /data1/odin/dayily_count/0000* >> /data1/odin/odin_count_%s.csv' % day
     os.system('cat /data1/odin/dayily_count/0000* >> /data1/odin/odin_count_%s.csv' % day)
     print 'send mail /data1/odin/odin_count_%s.csv '%day
-    #sendMail(day,'',['/data1/odin/odin_count_%s.csv' % day])
+    sendMail(day,'',['/data1/odin/odin_count_%s.csv' % day])
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
