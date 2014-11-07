@@ -206,6 +206,10 @@ def parse_ac_line(line):
     return None
 
 def parse_file(parser, source_file, output_file, mode="w"):
+    if not os.path.isfile(source_file):
+        print "%s not exsit"%source_file
+        return
+
     output_writer = open(output_file, mode)
     with open(source_file) as f:
         for line in f:
@@ -323,7 +327,3 @@ if __name__ == '__main__':
     else:
         print "Usage: type[search|nv|ad_imp|gdp] all (day)"
         sys.exit(-1)
-
-
-
-
