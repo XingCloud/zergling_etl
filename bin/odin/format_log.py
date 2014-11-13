@@ -153,12 +153,14 @@ def parse_adimp_line(line):
         attrs = line.split("\t")
         if attrs[6] not in project_short.values() or not "10004" == attrs[3]:
             return None
+
         attrs[0] = datetime.datetime.fromtimestamp(float(attrs[0])).strftime("%Y-%m-%d %H:%M:%S")
 
-        #switch the uid and reqid
-        uid = attrs[1]
-        attrs[1] = attrs[2]
-        attrs[2] = uid
+        if len(attrs) == 6:
+            #switch the uid and reqid
+            uid = attrs[1]
+            attrs[1] = attrs[2]
+            attrs[2] = uid
 
         return "\t".join(attrs)
     except Exception,e:
