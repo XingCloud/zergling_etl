@@ -156,11 +156,13 @@ def parse_adimp_line(line):
 
         attrs[0] = datetime.datetime.fromtimestamp(float(attrs[0])).strftime("%Y-%m-%d %H:%M:%S")
 
-        if len(attrs) == 6:
+        if len(attrs) == 7:
             #switch the uid and reqid
             uid = attrs[1]
             attrs[1] = attrs[2]
             attrs[2] = uid
+        elif len(attrs) == 8 and attrs[4] == "undefined": #test log
+            return None
 
         return "\t".join(attrs)
     except Exception,e:
