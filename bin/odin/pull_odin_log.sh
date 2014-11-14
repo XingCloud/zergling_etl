@@ -33,8 +33,8 @@ do
     echo "clean ${filename}"
     ssh elex@${host} rm ${remote_log_dir}/${filename}
     rm ${local_log_dir}/${filename}
-
-    echo "format odin log"
-    python $bin/format_log.py ad_imp all
-    echo "done"
 done
+
+echo "format odin log"
+python $bin/format_log.py ad_imp all
+echo "done"
