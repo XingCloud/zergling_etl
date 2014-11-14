@@ -164,6 +164,9 @@ def parse_adimp_line(line):
         elif len(attrs) == 8 and attrs[4] == "undefined": #test log
             return None
 
+        if len(attrs) == 7:
+            attrs.append("default")
+
         return "\t".join(attrs)
     except Exception,e:
         print e
