@@ -9,12 +9,12 @@ import re
 
 browsers = {"Opera":"Opera", "Chrome":"Chrome", "Firefox":"Firefox", "Safari":"Safari", "MSIE":"MSIE", "Trident":"MSIE"}
 project_short = { "isearch.omiga-plus.com": "omiga-plus",
-            "istart.webssearches.com": "webssearches",
-            "www.22find.com": "22find",
-            "www.istartsurf.com": "istartsurf",
-            "www.mystartsearch.com": "mystartsearch",
-            "www.sweet-page.com": "sweet-page",
-            "www.v9.com": "v9"}
+                  "istart.webssearches.com": "webssearches",
+                  "www.22find.com": "22find",
+                  "www.istartsurf.com": "istartsurf",
+                  "www.mystartsearch.com": "mystartsearch",
+                  "www.sweet-page.com": "sweet-page",
+                  "www.v9.com": "v9"}
 
 expired_day = (datetime.datetime.now() + datetime.timedelta(days=-10)).strftime("%Y%m%d")
 this = __import__(__name__)
@@ -141,7 +141,7 @@ def parse_nv_line(line):
         ip = attrs[0].split(", ")[0]
         #p time reqid uid ip nation ua os width height refer
         return "%s\t%s %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(pid, time[:10],time[11:],params["reqID"],params["User_id"],ip,
-                nation,ua,params["os"],params["Screen_width"],params["Screen_Height"],'')
+                                                                nation,ua,params["os"],params["Screen_width"],params["Screen_Height"],'')
 
     except Exception,e:
         print e
@@ -191,7 +191,7 @@ def parse_gdp_line(line):
 
         #time uid ip nation lang os ptid title meta url
         return "%s %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(time[:10],time[11:],params["uid"],ip,nation,
-            params["lang"],params["os"],params["ptid"],title,meta,url)
+                                                            params["lang"],params["os"],params["ptid"],title,meta,url)
     except Exception,e:
         print e
 
@@ -205,9 +205,23 @@ def parse_ac_line(line):
         for param in attrs[2][8:].split("&"):
             index = param.find("=")
             params[param[:index]] = param[index+1:]
+        reqid = params["reqid"]
+
+        nation = '\N'
+        uid = '\N'
+
+        if len(attrs) == 5:
+            nation = attrs[4].lower()
+            params = {}
+            for param in attrs[3][attrs[3].find("?")+1:].split("&"):
+                index = param.find("=")
+                params[param[:index]] = param[index+1:]
+            uid = params["uid"]
+
+        #http://www.sweet-page.com/?type=hp&ts=1414075222&from=cor&uid=ST500DM002-1BD142_Z3TP5QG4        FR
 
         #time reqid
-        return "%s %s\t%s"%(time[:10],time[11:],params["reqid"])
+        return "%s %s\t%s\t%s\t%s"%(time[:10],time[11:],reqid,uid, nation)
     except Exception,e:
         print e
     return None
