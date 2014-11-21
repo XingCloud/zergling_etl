@@ -31,6 +31,12 @@ def check_uid(uid):
 def hive_exec(sql):
     os.system("ssh dmnode1 'hive -e \"%s\"" % sql)
 
+def getIP(strIp):
+    ips = strIp.split(",")
+    if len(ips) == 2:
+        return ips[1].strip()
+    return strIp
+
 def mergeAndLoad(yesterday,logtype,orig_filename,tdby_output_file,yesterday_filename):
 
     #merge orig date to natural day
@@ -133,12 +139,15 @@ def parse_nv_line(line):
         if not check_uid(params["User_id"]):
             return None
 
-        nation = params["User_nation"]
+        nation = attrs[1]
+        if nation == '-':
+            nation = params["User_nation"]
         if len(nation) != 2:
             if attrs[1] == '-':
                 return None
             nation = attrs[1].lower()
-        ip = attrs[0].split(",")[0]
+        ip = getIP(attrs[0])
+
         #p time reqid uid ip nation ua os width height refer
         return "%s\t%s %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(pid, time[:10],time[11:],params["reqID"],params["User_id"],ip,
                                                                 nation,ua,params["os"],params["Screen_width"],params["Screen_Height"],'')
