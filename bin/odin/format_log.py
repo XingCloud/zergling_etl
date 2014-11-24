@@ -139,13 +139,11 @@ def parse_nv_line(line):
         if not check_uid(params["User_id"]):
             return None
 
-        nation = attrs[1]
+        nation = attrs[1].lower()
         if nation == '-':
             nation = params["User_nation"]
         if len(nation) != 2:
-            if attrs[1] == '-':
-                return None
-            nation = attrs[1].lower()
+            return None
         ip = getIP(attrs[0])
 
         #p time reqid uid ip nation ua os width height refer
