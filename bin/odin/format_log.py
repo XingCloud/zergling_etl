@@ -26,7 +26,7 @@ def get_browser(ua):
     return "Other"
 
 def check_uid(uid):
-    return re.match(r'.*[;!@#$%^&*()-=+\[\]\{\}"\'<>\\\.].*' , uid)
+    return re.match(r'.*[;,:%!@#$%^&*()-=+\[\]\{\}"\'<>\\\.].*' , uid)
 
 def hive_exec(sql):
     os.system("ssh dmnode1 'hive -e \"%s\"" % sql)
@@ -137,6 +137,7 @@ def parse_nv_line(line):
             params[kv[0]] = kv[1]
 
         if not check_uid(params["User_id"]):
+            print params["User_id"]
             return None
 
         nation = attrs[1].lower()
