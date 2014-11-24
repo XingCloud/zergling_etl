@@ -33,8 +33,8 @@ def hive_exec(sql):
 
 def getIP(strIp):
     ips = strIp.split(",")
-    if len(ips) == 2:
-        return ips[1].strip()
+    if len(ips) >1:
+        return ips[len(ips)-1].strip()
     return strIp
 
 def mergeAndLoad(yesterday,logtype,orig_filename,tdby_output_file,yesterday_filename):
