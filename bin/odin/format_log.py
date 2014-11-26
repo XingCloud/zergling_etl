@@ -14,7 +14,8 @@ project_short = { "isearch.omiga-plus.com": "omiga-plus",
                   "www.istartsurf.com": "istartsurf",
                   "www.mystartsearch.com": "mystartsearch",
                   "www.sweet-page.com": "sweet-page",
-                  "www.v9.com": "v9"}
+                  "www.v9.com": "v9",
+                  "www.delta-homes.com":"delta-homes"}
 
 expired_day = (datetime.datetime.now() + datetime.timedelta(days=-10)).strftime("%Y%m%d")
 this = __import__(__name__)
