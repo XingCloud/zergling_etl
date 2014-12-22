@@ -33,7 +33,7 @@ as_log=${access_log_path}/access.as.log
 gdp_log=${access_log_path}/access.gdp.log
 
 #odin ad imp
-imp_log=${access_log_path}/access.adimp.log
+adimp_log=${access_log_path}/access.adimp.log
 
 suffix=$(date -d"-5 mins" +"%Y%m%d%H%M").log
 
