@@ -234,6 +234,9 @@ def parse_ad_feimp_line(line):
             params[param[:index]] = param[index+1:]
         reqid = params["req_id"]
 
+        if 'NA' == reqid:
+            return None
+
         nation = attrs[2].lower()
         if nation == '-':
             nation = '\N'
