@@ -51,3 +51,10 @@ CREATE external table gdp(
   url string)
  partitioned by(day string)
  ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
+
+ CREATE external table ad_fe_imp(
+  time timestamp,
+  reqid string,
+  nation string)
+ partitioned by(day string)
+ ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
