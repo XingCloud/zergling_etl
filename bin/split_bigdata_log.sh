@@ -49,7 +49,7 @@ ac_log_new_path="/data1/user_log/ac/${day}"
 nv_log_new_path="/data1/user_log/nv/${day}"
 as_log_new_path="/data1/user_log/as/${day}"
 gdp_log_new_path="/data1/user_log/gdp/${day}"
-adimp_log_new_path="/data1/user_log/adimp/${day}"
+adimp_log_new_path="/data1/user_log/ad_feimp/${day}"
 
 if [ ! -d ${nav_log_new_path} ]; then
   mkdir -p ${nav_log_new_path}
