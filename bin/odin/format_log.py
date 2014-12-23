@@ -229,7 +229,7 @@ def parse_ad_feimp_line(line):
         attrs = line.split("\t")
         time = attrs[1][:19]
         params = {}
-        for param in attrs[4][8:].split("&"):
+        for param in attrs[3][9:].split("&"):
             index = param.find("=")
             params[param[:index]] = param[index+1:]
         reqid = params["req_id"]
