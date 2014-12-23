@@ -20,9 +20,6 @@ project_short = { "isearch.omiga-plus.com": "omiga-plus",
 expired_day = (datetime.datetime.now() + datetime.timedelta(days=-10)).strftime("%Y%m%d")
 this = __import__(__name__)
 
-convert_id = {"192299":"50996","3860421":"50932","3972886":"50992","9428":"50993","190656":"50994"}
-
-
 def get_browser(ua):
     for (browser_type, name) in browsers.items():
         if ua.find(browser_type) >= 0:
@@ -163,13 +160,10 @@ def parse_nv_line(line):
 def parse_adimp_line(line):
     try:
         attrs = line.split("\t")
-        if attrs[6] not in project_short.values() or not "10004" == attrs[3]:
+        if attrs[6] not in project_short.values() or not "10004" == attrs[3] or 'NA' == attrs[2]:
             return None
 
         attrs[0] = datetime.datetime.fromtimestamp(float(attrs[0])).strftime("%Y-%m-%d %H:%M:%S")
-
-        if attrs[4] in convert_id:
-            attrs[4] = convert_id[attrs[4]]
 
         return "\t".join(attrs)
     except Exception,e:
@@ -226,6 +220,26 @@ def parse_ac_line(line):
 
         #time reqid
         return "%s %s\t%s\t%s\t%s"%(time[:10],time[11:],reqid,uid, nation)
+    except Exception,e:
+        print e
+    return None
+
+def parse_ad_feimp_line(line):
+    try:
+        attrs = line.split("\t")
+        time = attrs[1][:19]
+        params = {}
+        for param in attrs[3][8:].split("&"):
+            index = param.find("=")
+            params[param[:index]] = param[index+1:]
+        reqid = params["req_id"]
+
+        nation = attrs[2]
+        if nation == '-':
+            nation = '\N'
+
+        #time reqid nation
+        return "%s %s\t%s\t%s"%(time[:10],time[11:],reqid,nation)
     except Exception,e:
         print e
     return None
@@ -335,7 +349,7 @@ if __name__ == '__main__':
             parse_search_file(yesterday, tdb_yesterday)
         elif sys.argv[1] == "ad_imp":
             parse_adimp_file(yesterday, tdb_yesterday)
-        elif sys.argv[1] == "nv" or sys.argv[1] == "gdp" or sys.argv[1] == "ac":
+        elif sys.argv[1] == "nv" or sys.argv[1] == "gdp" or sys.argv[1] == "ac" or sys.argv[1] == "ad_feimp":
             parse_default_file(sys.argv[1], yesterday, tdb_yesterday)
     elif len(sys.argv) == 5 and "single" == sys.argv[2]:
         func = None
