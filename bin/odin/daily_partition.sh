@@ -19,9 +19,7 @@ hive -e " use odin;
 
 
 history=`date -d "80 days ago" +%Y%m%d`
-hadoop fs -rm /user/hadoop/odin/nv/$history/*
-hadoop fs -rm /user/hadoop/odin/search/$history/*
-hadoop fs -rm /user/hadoop/odin/ad_imp/$history/*
-hadoop fs -rm /user/hadoop/odin/gdp/$history/*
-hadoop fs -rm /user/hadoop/odin/ac/$history/*
-hadoop fs -rm /user/hadoop/odin/ad_feimp/$history/*
+for project in nv search ad_imp gdp ac ad_feimp
+do
+    hadoop fs -rm -r odin/$project/$history/
+done
