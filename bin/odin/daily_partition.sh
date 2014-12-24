@@ -18,3 +18,10 @@ hive -e " use odin;
     alter table ad_fe_imp add partition(day='$day') location '/user/hadoop/odin/ad_feimp/$day/'; "
 
 
+history=`date -d "80 days ago" +%Y%m%d`
+hadoop fs -rm /user/hadoop/odin/nv/$history/*
+hadoop fs -rm /user/hadoop/odin/search/$history/*
+hadoop fs -rm /user/hadoop/odin/ad_imp/$history/*
+hadoop fs -rm /user/hadoop/odin/gdp/$history/*
+hadoop fs -rm /user/hadoop/odin/ac/$history/*
+hadoop fs -rm /user/hadoop/odin/ad_feimp/$history/*
