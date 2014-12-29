@@ -241,8 +241,12 @@ def parse_ad_feimp_line(line):
         if nation == '-':
             nation = '\N'
 
+        adid = "\N"
+        if "code" in params:
+            adid = params["code"]
+
         #time reqid nation
-        return "%s %s\t%s\t%s"%(time[:10],time[11:],reqid,nation)
+        return "%s %s\t%s\t%s\t%s"%(time[:10],time[11:],reqid,nation,adid)
     except Exception,e:
         print e
     return None
