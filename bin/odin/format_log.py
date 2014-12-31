@@ -17,7 +17,7 @@ project_short = { "isearch.omiga-plus.com": "omiga-plus",
                   "www.v9.com": "v9",
                   "www.delta-homes.com":"delta-homes"}
 
-expired_day = (datetime.datetime.now() + datetime.timedelta(days=-7)).strftime("%Y%m%d")
+expired_day = (datetime.datetime.now() + datetime.timedelta(days=-5)).strftime("%Y%m%d")
 this = __import__(__name__)
 
 def get_browser(ua):
