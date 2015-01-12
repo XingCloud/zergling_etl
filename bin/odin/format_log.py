@@ -123,7 +123,7 @@ def parse_nv_line(line):
         refer_params = {}
         index = refer.find("?")
         if index > 0 :
-            for param in refer[refer.find("?")+1:].split("&"):
+            for param in refer[index+1:].split("&"):
                 kv = param.split("=")
                 refer_params[kv[0]] = kv[1]
 
