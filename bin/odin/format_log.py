@@ -120,6 +120,19 @@ def parse_nv_line(line):
         ua = get_browser(attrs[3])
         refer = attrs[4]
 
+        refer_params = {}
+        for param in refer[refer.find("?")+1:].split("&"):
+            kv = param.split("=")
+            refer_params[kv[0]] = kv[1]
+
+        ref = '\N'
+        if "from" in refer_params:
+            ref = refer_params["from"]
+
+        opt = '\N'
+        if "type" in refer_params:
+            opt = refer_params["type"]
+
         project = refer[7:]
         index = project.find("/")
         if index > 0:
@@ -149,8 +162,8 @@ def parse_nv_line(line):
         ip = getIP(attrs[0])
 
         #p time reqid uid ip nation ua os width height refer
-        return "%s\t%s %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(pid, time[:10],time[11:],params["reqID"],params["User_id"],ip,
-                                                                nation,ua,params["os"],params["Screen_width"],params["Screen_Height"],'')
+        return "%s\t%s %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(pid, time[:10],time[11:],params["reqID"],params["User_id"],ip,
+                                                                nation,ua,params["os"],params["Screen_width"],params["Screen_Height"],'',ref,opt)
 
     except Exception,e:
         print e
