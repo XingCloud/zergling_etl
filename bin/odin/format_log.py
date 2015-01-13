@@ -165,7 +165,7 @@ def parse_nv_line(line):
 
         #p time reqid uid ip nation ua os width height refer
         return "%s\t%s %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(pid, time[:10],time[11:],params["reqID"],params["User_id"],ip,
-                                                                nation,ua,params["os"],params["Screen_width"],params["Screen_Height"],'',ref,opt)
+                                                                nation,ua,params["os"],params["Screen_width"],params["Screen_Height"],'\N',ref,opt)
 
     except Exception,e:
         print e
