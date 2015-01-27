@@ -262,11 +262,11 @@ def parse_ad_feimp_line(line):
 
         slot = "10004"
         if "slot" in params:
-            adid = params["slot"]
+            slot = params["slot"]
 
         dt = "\N"
         if "dt" in params:
-            adid = params["dt"]
+            dt = params["dt"]
 
         #time reqid nation
         return "%s %s\t%s\t%s\t%s\t%s\t%s"%(time[:10],time[11:],reqid,nation,adid,slot,dt)
