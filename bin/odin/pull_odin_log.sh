@@ -36,5 +36,5 @@ do
 done
 
 echo "format odin log"
-python $bin/format_log.py ad_imp all
+python $bin/format_log.py ad_imp all ${day}
 echo "done"
