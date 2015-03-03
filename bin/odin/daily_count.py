@@ -17,7 +17,7 @@ row format delimited
 fields terminated by ','
 select * from (
 select visit.pid,visit.pv,visit.pr,visit.pu,se.sv,se.sr,se.su,an.iv,an.ir,an.iu,ic.cv,ic.cr,ic.cu from
-(select pid, count(*) pv, count(distinct reqid) pr, count(distinct uid) pu from odin.nav_visit where day='%s' group by pid ) visit join
+(select pid, count(*) pv, count(distinct reqid) pr, count(distinct uid) pu from odin.nav_visit where day='%s' group by pid ) visit left outer join
 (select pid, count(*) sv, count(distinct reqid) sr, count(distinct uid) su from odin.search where day='%s' group by pid) se on visit.pid = se.pid left outer join
 (select pid, count(*) iv, count(distinct reqid) ir, count(distinct uid) iu from odin.ad_impression where day='%s' group by pid) an on an.pid = se.pid left outer join
 (select pid, count(*) cv, count(distinct ai.reqid) cr, count(distinct ai.uid) cu from odin.ad_click ac join odin.ad_impression ai on ai.reqid = ac.reqid and ai.day = ac.day where ac.day = '%s' group by pid) ic on ic.pid = visit.pid
