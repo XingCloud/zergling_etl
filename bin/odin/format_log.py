@@ -15,7 +15,17 @@ project_short = { "isearch.omiga-plus.com": "omiga-plus",
                   "www.mystartsearch.com": "mystartsearch",
                   "www.sweet-page.com": "sweet-page",
                   "www.v9.com": "v9",
-                  "www.delta-homes.com":"delta-homes"}
+                  "www.delta-homes.com":"delta-homes",
+                  "www.key-find.com": "key-find",
+                  "myhome.vi-view.com":"vi-view",
+                  "www.omniboxes.com":"omniboxes",
+                  "www.luckysearches.com":"luckysearches",
+                  "www.luckybeginning.com":"luckybeginning",
+                  "www.do-search.com":"do-search",
+                  "mystart.uninstallmaster.com":"uninstallmaster",
+                  "mystart.vi-view.com":"vi-view",
+                  "mystart.live-hotspot.com":"live-hotspot"
+                  }
 
 expired_day = (datetime.datetime.now() + datetime.timedelta(days=-5)).strftime("%Y%m%d")
 this = __import__(__name__)
