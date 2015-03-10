@@ -19,13 +19,13 @@ select * from (
 select visit.pid,visit.pv,visit.pr,visit.pu,se.sv,se.sr,se.su,an.iv,an.ir,an.iu,ic.cv,ic.cr,ic.cu from
 (select pid, count(*) pv, count(distinct reqid) pr, count(distinct uid) pu from odin.nav_visit where day='%s' group by pid ) visit left outer join
 (select pid, count(*) sv, count(distinct reqid) sr, count(distinct uid) su from odin.search where day='%s' group by pid) se on visit.pid = se.pid left outer join
-(select pid, count(*) iv, count(distinct reqid) ir, count(distinct uid) iu from odin.ad_fe_imp where day='%s' group by pid) an on an.pid = visit.pid left outer join
-(select pid, count(*) cv, count(distinct ai.reqid) cr, count(distinct ai.uid) cu from odin.ad_click ac join odin.ad_fe_imp ai on ai.reqid = ac.reqid and ai.day = ac.day where ac.day = '%s' group by pid) ic on ic.pid = visit.pid
+(select pid, count(*) iv, count(distinct reqid) ir, count(distinct uid) iu from odin.ad_impression where day='%s' group by pid) an on an.pid = visit.pid left outer join
+(select pid, count(*) cv, count(distinct ai.reqid) cr, count(distinct ai.uid) cu from odin.ad_click ac join odin.ad_impression ai on ai.reqid = ac.reqid and ai.day = ac.day where ac.day = '%s' group by pid) ic on ic.pid = visit.pid
 union all
 select tv.pid,tv.pv,tv.pr,tv.pu,ts.sv,ts.sr,ts.su,ti.iv,ti.ir,ti.iu,tc.cv,tc.cr,tc.cu from
 (select 'total' pid, count(*) pv , count(distinct reqid) pr,count(distinct uid) pu from odin.nav_visit where day='%s') tv join
 (select 'total' pid, count(*) sv, count(distinct reqid) sr,count(distinct uid) su from odin.search where day='%s') ts on tv.pid = ts.pid join
-(select 'total' pid, count(*) iv, count(distinct reqid) ir, count(distinct uid) iu from odin.ad_fe_imp where day='%s') ti on ti.pid = ts.pid join
+(select 'total' pid, count(*) iv, count(distinct reqid) ir, count(distinct uid) iu from odin.ad_impression where day='%s') ti on ti.pid = ts.pid join
 (select 'total' pid, count(*) cv, count(distinct reqid) cr, '' cu from odin.ad_click where day='%s') tc on tc.pid = ti.pid ) tmp
 '''
 
