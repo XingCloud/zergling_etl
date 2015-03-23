@@ -14,10 +14,6 @@
     <name>hbase.cluster.distributed</name>
     <value>true</value>
   </property>
-  <property skipInDoc="true">
-    <name>hbase.defaults.for.version</name>
-    <value>0.94.15-cdh4.6.0</value>
-  </property>
   <property>
     <name>hbase.client.ipc.pool.type</name>
     <value>RoundRobinPool</value>
