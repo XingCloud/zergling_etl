@@ -11,7 +11,7 @@ fi
 
 host=ares
 remote_log_file=/home/elex/apps/ares.adserver/logs/access.log.${day}
-local_log_file = /data1/user_log/ares/${day}/access.${day}.log
+local_log_file=/data1/user_log/ares/${day}/access.${day}.log
 
 mkdir -p /data1/user_log/ares/${day}/
 
