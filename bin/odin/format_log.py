@@ -6,6 +6,7 @@ import os
 import commands
 import urllib
 import re
+import urlparse
 
 browsers = {"Opera":"Opera", "Chrome":"Chrome", "Firefox":"Firefox", "Safari":"Safari", "MSIE":"MSIE", "Trident":"MSIE"}
 project_short = { "isearch.omiga-plus.com": "omiga-plus",
@@ -25,7 +26,7 @@ project_short = { "isearch.omiga-plus.com": "omiga-plus",
                   "mystart.uninstallmaster.com":"uninstallmaster",
                   "mystart.vi-view.com":"vi-view",
                   "mystart.live-hotspot.com":"live-hotspot"
-                  }
+}
 
 expired_day = (datetime.datetime.now() + datetime.timedelta(days=-5)).strftime("%Y%m%d")
 this = __import__(__name__)
@@ -175,7 +176,7 @@ def parse_nv_line(line):
 
         #p time reqid uid ip nation ua os width height refer
         return "%s\t%s %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s"%(pid, time[:10],time[11:],params["reqID"],params["User_id"],ip,
-                                                                nation,ua,params["os"],params["Screen_width"],params["Screen_Height"],'\N',ref,opt)
+                                                                        nation,ua,params["os"],params["Screen_width"],params["Screen_Height"],'\N',ref,opt)
 
     except Exception,e:
         print e
@@ -284,6 +285,29 @@ def parse_ad_feimp_line(line):
         print e
     return None
 
+def parse_ares_line(line):
+    try:
+        attrs = line.split("\"")
+        ip = getIP(attrs[0].split(" ")[0])
+        t = attrs[0].split("[")[1][:-2]
+        url_str = attrs[1][4:]
+        ft = datetime.datetime.strptime(t, "%a, %d %b %Y %H:%M:%S GMT")
+        sft = ft.strftime("%Y-%m-%d %H:%M:%S")
+        url = urlparse.urlparse(url_str)
+        params = urlparse.parse_qs(url.query, False)
+
+        browser = get_browser(params["agent"][0])
+        #uid reqid ip nation size category language adid camp_id site slot cookie browser time
+
+        return "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (params["uid"][0],
+                                                                           params["reqid"][0], ip, params["nation"][0], params["size"][0], params["category"][0],
+                                                                           params["language"][0], params["adid"][0], params["camp_id"][0], params["site"], params["slot"][0],
+                                                                           params["cookie"][0], browser, sft)
+
+    except Exception, e:
+        print e
+    return None
+
 def parse_file(parser, source_file, output_file, mode="w"):
     if not os.path.isfile(source_file):
         print "%s not exsit"%source_file
@@ -389,7 +413,7 @@ if __name__ == '__main__':
             parse_search_file(yesterday, tdb_yesterday)
         elif sys.argv[1] == "ad_imp":
             parse_adimp_file(yesterday, tdb_yesterday)
-        elif sys.argv[1] == "nv" or sys.argv[1] == "gdp" or sys.argv[1] == "ac" or sys.argv[1] == "ad_feimp":
+        elif sys.argv[1] == "nv" or sys.argv[1] == "gdp" or sys.argv[1] == "ac" or sys.argv[1] == "ad_feimp" or sys.argv[1] == "ares":
             parse_default_file(sys.argv[1], yesterday, tdb_yesterday)
     elif len(sys.argv) == 5 and "single" == sys.argv[2]:
         func = None
