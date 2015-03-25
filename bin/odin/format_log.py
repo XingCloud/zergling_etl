@@ -296,16 +296,18 @@ def parse_ares_line(line):
         url = urlparse.urlparse(url_str)
         params = urlparse.parse_qs(url.query, False)
 
+        pid = params["size"][0].split(".")[1]
+
         browser = get_browser(params["agent"][0])
         #uid reqid ip nation size category language adid camp_id site slot cookie browser time
 
-        return "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (params["uid"][0],
-                                                                           params["reqid"][0], ip, params["nation"][0], params["size"][0], params["category"][0],
-                                                                           params["language"][0], params["adid"][0], params["camp_id"][0], params["site"], params["slot"][0],
-                                                                           params["cookie"][0], browser, sft)
+        return "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (params["uid"][0],
+                                                                               params["reqid"][0], ip, params["nation"][0], params["size"][0], params["category"][0],
+                                                                               params["language"][0], params["adid"][0], params["camp_id"][0], params["site"][0], pid,
+                                                                               params["slot"][0], params["cookie"][0], browser, sft)
 
     except Exception, e:
-        print e
+        print line
     return None
 
 def parse_file(parser, source_file, output_file, mode="w"):
@@ -428,5 +430,5 @@ if __name__ == '__main__':
         if func:
             parse_file(func, sys.argv[3], sys.argv[4])
     else:
-        print "Usage: type[search|nv|ad_imp|gdp] all (day)"
+        print "Usage: type[search|nv|ad_imp|gdp|ares] all (day)"
         sys.exit(-1)
