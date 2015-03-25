@@ -291,7 +291,7 @@ def parse_ares_line(line):
         ip = getIP(attrs[0].split(" ")[0])
         t = attrs[0].split("[")[1][:-2]
         url_str = attrs[1][4:]
-        ft = datetime.datetime.strptime(t, "%a, %d %b %Y %H:%M:%S GMT")
+        ft = (datetime.datetime.strptime(t, "%a, %d %b %Y %H:%M:%S GMT") + datetime.timedelta(hours=8))
         sft = ft.strftime("%Y-%m-%d %H:%M:%S")
         url = urlparse.urlparse(url_str)
         params = urlparse.parse_qs(url.query, False)
