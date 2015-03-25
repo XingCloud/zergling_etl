@@ -302,8 +302,7 @@ def parse_ares_line(line):
             site = params["site"][0]
             pid = site.split(".")[1]
 
-
-        browser = get_browser(params["agent"][0])
+        browser = get_browser(attrs[-2])
         #uid reqid ip nation size category language adid camp_id site slot cookie browser time
 
         return "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (params["uid"][0],
