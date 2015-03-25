@@ -296,7 +296,7 @@ def parse_ares_line(line):
         url = urlparse.urlparse(url_str)
         params = urlparse.parse_qs(url.query, False)
 
-        pid = params["size"][0].split(".")[1]
+        pid = params["site"][0].split(".")[1]
 
         browser = get_browser(params["agent"][0])
         #uid reqid ip nation size category language adid camp_id site slot cookie browser time
