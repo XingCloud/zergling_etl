@@ -296,18 +296,23 @@ def parse_ares_line(line):
         url = urlparse.urlparse(url_str)
         params = urlparse.parse_qs(url.query, False)
 
-        pid = params["site"][0].split(".")[1]
+        site = params["site"][0]
+        if site:
+            pid = site.split(".")[1]
+        else:
+            site = '\N'
+            pid = '\N'
 
         browser = get_browser(params["agent"][0])
         #uid reqid ip nation size category language adid camp_id site slot cookie browser time
 
         return "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (params["uid"][0],
-                                                                               params["reqid"][0], ip, params["nation"][0], params["size"][0], params["category"][0],
-                                                                               params["language"][0], params["adid"][0], params["camp_id"][0], params["site"][0], pid,
+                                                                               params["reqid"][0], ip, params["nation"][0].lower(), params["size"][0], params["category"][0],
+                                                                               params["language"][0], params["adid"][0], params["camp_id"][0], site, pid,
                                                                                params["slot"][0], params["cookie"][0], browser, sft)
 
     except Exception, e:
-        print line
+        print e
     return None
 
 def parse_file(parser, source_file, output_file, mode="w"):
