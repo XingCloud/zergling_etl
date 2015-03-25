@@ -298,7 +298,7 @@ def parse_ares_line(line):
 
         site = '\N'
         pid = '\N'
-        if len(params["site"]) > 0 :
+        if "site" in params :
             site = params["site"][0]
             pid = site.split(".")[1]
 
