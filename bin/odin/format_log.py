@@ -305,7 +305,7 @@ def parse_ares_line(line):
         browser = get_browser(attrs[-2])
 
         category = '\N'
-        if "category" in params["category"] and "undefined" != params["category"][0]:
+        if "category" in params and "undefined" != params["category"][0]:
             category = params["category"][0]
 
         #uid reqid ip nation size category language adid camp_id site slot cookie browser time
