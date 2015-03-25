@@ -17,6 +17,9 @@ hive -e " use odin;
     alter table ad_click add partition(day='$day') location '/user/hadoop/odin/ac/$day/';
     alter table ad_fe_imp add partition(day='$day') location '/user/hadoop/odin/ad_feimp/$day/'; "
 
+hive -e " use ares;
+    alter table ares_impression add partition(day='$day') location '/user/hadoop/odin/ares/$day/';"
+
 
 history=`date -d "80 days ago" +%Y%m%d`
 for project in nv search ad_imp ac ad_feimp
