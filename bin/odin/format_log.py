@@ -25,7 +25,7 @@ project_short = { "isearch.omiga-plus.com": "omiga-plus",
                   "www.do-search.com":"do-search",
                   "mystart.uninstallmaster.com":"uninstallmaster",
                   "mystart.vi-view.com":"vi-view",
-                  "www.qzone8.com":"qzone8",
+                  "www.qone8.com":"qone8",
                   "mystart.live-hotspot.com":"live-hotspot"
 }
 
