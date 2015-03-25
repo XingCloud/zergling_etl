@@ -296,12 +296,12 @@ def parse_ares_line(line):
         url = urlparse.urlparse(url_str)
         params = urlparse.parse_qs(url.query, False)
 
-        site = params["site"][0]
-        if site:
+        site = '\N'
+        pid = '\N'
+        if len(params["site"]) > 0 :
+            site = params["site"][0]
             pid = site.split(".")[1]
-        else:
-            site = '\N'
-            pid = '\N'
+
 
         browser = get_browser(params["agent"][0])
         #uid reqid ip nation size category language adid camp_id site slot cookie browser time
