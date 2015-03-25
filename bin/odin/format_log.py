@@ -303,10 +303,15 @@ def parse_ares_line(line):
             pid = site.split(".")[1]
 
         browser = get_browser(attrs[-2])
+
+        category = '\N'
+        if "category" in params["category"] and "undefined" != params["category"][0]:
+            category = params["category"][0]
+
         #uid reqid ip nation size category language adid camp_id site slot cookie browser time
 
         return "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (params["uid"][0],
-                                                                               params["reqid"][0], ip, params["nation"][0].lower(), params["size"][0], params["category"][0],
+                                                                               params["reqid"][0], ip, params["nation"][0].lower(), params["size"][0], category,
                                                                                params["language"][0], params["adid"][0], params["camp_id"][0], site, pid,
                                                                                params["slot"][0], params["cookie"][0], browser, sft)
 
