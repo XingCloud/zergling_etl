@@ -1,6 +1,9 @@
 # -*- coding:utf-8 -*-
 
 import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 import datetime
 import os
 import commands
@@ -332,7 +335,9 @@ def parse_ares_click_line(line):
         ip = getFieldValue(click, "ip")
         ts = click["ts"]
         clickid = click["clickid"]
-        nation = click["nation"].lower()
+        nation = click["nation"]
+        if not nation :
+            nation  = '\N'
         site = getFieldValue(click, "site")
         pid = getFieldValue(click, "src")
         monkey = getFieldValue(click, "monkey")
