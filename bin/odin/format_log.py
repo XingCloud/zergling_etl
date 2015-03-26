@@ -7,6 +7,7 @@ import commands
 import urllib
 import re
 import urlparse
+import json
 
 browsers = {"Opera":"Opera", "Chrome":"Chrome", "Firefox":"Firefox", "Safari":"Safari", "MSIE":"MSIE", "Trident":"MSIE"}
 project_short = { "isearch.omiga-plus.com": "omiga-plus",
@@ -320,6 +321,45 @@ def parse_ares_line(line):
         print e
     return None
 
+def parse_ares_click_line(line):
+    try:
+        click = json.loads(line)
+        time = datetime.datetime.fromtimestamp(float(str(click["ts"])[:10])).strftime("%Y-%m-%d %H:%M:%S")
+        uid = getFieldValue(click, "uid")
+        reqid = getFieldValue(click, "reqid")
+        camp_id = click["id"]
+        ad_id = getFieldValue(click, "ad")
+        ip = getFieldValue(click, "ip")
+        ts = click["ts"]
+        clickid = click["clickid"]
+        nation = click["nation"].lower()
+        site = getFieldValue(click, "site")
+        pid = getFieldValue(click, "src")
+        monkey = getFieldValue(click, "monkey")
+        sub1 = getFieldValue(click, "sub1")
+        sub2 = getFieldValue(click, "sub2")
+        network = getFieldValue(click, "network")
+        category = click["category"]
+        title = getFieldValue(click, "title")
+
+        #uid reqid camp_id ad_id ip time ts clickid nation site pid monkey sub1 sub2 network category title
+        return "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (uid,
+                                                                                       reqid, camp_id, ad_id, ip, time, ts, clickid, nation, site, pid, monkey,
+                                                                                       sub1, sub2, network, category, title)
+    except Exception, e:
+        print e
+        print line
+    return None
+
+def getFieldValue(obj, attrName):
+    if attrName in obj and obj[attrName]:
+        value = obj[attrName].strip()
+        if len(value) == 0:
+            return '\N'
+        return value
+    else:
+        return '\N'
+
 def parse_file(parser, source_file, output_file, mode="w"):
     if not os.path.isfile(source_file):
         print "%s not exsit"%source_file
@@ -425,7 +465,8 @@ if __name__ == '__main__':
             parse_search_file(yesterday, tdb_yesterday)
         elif sys.argv[1] == "ad_imp":
             parse_adimp_file(yesterday, tdb_yesterday)
-        elif sys.argv[1] == "nv" or sys.argv[1] == "gdp" or sys.argv[1] == "ac" or sys.argv[1] == "ad_feimp" or sys.argv[1] == "ares":
+        elif sys.argv[1] == "nv" or sys.argv[1] == "gdp" or sys.argv[1] == "ac" or sys.argv[1] == "ad_feimp" \
+            or sys.argv[1] == "ares" or sys.argv[1] == "ares_click":
             parse_default_file(sys.argv[1], yesterday, tdb_yesterday)
     elif len(sys.argv) == 5 and "single" == sys.argv[2]:
         func = None
