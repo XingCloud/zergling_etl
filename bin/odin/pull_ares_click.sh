@@ -9,7 +9,7 @@ else
     day=`date -d "1 days ago" +%Y%m%d`
 fi
 
-remotedf=`date -d '${day}' +%Y-%m-%d`
+remotedf=`date -d "${day}" +%Y-%m-%d`
 filename=click-${remotedf}.log.gz
 
 path=/data1/user_log/ares_click/${day}/
