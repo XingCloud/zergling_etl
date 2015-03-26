@@ -15,8 +15,9 @@ filename=click-${remotedf}.log.gz
 path=/data1/user_log/ares_click/${day}/
 mkdir -p ${path}
 cd ${path}
-`/usr/bin/lftp log:MhxzKhl1234.@click.v9.com  -e "cd /home/elex/apps/logs/ares.jumper/; get ${filename} ; quit;"`
+/usr/bin/lftp log:MhxzKhl1234.@click.v9.com  -e "cd /home/elex/apps/logs/ares.jumper/; get $filename ; quit;"
 
+cd ${path}
 gunzip ${filename}
 rm ${filename}
 
