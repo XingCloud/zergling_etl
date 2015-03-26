@@ -343,7 +343,8 @@ def parse_ares_click_line(line):
             pid = site.split(".")[1]
         else:
             pid = getFieldValue(click, "src")
-        monkey = getFieldValue(click, "monkey")
+
+        monkey = click("monkey")
         sub1 = getFieldValue(click, "sub1")
         sub2 = getFieldValue(click, "sub2")
         network = getFieldValue(click, "network")
