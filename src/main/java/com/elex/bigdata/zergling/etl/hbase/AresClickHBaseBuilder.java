@@ -88,8 +88,8 @@ public class AresClickHBaseBuilder implements HBaseBuilder {
     }
 
     private void putNotNull(Put put,byte[] cf,byte[] col,long time ,Object value){
-        if(value != null){
-            put.add(cf,col,time,Bytes.toBytes(value.toString()));
+        if(value != null && value.toString().trim().length() > 0){
+            put.add(cf,col,time,Bytes.toBytes(value.toString().trim()));
         }
     }
 
