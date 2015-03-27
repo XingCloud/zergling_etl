@@ -68,13 +68,13 @@ public class AresClickIndex extends BaseRegionObserver{
 
             byte[] key1 = Bytes.add(Bytes.toBytes("1" + day), put.getRow());
             byte[] key2 = Bytes.add(Bytes.toBytes("2" + day), put.get(adcf, projectCol).get(0).getValue(), put.getRow());
-            byte[] key3 = Bytes.add(Bytes.toBytes("3" + day), put.get(adcf, nationCol).get(0).getValueArray(), put.getRow());
+            byte[] key3 = Bytes.add(Bytes.toBytes("3" + day), put.get(adcf, nationCol).get(0).getValue(), put.getRow());
 
             byte[] cmpID = put.get(adcf, campIDCol).get(0).getValue();
             byte[] adID = null;
 
             if(put.has(adcf, adIDCol)){
-                adID = put.get(adcf, adIDCol).get(0).getValueArray();
+                adID = put.get(adcf, adIDCol).get(0).getValue();
             }
 
             HTable table = (HTable)conn.getTable(INDEX_TABLE);
