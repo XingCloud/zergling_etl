@@ -63,7 +63,7 @@ public class AresClickHBaseBuilder implements HBaseBuilder {
         String network = click.get("network").toString();
         String campID = click.get("id").toString();
 
-        long timestamp = Long.parseLong(click.get("ts").toString());
+        long timestamp = ((Double)click.get("ts")).longValue();
 
         byte[] rowKey = Bytes.toBytes(click.get("clickid").toString());
         Put put = new Put(rowKey);
