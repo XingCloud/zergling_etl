@@ -1,6 +1,7 @@
 package com.elex.bigdata.cp;
 
 import org.apache.hadoop.hbase.CoprocessorEnvironment;
+import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.coprocessor.BaseRegionObserver;
 import org.apache.hadoop.hbase.coprocessor.ObserverContext;
@@ -66,11 +67,10 @@ public class AresClickIndex extends BaseRegionObserver{
             String day = String.valueOf(c.get(Calendar.YEAR)) + monStr + dateStr;
 
             byte[] key1 = Bytes.add(Bytes.toBytes("1" + day), put.getRow());
-            byte[] key2 = Bytes.add(Bytes.toBytes("2" + day), Bytes.toBytes(Bytes.toString(put.get(adcf, projectCol).get(0).getValueArray())), put.getRow());
+            byte[] key2 = Bytes.add(Bytes.toBytes("2" + day), put.get(adcf, projectCol).get(0).getValue(), put.getRow());
             byte[] key3 = Bytes.add(Bytes.toBytes("3" + day), put.get(adcf, nationCol).get(0).getValueArray(), put.getRow());
 
-
-            byte[] cmpID = Bytes.toBytes(Bytes.toString(put.get(adcf, campIDCol).get(0).getValueArray()));
+            byte[] cmpID = put.get(adcf, campIDCol).get(0).getValue();
             byte[] adID = null;
 
             if(put.has(adcf, adIDCol)){
