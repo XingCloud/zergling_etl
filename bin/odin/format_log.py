@@ -338,6 +338,8 @@ def parse_ares_click_line(line):
         nation = click["nation"]
         if not nation :
             nation  = '\N'
+        else:
+            nation.lower()
         site = getFieldValue(click, "site")
         if site != '\N' and site != "blank" :
             pid = site.split(".")[1]
