@@ -7,10 +7,6 @@
   <groupId>com.elex.bigdata</groupId>
   <artifactId>zergling_etl</artifactId>
   <version>1.0</version>
-    <modules>
-        <module>coprocessor</module>
-    </modules>
-    <packaging>pom</packaging>
 
   <repositories>
     <repository>
