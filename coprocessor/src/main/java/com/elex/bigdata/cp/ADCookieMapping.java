@@ -41,10 +41,8 @@ public class ADCookieMapping extends BaseRegionObserver{
         conn = HConnectionManager.createConnection(env.getConfiguration());
     }
 
-
     @Override
-    public void postPut(final ObserverContext<RegionCoprocessorEnvironment> e,
-                        final Put put, final WALEdit edit, final boolean writeToWAL) throws IOException {
+    public void postPut(ObserverContext<RegionCoprocessorEnvironment> e, Put put, WALEdit edit, Durability durability) throws IOException {
         if(put.has(adcf,uidCol)){
 
             long time = put.get(adcf, uidCol).get(0).getTimestamp();
