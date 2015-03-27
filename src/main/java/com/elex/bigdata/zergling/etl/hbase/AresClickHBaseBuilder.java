@@ -23,7 +23,7 @@ public class AresClickHBaseBuilder implements HBaseBuilder {
     public static final Log Ares_LOG = LogFactory.getLog("ares");
 
     //ares_convs
-    private byte[] cf = Bytes.toBytes("click");
+    private byte[] cf = Bytes.toBytes("c");
     private byte[] uidCol = Bytes.toBytes("uid");
     private byte[] reqidCol = Bytes.toBytes("reqid");
     private byte[] nationCol = Bytes.toBytes("na");
