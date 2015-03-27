@@ -66,10 +66,11 @@ public class AresClickIndex extends BaseRegionObserver{
             String day = String.valueOf(c.get(Calendar.YEAR)) + monStr + dateStr;
 
             byte[] key1 = Bytes.add(Bytes.toBytes("1" + day), put.getRow());
-            byte[] key2 = Bytes.add(Bytes.toBytes("2" + day), put.get(adcf, projectCol).get(0).getValueArray(), put.getRow());
+            byte[] key2 = Bytes.add(Bytes.toBytes("2" + day), Bytes.toBytes(Bytes.toString(put.get(adcf, projectCol).get(0).getValueArray())), put.getRow());
             byte[] key3 = Bytes.add(Bytes.toBytes("3" + day), put.get(adcf, nationCol).get(0).getValueArray(), put.getRow());
 
-            byte[] cmpID = put.get(adcf, campIDCol).get(0).getValueArray();
+
+            byte[] cmpID = Bytes.toBytes(Bytes.toString(put.get(adcf, campIDCol).get(0).getValueArray()));
             byte[] adID = null;
 
             if(put.has(adcf, adIDCol)){
@@ -81,10 +82,10 @@ public class AresClickIndex extends BaseRegionObserver{
             put1.add(adcf,campIDCol,time,cmpID);
 
             Put put2 = new Put(key2);
-            put1.add(adcf,campIDCol,time,cmpID);
+            put2.add(adcf,campIDCol,time,cmpID);
 
             Put put3 = new Put(key3);
-            put1.add(adcf,campIDCol,time,cmpID);
+            put3.add(adcf,campIDCol,time,cmpID);
 
             if(adID != null){
                 put1.add(adcf, adIDCol, time, adID);
