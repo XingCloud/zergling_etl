@@ -11,5 +11,12 @@
 
     <artifactId>coprocessor</artifactId>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-server</artifactId>
+            <version>0.98.6-cdh5.3.2</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>
