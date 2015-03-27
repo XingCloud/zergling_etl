@@ -34,6 +34,11 @@ public enum LogType {
         public HBaseBuilder getBuilder() {
             return new GMLogHBaseBuilder();
         }
+    },ARES("ares"){
+        @Override
+        public HBaseBuilder getBuilder() {
+            return new AresClickHBaseBuilder();
+        }
     },NAV("nav"){
         @Override
         public HBaseBuilder getBuilder() {
