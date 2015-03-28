@@ -53,7 +53,7 @@ public class AresClickHBaseBuilder implements HBaseBuilder {
             nation = click.get("nation").toString().toLowerCase();
         }
         String pid = "xx";
-        if(click.get("src") == null && click.get("site") != null && "blank".equals(click.get("site"))){
+        if(click.get("src") == null && click.get("site") != null && !"blank".equals(click.get("site"))){
             pid = click.get("site").toString().split("\\.")[1];
         }else if(click.get("src") != null){
             pid = click.get("src").toString();
