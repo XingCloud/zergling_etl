@@ -21,6 +21,8 @@ cd ${path}
 gunzip ${filename}
 rm ${filename}
 
+/usr/java/jdk1.7.0_55/bin/java -jar /home/hadoop/git_project_home/zergling_etl/target/LogImport-jar-with-dependencies.jar ares ares_click ${path}/click-${remotedf}.log 12 2000 all
+
 echo "format ares click log"
 python $bin/format_log.py ares_click all ${day}
 echo "done"
