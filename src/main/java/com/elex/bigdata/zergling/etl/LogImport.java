@@ -89,7 +89,7 @@ public class LogImport {
         }
         for(Future<String> job : jobs){
             try {
-                job.get(3,TimeUnit.MINUTES);
+                job.get(2,TimeUnit.MINUTES);
                 System.out.print(".");
             } catch (InterruptedException e) {
                 error = true;
@@ -102,9 +102,7 @@ public class LogImport {
                 e.printStackTrace();
             } catch (TimeoutException e) {
                 error = true;
-                LOGGER.error(e.getMessage());
-                //TODO: 超时异常
-                e.printStackTrace();
+                throw e; //抛出异常，退出
             }
         }
 
