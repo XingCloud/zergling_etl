@@ -102,7 +102,10 @@ public class LogImport {
                 e.printStackTrace();
             } catch (TimeoutException e) {
                 error = true;
-                throw e; //抛出异常，退出
+                LOGGER.error(e.getMessage());
+                //TODO: 超时异常
+                e.printStackTrace();
+                break; //有错误跳出
             }
         }
 
