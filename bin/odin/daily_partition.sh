@@ -19,7 +19,7 @@ hive -e " use odin;
 
 hive -e " use ares;
     alter table ares_impression add partition(day='$day') location '/user/hadoop/odin/ares/$day/';
-    alter table ares_click add partition(day='$day') location '/user/hadoop/odin/ares_click/$day/';"
+    alter table ares_click_trans add partition(day='$day') location '/user/hadoop/ares/click_trans/$day/';"
 
 
 history=`date -d "80 days ago" +%Y%m%d`
