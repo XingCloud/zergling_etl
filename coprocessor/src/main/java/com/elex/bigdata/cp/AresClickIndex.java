@@ -49,7 +49,7 @@ public class AresClickIndex extends BaseRegionObserver{
         if(put.has(adcf,nationCol)){
 
             long time = put.get(adcf, nationCol).get(0).getTimestamp();
-            Calendar c = Calendar.getInstance();
+/*            Calendar c = Calendar.getInstance();
             c.setTimeInMillis(time);
 
             int month = c.get(Calendar.MONTH) + 1;
@@ -64,11 +64,11 @@ public class AresClickIndex extends BaseRegionObserver{
                 dateStr = "0" + dateStr;
             }
 
-            String day = String.valueOf(c.get(Calendar.YEAR)) + monStr + dateStr;
+            String day = String.valueOf(c.get(Calendar.YEAR)) + monStr + dateStr;*/
 
-            byte[] key1 = Bytes.add(Bytes.toBytes("1" + day), put.getRow());
-            byte[] key2 = Bytes.add(Bytes.toBytes("2" + day), put.get(adcf, projectCol).get(0).getValue(), put.getRow());
-            byte[] key3 = Bytes.add(Bytes.toBytes("3" + day), put.get(adcf, nationCol).get(0).getValue(), put.getRow());
+            byte[] key1 = Bytes.add(Bytes.toBytes("1"), Bytes.tail(put.getRow(), (put.getRow().length -8)));
+//            byte[] key2 = Bytes.add(Bytes.toBytes("2" + day), put.get(adcf, projectCol).get(0).getValue(), put.getRow());
+//            byte[] key3 = Bytes.add(Bytes.toBytes("3" + day), put.get(adcf, nationCol).get(0).getValue(), put.getRow());
 
             byte[] cmpID = put.get(adcf, campIDCol).get(0).getValue();
             byte[] adID = null;
@@ -80,23 +80,24 @@ public class AresClickIndex extends BaseRegionObserver{
             HTable table = (HTable)conn.getTable(INDEX_TABLE);
             Put put1 = new Put(key1);
             put1.add(adcf,campIDCol,time,cmpID);
+            put1.add(adcf, Bytes.toBytes("day"), time, Bytes.head(put.getRow(), 8));
 
-            Put put2 = new Put(key2);
-            put2.add(adcf,campIDCol,time,cmpID);
-
-            Put put3 = new Put(key3);
-            put3.add(adcf,campIDCol,time,cmpID);
+//            Put put2 = new Put(key2);
+//            put2.add(adcf,campIDCol,time,cmpID);
+//
+//            Put put3 = new Put(key3);
+//            put3.add(adcf,campIDCol,time,cmpID);
 
             if(adID != null){
                 put1.add(adcf, adIDCol, time, adID);
-                put2.add(adcf, adIDCol, time, adID);
-                put3.add(adcf, adIDCol, time, adID);
+//                put2.add(adcf, adIDCol, time, adID);
+//                put3.add(adcf, adIDCol, time, adID);
             }
 
             List<Put> puts = new ArrayList<Put>();
             puts.add(put1);
-            puts.add(put2);
-            puts.add(put3);
+//            puts.add(put2);
+//            puts.add(put3);
             table.put(puts);
 
             table.close();

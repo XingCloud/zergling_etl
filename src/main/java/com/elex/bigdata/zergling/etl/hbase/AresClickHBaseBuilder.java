@@ -65,7 +65,7 @@ public class AresClickHBaseBuilder implements HBaseBuilder {
 
         long timestamp = ((Double)click.get("ts")).longValue();
 
-        byte[] rowKey = Bytes.toBytes(click.get("clickid").toString());
+        byte[] rowKey = Bytes.add(Bytes.toBytes(getDay(timestamp)), Bytes.toBytes(click.get("clickid").toString()));
         Put put = new Put(rowKey);
         put.add(cf, uidCol, timestamp, Bytes.toBytes(uid));
         put.add(cf, reqidCol, timestamp, Bytes.toBytes(reqid));
@@ -91,6 +91,25 @@ public class AresClickHBaseBuilder implements HBaseBuilder {
         if(value != null && value.toString().trim().length() > 0){
             put.add(cf,col,time,Bytes.toBytes(value.toString().trim()));
         }
+    }
+
+    private String getDay(long ts){
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(ts);
+
+        int month = c.get(Calendar.MONTH) + 1;
+        String monStr = String.valueOf(month);
+        if(month < 10){
+            monStr = "0" + monStr;
+        }
+
+        int date = c.get(Calendar.DATE);
+        String dateStr = String.valueOf(date);
+        if(date <10){
+            dateStr = "0" + dateStr;
+        }
+
+        return String.valueOf(c.get(Calendar.YEAR)) + monStr + dateStr;
     }
 
 }
