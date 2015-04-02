@@ -89,18 +89,27 @@ def count_ares_imp(day):
         fields terminated by '\t'
     '''
     data_path = "/data1/odin/ares_imp"
+
+    day7 = (datetime.datetime.strptime(day, "%Y%m%d") + datetime.timedelta(days=-6)).strftime("%Y%m%d")
+
     nation_sql = head + "SELECT cpid, upper(nation),count(1) FROM ares.ares_impression LATERAL VIEW explode(split(camp_id, ',')) t1 AS cpid " \
-                        "where day = '%s' and nation <> 'undefined' group by cpid, nation" % day
+                        "where day >= '%s' and day<= '%s' and nation <> 'undefined' group by cpid, nation"
     nation_site_sql = head + "SELECT cpid, upper(nation),site, count(1) FROM ares.ares_impression LATERAL VIEW explode(split(camp_id, ',')) t1 AS cpid " \
-                             "where day = '%s' and  nation <> 'undefined' and site is not null group by cpid, nation,site" % day
+                             "where day >= '%s' and day<= '%s' and  nation <> 'undefined' and site is not null group by cpid, nation,site"
     nation_site_slot_sql = head + "SELECT cpid, upper(nation),site, slot, count(1) FROM ares.ares_impression LATERAL VIEW explode(split(camp_id, ',')) t1 AS cpid " \
-                                  "where day = '%s' and nation <> 'undefined' and site is not null and slot is not null group by cpid, nation,site,slot" % day
+                                  "where day >= '%s' and day<= '%s' and nation <> 'undefined' and site is not null and slot is not null group by cpid, nation,site,slot"
 
     try:
-        os.system("mkdir /data1/ares/%s" % day)
-        execute_query(data_path, nation_sql, "/data1/ares/%s/nation.dat" % day)
-        execute_query(data_path, nation_site_sql, "/data1/ares/%s/nation_site.dat" % day)
-        execute_query(data_path, nation_site_slot_sql, "/data1/ares/%s/nation_site_slot.dat" % day)
+        os.system("mkdir -p /data1/ares/%s/imp_1" % day)
+        os.system("mkdir -p /data1/ares/%s/imp_7" % day)
+        # 1 day
+        execute_query(data_path, nation_sql % (day, day), "/data1/ares/%s/imp_1/nation.dat" % day)
+        execute_query(data_path, nation_site_sql % (day, day), "/data1/ares/%s/imp_1/nation_site.dat" % day)
+        execute_query(data_path, nation_site_slot_sql % (day, day), "/data1/ares/%s/imp_1/nation_site_slot.dat" % day)
+        # 7 day
+        execute_query(data_path, nation_sql % (day, day7), "/data1/ares/%s/imp_7/nation.dat" % day)
+        execute_query(data_path, nation_site_sql % (day, day7), "/data1/ares/%s/imp_7/nation_site.dat" % day)
+        execute_query(data_path, nation_site_slot_sql % (day, day7), "/data1/ares/%s/imp_7/nation_site_slot.dat" % day)
     except Exception, e:
         print str(e)
         sendMail("export eares impression data failed", str(e), aeros_mailto_list)
