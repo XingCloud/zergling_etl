@@ -93,11 +93,11 @@ def count_ares_imp(day):
     day7 = (datetime.datetime.strptime(day, "%Y%m%d") + datetime.timedelta(days=-6)).strftime("%Y%m%d")
 
     nation_sql = head + "SELECT cpid, upper(nation),count(1) FROM ares.ares_impression LATERAL VIEW explode(split(camp_id, ',')) t1 AS cpid " \
-                        "where day >= '%s' and day<= '%s' and nation <> 'undefined' group by cpid, nation"
+                        "where day >= '%s' and day<= '%s' and nation <> 'undefined' and nation is not null group by cpid, nation"
     nation_site_sql = head + "SELECT cpid, upper(nation),site, count(1) FROM ares.ares_impression LATERAL VIEW explode(split(camp_id, ',')) t1 AS cpid " \
-                             "where day >= '%s' and day<= '%s' and  nation <> 'undefined' and site is not null group by cpid, nation,site"
+                             "where day >= '%s' and day<= '%s' and  nation <> 'undefined' and nation is not null and site is not null group by cpid, nation,site"
     nation_site_slot_sql = head + "SELECT cpid, upper(nation),site, slot, count(1) FROM ares.ares_impression LATERAL VIEW explode(split(camp_id, ',')) t1 AS cpid " \
-                                  "where day >= '%s' and day<= '%s' and nation <> 'undefined' and site is not null and slot is not null group by cpid, nation,site,slot"
+                                  "where day >= '%s' and day<= '%s' and nation <> 'undefined' and nation is not null and site is not null and slot is not null group by cpid, nation,site,slot"
 
     try:
         os.system("mkdir -p /data1/ares/%s/imp_1" % day)
