@@ -89,7 +89,7 @@ public class LogImport {
         }
         for(Future<String> job : jobs){
             try {
-                job.get(2,TimeUnit.MINUTES);
+                job.get(1,TimeUnit.MINUTES);
                 System.out.print(".");
             } catch (InterruptedException e) {
                 error = true;
