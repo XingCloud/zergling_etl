@@ -107,9 +107,9 @@ def count_ares_imp(day):
         execute_query(data_path, nation_site_sql % (day, day), "/data1/ares/%s/imp_1/nation_site.dat" % day)
         execute_query(data_path, nation_site_slot_sql % (day, day), "/data1/ares/%s/imp_1/nation_site_slot.dat" % day)
         # 7 day
-        execute_query(data_path, nation_sql % (day, day7), "/data1/ares/%s/imp_7/nation.dat" % day)
-        execute_query(data_path, nation_site_sql % (day, day7), "/data1/ares/%s/imp_7/nation_site.dat" % day)
-        execute_query(data_path, nation_site_slot_sql % (day, day7), "/data1/ares/%s/imp_7/nation_site_slot.dat" % day)
+        execute_query(data_path, nation_sql % (day7, day), "/data1/ares/%s/imp_7/nation.dat" % day)
+        execute_query(data_path, nation_site_sql % (day7, day), "/data1/ares/%s/imp_7/nation_site.dat" % day)
+        execute_query(data_path, nation_site_slot_sql % (day7, day), "/data1/ares/%s/imp_7/nation_site_slot.dat" % day)
     except Exception, e:
         print str(e)
         sendMail("export eares impression data failed", str(e), aeros_mailto_list)
