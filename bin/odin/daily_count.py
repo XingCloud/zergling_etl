@@ -10,6 +10,7 @@ mailto_list = ["liqiang@xingcloud.com","zhangyi1942@gmail.com","chengen@elex-tec
 mail_host = "smtp.qq.com"
 mail_user = "xamonitor@xingcloud.com"
 mail_pass = "22C1NziwxZI5F"
+aeros_mailto_list = ["liqiang@xingcloud.com"]
 
 sql = '''
 insert overwrite local directory '/data1/odin/dayily_count'
@@ -29,23 +30,24 @@ select tv.pid,tv.pv,tv.pr,tv.pu,ts.sv,ts.sr,ts.su,ti.iv,ti.ir,ti.iu,tc.cv,tc.cr,
 (select 'total' pid, count(*) cv, count(distinct reqid) cr, '' cu from odin.ad_click where day='%s') tc on tc.pid = ti.pid ) tmp
 '''
 
-def sendMail(subject,content, filename):
+def sendMail(subject,content, mailto, filename):
     me="xamonitor@xingcloud.com"
     msg = email.MIMEMultipart.MIMEMultipart()
     msg['Subject'] = "odin daily log count " + subject
     msg['From'] = "liqiang@xingcloud.com"
-    msg['To'] = ";".join(mailto_list)
+    msg['To'] = ";".join(mailto)
     try:
         text_msg = email.MIMEText.MIMEText(content)
         msg.attach(text_msg)
 
-        for f in filename:
-            msg.attach(attach_file(f))
+        if filename:
+            for f in filename:
+                msg.attach(attach_file(f))
 
         s = smtplib.SMTP()
         s.connect(mail_host)
         s.login(mail_user, mail_pass)
-        s.sendmail(me, mailto_list, msg.as_string())
+        s.sendmail(me, mailto, msg.as_string())
         s.close()
         return True
     except Exception, e:
@@ -77,13 +79,48 @@ def count_odin(day):
     print 'cat /data1/odin/dayily_count/0000* >> /data1/odin/odin_count_%s.csv' % day
     os.system('cat /data1/odin/dayily_count/0000* >> /data1/odin/odin_count_%s.csv' % day)
     print 'send mail /data1/odin/odin_count_%s.csv '%day
-    sendMail(day,'',['/data1/odin/odin_count_%s.csv' % day])
+    sendMail(day,'',mailto_list,['/data1/odin/odin_count_%s.csv' % day])
+
+def count_ares_imp(day):
+    head = '''
+        insert overwrite local directory '/data1/odin/ares_imp'
+        row format delimited
+        fields terminated by '\t'
+    '''
+    data_path = "/data1/odin/ares_imp"
+    nation_sql = head + "SELECT cpid, upper(nation),count(1) FROM ares.ares_impression LATERAL VIEW explode(split(camp_id, ',')) t1 AS cpid where day = '%s' group by cpid, nation" % day
+    nation_site_sql = head + "SELECT cpid, upper(nation),site, count(1) FROM ares.ares_impression LATERAL VIEW explode(split(camp_id, ',')) t1 AS cpid where day = '%s' group by cpid, nation,site" % day
+    nation_site_slot_sql = head + "SELECT cpid, upper(nation),site, slot, count(1) FROM ares.ares_impression LATERAL VIEW explode(split(camp_id, ',')) t1 AS cpid where day = '%s' group by cpid, nation,site,slot" % day
+
+    try:
+        os.system("mkdir /data1/ares/%s" % day)
+        execute_query(data_path, nation_sql, "/data1/ares/%s/nation.dat" % day)
+        execute_query(data_path, nation_site_sql, "/data1/ares/%s/nation_site.dat" % day)
+        execute_query(data_path, nation_site_slot_sql, "/data1/ares/%s/nation_site_slot.dat" % day)
+    except Exception, e:
+        print str(e)
+        sendMail("export eares impression data failed", str(e), aeros_mailto_list)
+
+    expired_day = (datetime.datetime.now() + datetime.timedelta(days=-7)).strftime("%Y%m%d")
+    os.system("rm -rf /data1/ares/%s/" % expired_day)
+
+def execute_query(data_path, sql, outputname):
+    print "hive -e \"%s\"" % sql
+    os.system("hive -e \"%s\"" % sql)
+    os.system("cat %s/000* > %s" % (data_path, outputname))
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        day = sys.argv[1]
-    else:
+    if len(sys.argv) == 3:
+        data_type = sys.argv[1]
+        day = sys.argv[2]
+    elif len(sys.argv == 2):
+        data_type = sys.argv[1]
         day = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y%m%d")
 
-    count_odin(day)
+    if "odin" == data_type:
+        count_odin(day)
+    elif "ares" == data_type:
+        count_ares_imp(day)
+
+
 
