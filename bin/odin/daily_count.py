@@ -90,11 +90,11 @@ def count_ares_imp(day):
     '''
     data_path = "/data1/odin/ares_imp"
     nation_sql = head + "SELECT cpid, upper(nation),count(1) FROM ares.ares_impression LATERAL VIEW explode(split(camp_id, ',')) t1 AS cpid " \
-                        "where day = '%s' and nation <> 'UNDEFINED' group by cpid, nation" % day
+                        "where day = '%s' and nation <> 'undefined' group by cpid, nation" % day
     nation_site_sql = head + "SELECT cpid, upper(nation),site, count(1) FROM ares.ares_impression LATERAL VIEW explode(split(camp_id, ',')) t1 AS cpid " \
-                             "where day = '%s' and  nation <> 'UNDEFINED' and site is not null group by cpid, nation,site" % day
+                             "where day = '%s' and  nation <> 'undefined' and site is not null group by cpid, nation,site" % day
     nation_site_slot_sql = head + "SELECT cpid, upper(nation),site, slot, count(1) FROM ares.ares_impression LATERAL VIEW explode(split(camp_id, ',')) t1 AS cpid " \
-                                  "where day = '%s' and nation <> 'UNDEFINED' and site is not null and slot is not null group by cpid, nation,site,slot" % day
+                                  "where day = '%s' and nation <> 'undefined' and site is not null and slot is not null group by cpid, nation,site,slot" % day
 
     try:
         os.system("mkdir /data1/ares/%s" % day)
