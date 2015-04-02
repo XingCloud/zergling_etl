@@ -82,7 +82,7 @@ def count_odin(day):
     sendMail(day,'',mailto_list,['/data1/odin/odin_count_%s.csv' % day])
 
 def count_ares_imp(day):
-    print "begin count %s ares impression %s" % (day,datetime.now())
+    print "begin count %s ares impression %s" % (day,datetime.datetime.now())
     head = '''
         insert overwrite local directory '/data1/odin/ares_imp'
         row format delimited
@@ -104,7 +104,7 @@ def count_ares_imp(day):
 
     expired_day = (datetime.datetime.now() + datetime.timedelta(days=-7)).strftime("%Y%m%d")
     os.system("rm -rf /data1/ares/%s/" % expired_day)
-    print "end count %s ares impression %s" % (day,datetime.now())
+    print "end count %s ares impression %s" % (day,datetime.datetime.now())
 
 def execute_query(data_path, sql, outputname):
     print "hive -e \"%s\"" % sql
