@@ -115,7 +115,7 @@ if __name__ == '__main__':
     if len(sys.argv) == 3:
         data_type = sys.argv[1]
         day = sys.argv[2]
-    elif len(sys.argv == 2):
+    elif len(sys.argv) == 2:
         data_type = sys.argv[1]
         day = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y%m%d")
 
