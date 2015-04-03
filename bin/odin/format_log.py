@@ -336,7 +336,7 @@ def parse_ares_click_line(line):
         ts = click["ts"]
         clickid = click["clickid"]
         nation = click["nation"]
-        if not nation :
+        if not nation or len(nation) != 2:
             nation  = '\N'
         else:
             nation.lower()
