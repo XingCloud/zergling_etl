@@ -313,11 +313,19 @@ def parse_ares_line(line):
         if "category" in params and "undefined" != params["category"][0]:
             category = params["category"][0]
 
+        nation = params["nation"][0].lower()
+        if len(nation) != 2:
+            nation = '\N'
+
+        lang = params["language"][0]
+        if len(lang) > 5:
+            lang = '\N'
+
         #uid reqid ip nation size category language adid camp_id site slot cookie browser time
 
         return "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (params["uid"][0],
-                                                                               params["reqid"][0], ip, params["nation"][0].lower(), params["size"][0], category,
-                                                                               params["language"][0], params["adid"][0], params["camp_id"][0], site, pid,
+                                                                               params["reqid"][0], ip, nation, params["size"][0], category,
+                                                                               lang, params["adid"][0], params["camp_id"][0], site, pid,
                                                                                params["slot"][0], params["cookie"][0], browser, sft)
 
     except Exception, e:
