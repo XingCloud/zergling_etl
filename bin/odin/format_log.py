@@ -321,12 +321,16 @@ def parse_ares_line(line):
         if len(lang) > 5:
             lang = '\N'
 
+        hit = "\N"
+        if "hit" in params:
+            hit = params["hit"][0]
+
         #uid reqid ip nation size category language adid camp_id site slot cookie browser time
 
-        return "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (params["uid"][0],
+        return "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (params["uid"][0],
                                                                                params["reqid"][0], ip, nation, params["size"][0], category,
                                                                                lang, params["adid"][0], params["camp_id"][0], site, pid,
-                                                                               params["slot"][0], params["cookie"][0], browser, sft)
+                                                                               params["slot"][0], params["cookie"][0], browser, sft, hit)
 
     except Exception, e:
         print e
