@@ -3,6 +3,7 @@ package com.elex.bigdata.zergling.etl.hbase;
 import com.elex.bigdata.zergling.etl.ETLConstants;
 import com.elex.bigdata.zergling.etl.ETLUtils;
 import com.elex.bigdata.zergling.etl.model.LogType;
+import com.google.common.base.Splitter;
 import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -10,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import java.net.URL;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -28,6 +30,7 @@ public class AresClickHBaseBuilder implements HBaseBuilder {
     private byte[] reqidCol = Bytes.toBytes("reqid");
     private byte[] nationCol = Bytes.toBytes("na");
     private byte[] pidCol = Bytes.toBytes("pid");
+    private byte[] hitCol = Bytes.toBytes("hit");
     private byte[] netWrokCol = Bytes.toBytes("nw");
     private byte[] campIDCol = Bytes.toBytes("camp");
     private byte[] adIDCol = Bytes.toBytes("ad");
@@ -59,6 +62,11 @@ public class AresClickHBaseBuilder implements HBaseBuilder {
             pid = click.get("src").toString();
         }
 
+        String referer = click.get("referer").toString();
+        URL url = new URL(referer);
+        final Map<String, String> map = Splitter.on('&').trimResults().withKeyValueSeparator("=").split(url.getQuery());
+        String hit = map.get("hit");
+
         String category = click.get("category").toString();
         String network = click.get("network").toString();
         String campID = click.get("id").toString();
@@ -75,6 +83,7 @@ public class AresClickHBaseBuilder implements HBaseBuilder {
         put.add(cf, netWrokCol, timestamp, Bytes.toBytes(network));
         put.add(cf, categoryCol, timestamp, Bytes.toBytes(category));
         putNotNull(put, cf, adIDCol, timestamp, click.get("ad"));
+        putNotNull(put, cf, hitCol, timestamp, hit);
         putNotNull(put, cf, titleCol, timestamp, click.get("title"));
         putNotNull(put, cf, monekeyCol, timestamp, click.get("monkey"));
         putNotNull(put, cf, sub1Col,  timestamp, click.get("sub1"));
