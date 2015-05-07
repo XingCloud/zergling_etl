@@ -173,7 +173,15 @@
       <artifactId>hashing</artifactId>
       <version>1.0</version>
     </dependency>
-      <dependency>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>18.0</version>
+    </dependency>
+
+
+    <dependency>
           <groupId>com.google.code.gson</groupId>
           <artifactId>gson</artifactId>
           <version>2.1</version>
