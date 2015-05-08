@@ -62,11 +62,6 @@ public class AresClickHBaseBuilder implements HBaseBuilder {
             pid = click.get("src").toString();
         }
 
-        String referer = click.get("referer").toString();
-        URL url = new URL(referer);
-        final Map<String, String> map = Splitter.on('&').trimResults().withKeyValueSeparator("=").split(url.getQuery());
-        String hit = map.get("hit");
-
         String category = click.get("category").toString();
         String network = click.get("network").toString();
         String campID = click.get("id").toString();
@@ -83,7 +78,7 @@ public class AresClickHBaseBuilder implements HBaseBuilder {
         put.add(cf, netWrokCol, timestamp, Bytes.toBytes(network));
         put.add(cf, categoryCol, timestamp, Bytes.toBytes(category));
         putNotNull(put, cf, adIDCol, timestamp, click.get("ad"));
-        putNotNull(put, cf, hitCol, timestamp, hit);
+        putNotNull(put, cf, hitCol, timestamp, click.get("hit"));
         putNotNull(put, cf, titleCol, timestamp, click.get("title"));
         putNotNull(put, cf, monekeyCol, timestamp, click.get("monkey"));
         putNotNull(put, cf, sub1Col,  timestamp, click.get("sub1"));
